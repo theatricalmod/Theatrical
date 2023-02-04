@@ -1,0 +1,11 @@
+{
+  "artneti.dmxUniverse": "DMX Universe",
+  "artneti.ipAddress": "IP Address",
+  "artneti.save": "Save",
+  "block.theatrical.artnet_interface": "ArtNet Interface",
+  "block.theatrical.moving_light": "Moving Light",
+  "block.theatrical.pipe": "Rigging Pipe",
+  "fixture.dmxStart": "DMX Address",
+  "itemGroup.theatrical.theatrical": "Theatrical",
+  "screen.movinglight": "Moving Light"
+}

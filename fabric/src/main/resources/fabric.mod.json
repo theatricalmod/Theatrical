@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "id": "theatrical",
+  "version": "${version}",
+  "name": "Theatrical",
+  "description": "Theatrical, bringing the theatre to Minecraft.",
+  "authors": [
+    "Rushmead"
+  ],
+  "contact": {
+    "homepage": "https://github.com/theatricalmod",
+    "sources": "https://github.com/theatricalmod"
+  },
+  "license": "Apache-2.0",
+  "icon": "assets/theatrical/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "dev.imabad.theatrical.fabric.TheatricalFabric"
+    ],
+    "client": [
+      "dev.imabad.theatrical.fabric.TheatricalClientFabric"
+    ]
+  },
+  "mixins": ["theatrical.mixins.json"],
+  "depends": {
+    "fabric": "*",
+    "minecraft": ">=1.19.2",
+    "architectury": ">=6.2.43"
+  }
+}

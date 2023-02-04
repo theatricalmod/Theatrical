@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=north": {"model":  "theatrical:block/pipe", "y":  90},
+    "facing=south": {"model":  "theatrical:block/pipe", "y": 90},
+    "facing=west": {"model":  "theatrical:block/pipe"},
+    "facing=east": {"model":  "theatrical:block/pipe"}
+  }
+}

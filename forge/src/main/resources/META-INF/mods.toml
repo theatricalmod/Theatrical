@@ -1,0 +1,35 @@
+modLoader = "javafml"
+loaderVersion = "[43,)"
+#issueTrackerURL = ""
+license = "Apache-2.0"
+
+[[mods]]
+modId = "theatrical"
+version = "${version}"
+displayName = "Theatrical"
+authors = "Rushmead"
+description = '''
+Theatrical, bringing the theatre to Minecraft.
+'''
+#logoFile = ""
+
+[[dependencies.theatrical]]
+modId = "forge"
+mandatory = true
+versionRange = "[43,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.theatrical]]
+modId = "minecraft"
+mandatory = true
+versionRange = "[1.19.2,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.theatrical]]
+modId = "architectury"
+mandatory = true
+versionRange = "[6.2.43,)"
+ordering = "AFTER"
+side = "BOTH"

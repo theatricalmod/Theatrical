@@ -1,0 +1,22 @@
+{
+	"textures": {
+		"0": "theatrical:block/moving_head_whole",
+		"2": "theatrical:block/moving_head_body",
+		"particle": "theatrical:block/light_side"
+	},
+	"elements": [
+		{
+			"name": "Base",
+			"from": [2, 0, 2],
+			"to": [14, 3, 14],
+			"faces": {
+				"north": {"uv": [3, 3, 6, 3.75], "texture": "#0"},
+				"east": {"uv": [9, 3, 12, 3.75], "texture": "#0"},
+				"south": {"uv": [9, 3, 12, 3.75], "texture": "#0"},
+				"west": {"uv": [9, 3, 12, 3.75], "texture": "#0"},
+				"up": {"uv": [3, 0, 6, 3], "texture": "#0"},
+				"down": {"uv": [6, 0, 9, 3], "texture": "#0"}
+			}
+		}
+	]
+}

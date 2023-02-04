@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "theatrical:block/artnet_interface"
+    }
+  }
+}
