@@ -11,8 +11,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
 public class SendArtNetData extends BaseC2SMessage {
-
-
     private BlockPos pos;
     private byte[] artNetData;
 
@@ -42,7 +40,9 @@ public class SendArtNetData extends BaseC2SMessage {
         Level level = context.getPlayer().level;
         BlockEntity be = level.getBlockEntity(pos);
         if(be instanceof ArtNetInterfaceBlockEntity artnetInterface) {
-            artnetInterface.update(artNetData);
+            if(level.getServer() != null && context.getPlayer().hasPermissions(level.getServer().getOperatorUserPermissionLevel())){
+                artnetInterface.update(artNetData);
+            }
         }
     }
 }

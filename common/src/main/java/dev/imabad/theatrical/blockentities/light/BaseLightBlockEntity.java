@@ -1,5 +1,6 @@
 package dev.imabad.theatrical.blockentities.light;
 
+import dev.architectury.injectables.annotations.ExpectPlatform;
 import dev.imabad.theatrical.api.FixtureProvider;
 import dev.imabad.theatrical.blockentities.ClientSyncBlockEntity;
 import dev.imabad.theatrical.blocks.HangableBlock;
@@ -18,12 +19,13 @@ import net.minecraft.world.level.block.LightBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 
 public abstract class BaseLightBlockEntity extends ClientSyncBlockEntity implements FixtureProvider {
-
+    AABB INFINITE_EXTENT_AABB = new AABB(Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
     private double distance = 0;
     protected int pan, tilt, focus, intensity, red, green, blue = 0;
     protected int prevTilt, prevPan, prevFocus, prevIntensity, prevRed, prevGreen, prevBlue = 0;
@@ -76,6 +78,10 @@ public abstract class BaseLightBlockEntity extends ClientSyncBlockEntity impleme
 
     public double getDistance() {
         return distance;
+    }
+
+    public AABB getRenderBoundingBox(){
+        return INFINITE_EXTENT_AABB;
     }
 
     protected boolean storePrev(){

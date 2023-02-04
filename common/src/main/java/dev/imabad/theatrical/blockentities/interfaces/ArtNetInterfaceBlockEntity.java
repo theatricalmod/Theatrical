@@ -1,5 +1,6 @@
 package dev.imabad.theatrical.blockentities.interfaces;
 
+import com.mojang.util.UUIDTypeAdapter;
 import dev.imabad.theatrical.TheatricalClient;
 import dev.imabad.theatrical.api.dmx.DMXConsumer;
 import dev.imabad.theatrical.blockentities.BaseBlockEntity;
@@ -8,6 +9,7 @@ import dev.imabad.theatrical.blockentities.ClientSyncBlockEntity;
 import dev.imabad.theatrical.config.TheatricalConfig;
 import dev.imabad.theatrical.dmx.DMXNetworkData;
 import dev.imabad.theatrical.net.SendArtNetData;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -21,6 +23,8 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.UUID;
+
 public class ArtNetInterfaceBlockEntity extends ClientSyncBlockEntity {
     public static <T extends BlockEntity> void tick(Level level, BlockPos pos, BlockState state, T be) {
         ArtNetInterfaceBlockEntity tile = (ArtNetInterfaceBlockEntity) be;
@@ -30,14 +34,17 @@ public class ArtNetInterfaceBlockEntity extends ClientSyncBlockEntity {
 //                // dothings
 //
 //            }
-            byte[] data = TheatricalClient.getArtNetManager().getClient(tile.ip).readDmxData(tile.subnet, tile.universe);
-            new SendArtNetData(pos, data).sendToServer();
+            if(tile.ownerUUID != null && tile.ownerUUID.equals(UUIDTypeAdapter.fromString(Minecraft.getInstance().getUser().getUuid()))){
+                byte[] data = TheatricalClient.getArtNetManager().getClient(tile.ip).readDmxData(tile.subnet, tile.universe);
+                new SendArtNetData(pos, data).sendToServer();
+            }
 //            tile.tickTimer = 0;
         }
     }
 
     private int subnet, universe, tickTimer = 0;
     private String ip = "127.0.0.1";
+    private UUID ownerUUID;
     public ArtNetInterfaceBlockEntity(BlockPos blockPos, BlockState blockState) {
         super(BlockEntities.ART_NET_INTERFACE.get(), blockPos, blockState);
     }
@@ -47,6 +54,7 @@ public class ArtNetInterfaceBlockEntity extends ClientSyncBlockEntity {
         compoundTag.putString("ip", ip);
         compoundTag.putInt("subnet", subnet);
         compoundTag.putInt("universe", universe);
+        compoundTag.putUUID("ownerUUID", ownerUUID);
     }
 
     @Override
@@ -54,6 +62,7 @@ public class ArtNetInterfaceBlockEntity extends ClientSyncBlockEntity {
         this.ip = compoundTag.getString("ip");
         this.subnet = compoundTag.getInt("subnet");
         this.universe = compoundTag.getInt("universe");
+        this.ownerUUID = compoundTag.getUUID("ownerUUID");
     }
 
     public void update(byte[] data) {
@@ -77,5 +86,9 @@ public class ArtNetInterfaceBlockEntity extends ClientSyncBlockEntity {
         this.ip = ipAddress;
         this.universe = dmxUniverse;
         level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
+    }
+
+    public void setOwnerUUID(UUID ownerUUID) {
+        this.ownerUUID = ownerUUID;
     }
 }

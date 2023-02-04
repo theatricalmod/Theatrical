@@ -27,4 +27,6 @@ public abstract class BaseLightBlock extends HangableBlock implements EntityBloc
     public boolean propagatesSkylightDown(BlockState blockState, BlockGetter blockGetter, BlockPos blockPos) {
         return true;
     }
+
+
 }
