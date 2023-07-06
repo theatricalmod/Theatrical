@@ -1,5 +1,5 @@
 plugins {
-    id "com.github.johnrengelman.shadow" version "7.1.2"
+    id "com.github.johnrengelman.shadow" version "7.0.0"
 }
 
 architectury {
@@ -31,8 +31,8 @@ dependencies {
     shadowCommon(project(path: ":common", configuration: "transformProductionFabric")) { transitive false }
 
     //ArtNet
-    implementation files("../libs/artnet4j-0.6.1.jar")
-    shadowCommon files("../libs/artnet4j-0.6.1.jar")
+    implementation "ch.bildspur:artnet4j:0.6.2"
+    shadowCommon "ch.bildspur:artnet4j:0.6.2"
 
     //YAML
     implementation "org.yaml:snakeyaml:1.33"
@@ -51,7 +51,7 @@ shadowJar {
     exclude "architectury.common.json"
 
     configurations = [project.configurations.shadowCommon]
-    classifier "dev-shadow"
+    archiveClassifier = "dev-shadow"
 }
 
 remapJar {
@@ -59,11 +59,11 @@ remapJar {
     input.set shadowJar.archiveFile
     dependsOn shadowJar
     archiveBaseName.set "${rootProject.archives_base_name}-${project.name}"
-    classifier null
+    archiveClassifier = null
 }
 
 jar {
-    classifier "dev"
+    archiveClassifier = "dev"
 }
 
 sourcesJar {

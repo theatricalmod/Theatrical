@@ -18,8 +18,8 @@ dependencies {
     modApi "dev.architectury:architectury:${rootProject.architectury_version}"
 
     //Artnet
-    implementation files("../libs/artnet4j-0.6.1.jar")
-    shadowCommon files("../libs/artnet4j-0.6.1.jar")
+    implementation "ch.bildspur:artnet4j:0.6.2"
+    shadowCommon "ch.bildspur:artnet4j:0.6.2"
 
     //YAML
     implementation "org.yaml:snakeyaml:1.33"

@@ -9,21 +9,6 @@ architectury {
 
 loom {
     accessWidenerPath = project(":common").loom.accessWidenerPath
-
-    launches {
-        data {
-            arg "--existing", file("../common/src/main/resources").absolutePath
-        }
-    }
-
-    forge {
-        convertAccessWideners = true
-        extraAccessWideners.add loom.accessWidenerPath.get().asFile.name
-
-        dataGen {
-            mod "theatrical"
-        }
-    }
 }
 
 configurations {
@@ -43,9 +28,9 @@ dependencies {
     shadowCommon(project(path: ":common", configuration: "transformProductionForge")) { transitive = false }
 
     //ArtNet
-    implementation files("../libs/artnet4j-0.6.1.jar")
-    forgeRuntimeLibrary files("../libs/artnet4j-0.6.1.jar")
-    shadowCommon files("../libs/artnet4j-0.6.1.jar")
+    implementation "ch.bildspur:artnet4j:0.6.2"
+    forgeRuntimeLibrary "ch.bildspur:artnet4j:0.6.2"
+    shadowCommon "ch.bildspur:artnet4j:0.6.2"
 
     //YAML
     implementation "org.yaml:snakeyaml:1.33"
@@ -66,18 +51,18 @@ shadowJar {
     exclude "architectury.common.json"
 
     configurations = [project.configurations.shadowCommon]
-    classifier "dev-shadow"
+    archiveClassifier = "dev-shadow"
 }
 
 remapJar {
     input.set shadowJar.archiveFile
     dependsOn shadowJar
     archiveBaseName.set "${rootProject.archives_base_name}-${project.name}"
-    classifier null
+    archiveClassifier = null
 }
 
 jar {
-    classifier "dev"
+    archiveClassifier = "dev"
 }
 
 sourcesJar {
