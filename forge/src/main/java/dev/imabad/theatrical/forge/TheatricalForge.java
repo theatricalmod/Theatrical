@@ -7,6 +7,7 @@ import dev.imabad.theatrical.TheatricalClient;
 import dev.imabad.theatrical.api.Fixture;
 import dev.imabad.theatrical.registry.FixtureRegistry;
 import net.minecraftforge.client.event.ModelEvent;
+import net.minecraftforge.client.event.RenderHighlightEvent;
 import net.minecraftforge.client.event.RenderLevelStageEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
@@ -31,6 +32,9 @@ public class TheatricalForge {
                 additionalEvent.register(fixture.getStaticModel());
                 additionalEvent.register(fixture.getTiltModel());
             }
+        });
+        MinecraftForge.EVENT_BUS.addListener((RenderHighlightEvent.Block renderHighlight) -> {
+            TheatricalClient.renderHitBox(renderHighlight.getPoseStack(),renderHighlight.getCamera().getEntity().getLevel(), renderHighlight.getTarget().getBlockPos(), renderHighlight.getCamera().getEntity(), renderHighlight.getCamera());
         });
         if(Platform.isDevelopmentEnvironment()) {
             MinecraftForge.EVENT_BUS.addListener((RenderLevelStageEvent renderLevelStageEvent) -> {

@@ -14,4 +14,5 @@ public class Items {
     public static final RegistrySupplier<Item> MOVING_LIGHT = ITEMS.register("moving_light", () -> new BlockItem(Blocks.MOVING_LIGHT_BLOCK.get(), new Item.Properties().tab(Theatrical.THEATRICAL_TAB)));
     public static final RegistrySupplier<Item> PIPE = ITEMS.register("pipe", () -> new BlockItem(Blocks.PIPE_BLOCK.get(), new Item.Properties().tab(Theatrical.THEATRICAL_TAB)));
     public static final RegistrySupplier<Item> ART_NET_INTERFACE = ITEMS.register("artnet_interface", () -> new BlockItem(Blocks.ART_NET_INTERFACE.get(), new Item.Properties().tab(Theatrical.THEATRICAL_TAB)));
+    public static final RegistrySupplier<Item> CABLE = ITEMS.register("cable", CableItem::new);
 }

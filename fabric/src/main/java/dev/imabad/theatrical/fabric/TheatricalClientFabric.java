@@ -21,6 +21,7 @@ public class TheatricalClientFabric implements ClientModInitializer {
                 out.accept(fixture.getTiltModel());
             }
         });
+        WorldRenderEvents.BLOCK_OUTLINE.register(this::renderBlockOutline);
         if(Platform.isDevelopmentEnvironment()) {
             WorldRenderEvents.AFTER_TRANSLUCENT.register(this::renderWorldLastFabric);
         }
@@ -28,5 +29,9 @@ public class TheatricalClientFabric implements ClientModInitializer {
 
     private void renderWorldLastFabric(WorldRenderContext context){
         TheatricalClient.renderWorldLast(context.matrixStack(), context.projectionMatrix(), context.camera(), context.tickDelta());
+    }
+
+    private boolean renderBlockOutline(WorldRenderContext context, WorldRenderContext.BlockOutlineContext blockOutlineContext){
+        return TheatricalClient.renderHitBox(context.matrixStack(), context.world(), blockOutlineContext.blockPos(), blockOutlineContext.entity(), context.camera());
     }
 }
