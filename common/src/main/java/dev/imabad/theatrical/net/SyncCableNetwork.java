@@ -48,7 +48,9 @@ public class SyncCableNetwork extends CableNetworkPacket {
 
         size = buf.readVarInt();
         for(int i = 0; i < size; i++){
-            addedNodes.put(buf.readVarInt(), CableNodePos.fromBuffer(buf, dimensionMap));
+            int index = buf.readVarInt();
+            CableNodePos cableNodePos = CableNodePos.fromBuffer(buf, dimensionMap);
+            addedNodes.put(index, cableNodePos);
         }
 
         size = buf.readVarInt();
@@ -111,6 +113,7 @@ public class SyncCableNetwork extends CableNetworkPacket {
                 network.removeNode(null, node.getPosition());
             }
         }
+
         for (Map.Entry<Integer, CableNodePos> entry : addedNodes.entrySet()) {
             Integer nodeId = entry.getKey();
             CableNodePos nodePos = entry.getValue();

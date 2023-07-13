@@ -197,16 +197,17 @@ public class CableBlock extends Block implements EntityBlock {
                         if(from != null){
                             boolean firstSameAsFrom = firstLocation.equals(from);
                             boolean secondSameAsFrom = secondLocation.equals(from);
+
 //                            if(!firstSameAsFrom && !secondSameAsFrom){
 //                                continue;
 //                            }
 
-                            if(firstSameAsFrom){
-                                skipFirst = true;
-                            }
-                            if(secondSameAsFrom){
-                                skipSecond = true;
-                            }
+//                            if(firstSameAsFrom){
+//                                skipFirst = true;
+//                            }
+//                            if(secondSameAsFrom){
+//                                skipSecond = true;
+//                            }
                         }
                         if(!skipFirst){
                             connected.add(firstLocation);
@@ -218,11 +219,22 @@ public class CableBlock extends Block implements EntityBlock {
                 }
             }
         }
+        if(from != null) {
+            if (connected.stream().noneMatch(dPos -> dPos.equals(from))) {
+                connected.clear();
+            } else {
+                connected.removeIf(dPos -> dPos.equals(from));
+            }
+        }
         return connected;
     }
 
     public static Collection<CableNodePos.DiscoveredPosition> walkCable(BlockGetter level, CableNodePos cablePos){
         List<CableNodePos.DiscoveredPosition> foundCables = new ArrayList<>();
+        if(cablePos == null){
+            System.out.println("Oh my god, where the fuck is this null cablepos");
+            return foundCables;
+        }
         for(BlockPos pos : cablePos.allAdjacent()){
             BlockState blockState = level.getBlockState(pos);
             if(blockState.getBlock() instanceof CableBlock cable){

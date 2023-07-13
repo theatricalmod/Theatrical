@@ -51,7 +51,7 @@ public class CableNetwork {
     }
 
     public boolean addNodeIfAbsent(CableNode node){
-        if(nodesByPosition.put(node.getPosition(), node) != null)
+        if(nodesByPosition.putIfAbsent(node.getPosition(), node) != null)
             return false;
         nodesById.put(node.getNodeId(), node);
         return true;
