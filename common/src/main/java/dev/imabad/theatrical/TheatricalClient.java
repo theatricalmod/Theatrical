@@ -13,6 +13,10 @@ import dev.imabad.theatrical.blocks.CableBlock;
 import dev.imabad.theatrical.blocks.light.MovingLightBlock;
 import dev.imabad.theatrical.client.blockentities.CableRenderer;
 import dev.imabad.theatrical.client.blockentities.MovingLightRenderer;
+import dev.imabad.theatrical.graphs.CableNetwork;
+import dev.imabad.theatrical.graphs.CableNode;
+import dev.imabad.theatrical.graphs.CableNodePos;
+import dev.imabad.theatrical.graphs.GlobalCableManager;
 import dev.imabad.theatrical.protocols.artnet.ArtNetManager;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
@@ -31,9 +35,15 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 
+import java.awt.*;
+import java.nio.ByteBuffer;
+import java.util.Map;
+import java.util.UUID;
+
 public class TheatricalClient {
 
     private static ArtNetManager artNetManager;
+    public static final GlobalCableManager CABLES = new GlobalCableManager();
 
     public static void init() {
         BlockEntityRendererRegistry.register(BlockEntities.MOVING_LIGHT.get(), MovingLightRenderer::new);
@@ -102,31 +112,56 @@ public class TheatricalClient {
     }
 
     public static void renderWorldLast(PoseStack poseStack, Matrix4f projectionMatrix, Camera camera, float tickDelta){
+        Minecraft mc = Minecraft.getInstance();
         var MY_BLOCK = new BlockPos(-4, -59, 11);
         Vec3 cameraPos = camera.getPosition();
         //#region translateToCamera
         poseStack.pushPose();
         poseStack.translate(-cameraPos.x, -cameraPos.y, -cameraPos.z);
         //#region translateToBlock
-        poseStack.pushPose();
-        poseStack.translate(MY_BLOCK.getX(), MY_BLOCK.getY(), MY_BLOCK.getZ());
-        //#region MainRender
-        poseStack.pushPose();
         MultiBufferSource.BufferSource bufferSource = Minecraft.getInstance().renderBuffers().bufferSource();
-        VertexConsumer buffer = bufferSource.getBuffer(RenderType.lines());
-        poseStack.pushPose();
-        poseStack.translate(0.5, 0.5, 0.5);
-        LevelRenderer.renderLineBox(poseStack, buffer, AABB.ofSize(new Vec3(0, 0, 0), 1d, 1d, 1d), 1, 1, 1, 1);
-        poseStack.popPose();
-        if(Minecraft.getInstance().level.getBlockEntity(MY_BLOCK) != null){
-//            renderThings(MY_BLOCK, buffer, poseStack, (MovingLightBlockEntity) Minecraft.getInstance().level.getBlockEntity(MY_BLOCK));
+        for(CableNetwork network : CABLES.getCableNetworks().values()){
+            Color color = getRandomColor(network.getId());
+            for (Map.Entry<CableNodePos, CableNode> cableNodeEntry : network.getNodes().entrySet()) {
+                CableNodePos pos = cableNodeEntry.getKey();
+                CableNode node = cableNodeEntry.getValue();
+                if(pos == null){
+                    continue;
+                }
+                if(!mc.level.dimension().equals(pos.dimension())){
+                    continue;
+                }
+                poseStack.pushPose();
+                Vec3 location = pos.getLocation();
+                poseStack.translate(location.x, location.y, location.z);
+                poseStack.pushPose();
+                //poseStack.translate(0.5, 0.5, 0.5);
+                VertexConsumer buffer = bufferSource.getBuffer(RenderType.lines());
+                LevelRenderer.renderLineBox(poseStack, buffer, AABB.ofSize(new Vec3(0, 0, 0), 0.1d, 0.1d, 0.1d), color.getRed(), color.getGreen(), color.getBlue(), 1);
+                poseStack.popPose();
+                poseStack.popPose();
+            }
         }
         bufferSource.endBatch(RenderType.lines());
         //#endregion
         poseStack.popPose();
-        //#endregion
-        poseStack.popPose();
-        //#endregion
-        poseStack.popPose();
+    }
+
+    public static Color getRandomColor(UUID id) {
+
+        byte[] bytes = UUID2Bytes(id);
+
+        int r= Math.abs(bytes[0]);
+        int g = Math.abs(bytes[1]);
+        int b = Math.abs(bytes[2]);
+
+        return new Color(r, g, b);
+    }
+
+    public static byte[] UUID2Bytes(UUID uuid) {
+
+        long hi = uuid.getMostSignificantBits();
+        long lo = uuid.getLeastSignificantBits();
+        return ByteBuffer.allocate(16).putLong(hi).putLong(lo).array();
     }
 }
