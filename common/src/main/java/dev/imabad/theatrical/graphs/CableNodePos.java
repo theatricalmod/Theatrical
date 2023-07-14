@@ -24,7 +24,7 @@ public class CableNodePos extends BlockPos{
         super(x, y, z);
     }
     public CableNodePos(double x, double y, double z){
-        super(Math.round(x * 2), Math.floor(y) * 2, Math.round(z * 2));
+        super(Math.round(x * 2), Math.round(y * 2), Math.round(z * 2));
     }
     public CableNodePos(Vec3 vec){this(vec.x, vec.y, vec.z);}
     public CableNodePos(BlockPos pos){
@@ -51,6 +51,7 @@ public class CableNodePos extends BlockPos{
         for (Direction direction : Direction.values()) {
             Vec3i normal = direction.getNormal();
             adjacent.add(new BlockPos(vec3.add(normal.getX() * step, normal.getY() * step, normal.getZ() * step)));
+            adjacent.add(new BlockPos(vec3.relative(direction, 1)));
         }
         return adjacent;
     }

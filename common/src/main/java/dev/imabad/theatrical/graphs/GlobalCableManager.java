@@ -4,6 +4,7 @@ import dev.imabad.theatrical.Theatrical;
 import dev.imabad.theatrical.api.CableType;
 import dev.imabad.theatrical.blocks.CableBlock;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
@@ -89,7 +90,7 @@ public class GlobalCableManager {
         markDirty();
     }
 //0 -60 -3
-    public List<CableNetwork> getIntersectingNetworks(LevelAccessor level, CableNodePos cablePos){
+    public List<CableNetwork> getIntersectingNetworks(CableNodePos cablePos){
         if(cableNetworks == null) {
             return Collections.emptyList();
         }
@@ -118,7 +119,7 @@ public class GlobalCableManager {
         CableNetworkSync sync = MANAGER.sync;
 
         for (CableNodePos.DiscoveredPosition removedLocation : ends) {
-            List<CableNetwork> intersectingNetworks = MANAGER.getIntersectingNetworks(level, removedLocation);
+            List<CableNetwork> intersectingNetworks = MANAGER.getIntersectingNetworks(removedLocation);
             for (CableNetwork network : intersectingNetworks) {
                 CableNode removedNode = network.locateNode(removedLocation);
                 if(removedNode == null){
@@ -185,7 +186,7 @@ public class GlobalCableManager {
 
         while(!frontier.isEmpty()){
             FrontierEntry entry = frontier.remove(0);
-            List<CableNetwork> intersectingNetworks = MANAGER.getIntersectingNetworks(level, entry.currentNode);
+            List<CableNetwork> intersectingNetworks = MANAGER.getIntersectingNetworks(entry.currentNode);
             for(CableNetwork network : intersectingNetworks){
                 CableNode cableNode = network.locateNode(entry.currentNode);
                 network.removeNode(level, entry.currentNode);
@@ -286,7 +287,7 @@ public class GlobalCableManager {
 
             continueToSearchWithParent(frontier, entry, parentNode, ends);
         }
-
+        level.getServer().sendSystemMessage(Component.literal(network.getId().toString()));
         MANAGER.markDirty();
         return network;
     }

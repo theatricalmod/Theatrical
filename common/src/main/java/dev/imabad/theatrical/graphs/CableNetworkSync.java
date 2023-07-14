@@ -3,6 +3,7 @@ package dev.imabad.theatrical.graphs;
 import dev.imabad.theatrical.api.CableType;
 import dev.imabad.theatrical.net.SyncCableNetwork;
 import it.unimi.dsi.fastutil.Pair;
+import it.unimi.dsi.fastutil.ints.IntIntImmutablePair;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.Nullable;
@@ -46,6 +47,14 @@ public class CableNetworkSync {
         currentPacket.packetDeletesNetwork = true;
     }
 
+    public void edgeAdded(CableNetwork network, CableNode node1, CableNode node2, CableEdge edge){
+        flushPacket(network);
+        currentPacket.addedEdges.add(
+                Pair.of(IntIntImmutablePair.of(node1.getNodeId(), node2.getNodeId()), edge.cableType)
+        );
+        currentPayload++;
+    }
+
     public void sendFullGraphTo(CableNetwork network, ServerPlayer target){
         SyncCableNetwork packet = new SyncCableNetwork(network.getId(), network.getType());
         packet.fullWipe = true;
@@ -54,6 +63,23 @@ public class CableNetworkSync {
         for(CableNode node : network.nodesByPosition.values()){
             SyncCableNetwork currentPacket = packet;
             currentPacket.addedNodes.put(node.getNodeId(), node.getPosition());
+            if(sent++ < 1000){
+                continue;
+            }
+
+            sent = 0;
+            packet = flushAndCreateNew(network, target, currentPacket);
+        }
+
+        for(CableNode node : network.nodesById.values()){
+            SyncCableNetwork currentPacket = packet;
+            if(!network.edgesByNode.containsKey(node)){
+                continue;
+            }
+            network.edgesByNode.get(node)
+                    .forEach((node2, edge) -> {
+                        currentPacket.addedEdges.add(Pair.of(IntIntImmutablePair.of(node.getNodeId(), node2.getNodeId()), edge.cableType));
+                    });
             if(sent++ < 1000){
                 continue;
             }

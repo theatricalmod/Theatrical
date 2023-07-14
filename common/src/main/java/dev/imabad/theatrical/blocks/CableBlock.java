@@ -2,6 +2,7 @@ package dev.imabad.theatrical.blocks;
 
 import com.mojang.authlib.minecraft.client.MinecraftClient;
 import com.mojang.math.Vector3d;
+import com.mojang.math.Vector3f;
 import dev.imabad.theatrical.api.CableType;
 import dev.imabad.theatrical.blockentities.CableBlockEntity;
 import dev.imabad.theatrical.graphs.CableNodePos;
@@ -10,6 +11,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
@@ -32,21 +34,22 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraft.world.ticks.LevelTickAccess;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 
 public class CableBlock extends Block implements EntityBlock {
 
     public static enum DirectionAxes {
         DOWN(new Vec3(1, 0, 0), new Vec3(0, 0, 1)),
         UP(new Vec3(1, 0, 0), new Vec3(0, 0, 1)),
-        NORTH(new Vec3(0, 1, 0), new Vec3(0, 0, 1)),
-        SOUTH(new Vec3(0, 1, 0), new Vec3(0, 0, 1)),
-        WEST(new Vec3(1, 0, 0), new Vec3(0, 1, 0)),
-        EAST(new Vec3(1, 0, 0), new Vec3(0, 1, 0));
+        NORTH(new Vec3(0, 1, 0), new Vec3(1, 0, 0)),
+        SOUTH(new Vec3(0, 1, 0), new Vec3(1, 0, 0)),
+        WEST(new Vec3(0, 0, 1), new Vec3(0, 1, 0)),
+        EAST(new Vec3(0, 0, 1), new Vec3(0, 1, 0));
         Vec3[] axes;
         DirectionAxes(Vec3... axes){
             this.axes = axes;
@@ -174,59 +177,138 @@ public class CableBlock extends Block implements EntityBlock {
         }
         return shapeIndex;
     }
+    // Get positions around the block specified that are connected to the current block.
     public Collection<CableNodePos.DiscoveredPosition> getConnected(@Nullable CableNodePos from, BlockGetter level, BlockPos pos, BlockState state){
-        Collection<CableNodePos.DiscoveredPosition> connected = new ArrayList<>();
+        Set<CableNodePos.DiscoveredPosition> connected = new HashSet<>();
+        // Grab center of the position provided
         Vec3 center = Vec3.atBottomCenterOf(pos);
-        for(Direction direction : Direction.values()){
-            if(level.getBlockEntity(pos) instanceof CableBlockEntity cable){
+        // Check if the tile is an actual cable
+        if(level.getBlockEntity(pos) instanceof CableBlockEntity cable){
+            // Loop through all the directions
+            for(Direction direction : Direction.values()){
+                // Check the cable has the side provided
                 if(cable.hasSide(direction)){
+                    // Get the axis' that the side has possible connections from
                     Vec3[] axes = DirectionAxes.fromDirection(direction).getAxes();
+                    Vec3 dirCenter = modifyCenter(center, direction);
+                    // Loop through the axis'
                     for (Vec3 axe : axes) {
-                        Vec3 firstOffset = axe.scale(0.5).add(center);
-                        CableNodePos.DiscoveredPosition firstLocation = new CableNodePos.DiscoveredPosition(level instanceof Level l ? l.dimension() : Level.OVERWORLD,
-                                firstOffset)
-                                .typeA(state.getValue(CABLE_TYPE))
-                                .typeB(getCableType(level, new BlockPos(firstOffset)));
-                        Vec3 secondOffset = axe.scale(-0.5).add(center);
-                        CableNodePos.DiscoveredPosition secondLocation = new CableNodePos.DiscoveredPosition(level instanceof Level l ? l.dimension() : Level.OVERWORLD,
-                                secondOffset)
-                                .typeA(state.getValue(CABLE_TYPE))
-                                .typeB(getCableType(level, new BlockPos(secondOffset)));
-                        boolean skipFirst = false;
-                        boolean skipSecond = false;
-                        if(from != null){
-                            boolean firstSameAsFrom = firstLocation.equals(from);
-                            boolean secondSameAsFrom = secondLocation.equals(from);
-
-//                            if(!firstSameAsFrom && !secondSameAsFrom){
-//                                continue;
-//                            }
-
-//                            if(firstSameAsFrom){
-//                                skipFirst = true;
-//                            }
-//                            if(secondSameAsFrom){
-//                                skipSecond = true;
-//                            }
-                        }
-                        if(!skipFirst){
-                            connected.add(firstLocation);
-                        }
-                        if(!skipSecond){
-                            connected.add(secondLocation);
-                        }
+                        // Add possible connection points from each axis to the list
+                        addToListIfConnected(from, connected,
+                                (isPositive) -> level instanceof Level l ? l.dimension() : Level.OVERWORLD,
+                                (isPositive, tPos) -> getCableType(level, new BlockPos(tPos)),
+                                getOffsetPos(dirCenter, direction, axe, false));
+                        addToListIfConnected(from, connected,
+                                (isPositive) -> level instanceof Level l ? l.dimension() : Level.OVERWORLD,
+                                (isPositive, tPos) -> getCableType(level, new BlockPos(tPos)),
+                                getOffsetPos(dirCenter, direction, axe, true));
                     }
                 }
             }
         }
-        if(from != null) {
-            if (connected.stream().noneMatch(dPos -> dPos.equals(from))) {
-                connected.clear();
-            } else {
-                connected.removeIf(dPos -> dPos.equals(from));
+        return connected;
+    }
+
+    public Collection<CableNodePos.DiscoveredPosition> getPossibleNodesForSide(Direction side, BlockGetter level, BlockPos pos){
+        Collection<CableNodePos.DiscoveredPosition> connected = new ArrayList<>();
+        // Grab center of the position provided
+        Vec3 center = Vec3.atBottomCenterOf(pos);
+        // Check if the tile is an actual cable
+        if(level.getBlockEntity(pos) instanceof CableBlockEntity cable){
+                // Check the cable has the side provided
+            if(cable.hasSide(side)){
+                // Get the axis' that the side has possible connections from
+                Vec3[] axes = DirectionAxes.fromDirection(side).getAxes();
+                Vec3 dirCenter = modifyCenter(center, side);
+                // Loop through the axis'
+                for (Vec3 axe : axes) {
+                    // Add possible connection points from each axis to the list
+                    addToListIfConnected(null, connected,
+                            (isPositive) -> level instanceof Level l ? l.dimension() : Level.OVERWORLD,
+                            (isPositive, tPos) -> getCableType(level, new BlockPos(tPos)),
+                            getOffsetPos(dirCenter, side, axe, false));
+                    addToListIfConnected(null, connected,
+                            (isPositive) -> level instanceof Level l ? l.dimension() : Level.OVERWORLD,
+                            (isPositive, tPos) -> getCableType(level, new BlockPos(tPos)),
+                            getOffsetPos(dirCenter, side, axe, true));
+                }
             }
         }
         return connected;
+    }
+
+    @NotNull
+    private static BiFunction<Double, Boolean, Vec3> getOffsetPos(Vec3 center, Direction direction, Vec3 axe, boolean isNeg) {
+        return (distance, isPositive) -> modifyAxis(axe, direction).scale(isPositive ? 0 : isNeg ? -distance : distance).add(center);
+    }
+
+    public static Vec3 modifyAxis(Vec3 axe, Direction direction){
+        Vector3f xyzDegrees = direction.getRotation().toXYZDegrees();
+        return axe;
+    }
+
+    public static Vec3 modifyCenter(Vec3 center, Direction direction){
+        switch(direction){
+            case EAST -> {
+                return center.add(0.5, 0.5, 0);
+            }
+            case WEST -> {
+                return center.add(-0.5, 0.5, 0);
+            }
+            case NORTH -> {
+                return center.add(0, 0.5, -0.5);
+            }
+            case SOUTH -> {
+                return center.add(0, 0.5, 0.5);
+            }
+            case UP -> {
+                return center.add(0, 1, 0);
+            }
+        }
+        return center;
+    }
+
+    public static void addToListIfConnected(@Nullable CableNodePos from, Collection<CableNodePos.DiscoveredPosition> listOfPos,
+                                            Function<Boolean, ResourceKey<Level>> dimensionGetter,
+                                            BiFunction<Boolean, Vec3, CableType> typeGetter,
+                                            BiFunction<Double, Boolean, Vec3> posGetter){
+        // Our first position is offset by 0.5 in the positive axis
+        Vec3 firstOffset = posGetter.apply(0.5, true);
+        CableNodePos.DiscoveredPosition firstLocation = new CableNodePos.DiscoveredPosition(dimensionGetter.apply(true),
+                firstOffset)
+                .typeA(typeGetter.apply(true, posGetter.apply(0.0d, true)))
+                .typeB(typeGetter.apply(true, posGetter.apply(1.0d, true)));
+        // Our first position is offset by 0.5 in the negative axis
+        Vec3 secondOffset = posGetter.apply(0.5, false);
+        CableNodePos.DiscoveredPosition secondLocation = new CableNodePos.DiscoveredPosition(dimensionGetter.apply(false),
+                secondOffset)
+                .typeA(typeGetter.apply(false, posGetter.apply(0.0d, false)))
+                .typeB(typeGetter.apply(false, posGetter.apply(1.0d, false)));
+
+        boolean skipFirst = false;
+        boolean skipSecond = false;
+        if(from != null){
+            boolean firstSameAsFrom = firstLocation.equals(from);
+            boolean secondSameAsFrom = secondLocation.equals(from);
+
+            // If neither of them came from the end we were provided then it's not possible to get to the positions.
+            if(!firstSameAsFrom && !secondSameAsFrom){
+                return;
+            }
+
+            if(firstSameAsFrom){
+                skipFirst = true;
+            }
+            if(secondSameAsFrom){
+                skipSecond = true;
+            }
+        }
+        if(!skipFirst){
+            listOfPos.add(firstLocation);
+        }
+        if(!skipSecond){
+            listOfPos.add(secondLocation);
+        }
     }
 
     public static Collection<CableNodePos.DiscoveredPosition> walkCable(BlockGetter level, CableNodePos cablePos){

@@ -3,15 +3,16 @@ package dev.imabad.theatrical.net;
 import dev.architectury.networking.simple.MessageType;
 import dev.imabad.theatrical.api.CableType;
 import dev.imabad.theatrical.graphs.*;
+import it.unimi.dsi.fastutil.Pair;
+import it.unimi.dsi.fastutil.ints.IntIntPair;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.world.phys.Vec3;
-import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.*;
 
 public class SyncCableNetwork extends CableNetworkPacket {
     public Map<Integer, CableNodePos> addedNodes;
     public List<Integer> removedNodes;
+    public List<Pair<IntIntPair, CableType>> addedEdges;
     public Map<Integer, UUID> splitSubNetworks;
     public boolean fullWipe;
 
@@ -21,6 +22,7 @@ public class SyncCableNetwork extends CableNetworkPacket {
         addedNodes = new HashMap<>();
         removedNodes = new ArrayList<>();
         splitSubNetworks = new HashMap<>();
+        addedEdges = new ArrayList<>();
         packetDeletesNetwork = false;
     }
 
@@ -38,6 +40,7 @@ public class SyncCableNetwork extends CableNetworkPacket {
 
         addedNodes = new HashMap<>();
         removedNodes = new ArrayList<>();
+        addedEdges = new ArrayList<>();
         splitSubNetworks = new HashMap<>();
         int size;
 
@@ -51,6 +54,11 @@ public class SyncCableNetwork extends CableNetworkPacket {
             int index = buf.readVarInt();
             CableNodePos cableNodePos = CableNodePos.fromBuffer(buf, dimensionMap);
             addedNodes.put(index, cableNodePos);
+        }
+
+        size = buf.readVarInt();
+        for(int i = 0; i < size; i++){
+            addedEdges.add(Pair.of(IntIntPair.of(buf.readVarInt(), buf.readVarInt()), CableType.valueOf(buf.readUtf())));
         }
 
         size = buf.readVarInt();
@@ -81,6 +89,14 @@ public class SyncCableNetwork extends CableNetworkPacket {
         addedNodes.forEach((node, pos) -> {
             buf.writeVarInt(node);
             pos.toBuf(buf, dimensionMap);
+        });
+
+        buf.writeVarInt(addedEdges.size());
+        addedEdges.forEach((topPair) -> {
+            IntIntPair ids = topPair.left();
+            buf.writeVarInt(ids.leftInt());
+            buf.writeVarInt(ids.rightInt());
+            buf.writeUtf(topPair.right().name());
         });
 
         buf.writeVarInt(splitSubNetworks.size());
@@ -120,8 +136,18 @@ public class SyncCableNetwork extends CableNetworkPacket {
             network.loadNode(nodePos, nodeId);
         }
 
+        for (Pair<IntIntPair, CableType> addedEdge : addedEdges) {
+            IntIntPair ids = addedEdge.first();
+            CableNode node1 = network.getNodeById(ids.leftInt());
+            CableNode node2 = network.getNodeById(ids.rightInt());
+            if(node1 != null && node2 != null){
+                network.putEdge(node1, node2, new CableEdge(node1, node2, addedEdge.right()));
+            }
+        }
+
         if(!splitSubNetworks.isEmpty()){
-            network.findDisconnectedNetworks(null, splitSubNetworks)
+            Set<CableNetwork> disconnectedNetworks = network.findDisconnectedNetworks(null, splitSubNetworks);
+            disconnectedNetworks
                     .forEach(manager::putNetwork);
         }
     }

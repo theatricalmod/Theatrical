@@ -65,6 +65,10 @@ public class CableNetwork {
         nodesById.put(node.getNodeId(), node);
     }
 
+    public Map<CableNode, CableEdge> getEdges(CableNode node){
+        return edgesByNode.get(node);
+    }
+
     public static CableNetwork load(CompoundTag tag) {
         CableNetwork cableNetwork = new CableNetwork(tag.getUUID("Id"));
         cableNetwork.type = CableType.valueOf(tag.getString("Type"));
@@ -212,7 +216,7 @@ public class CableNetwork {
                 return;
             }
             if(network.putEdge(n1, n2, edge)){
-                //TODO: Network Sync
+                Theatrical.CABLES.sync.edgeAdded(network, n1, n2, edge);
             }
         }));
 
@@ -230,7 +234,8 @@ public class CableNetwork {
 
         putEdge(node1, node2, edge);
         putEdge(node2, node1, edge2);
-        //TODO: Network sync
+        Theatrical.CABLES.sync.edgeAdded(this, node1, node2, edge);
+        Theatrical.CABLES.sync.edgeAdded(this, node2, node1, edge2);
 
         Theatrical.CABLES.markDirty();
     }
