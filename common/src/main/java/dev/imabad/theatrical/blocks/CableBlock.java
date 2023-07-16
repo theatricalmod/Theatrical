@@ -215,23 +215,20 @@ public class CableBlock extends Block implements EntityBlock {
         Vec3 center = Vec3.atBottomCenterOf(pos);
         // Check if the tile is an actual cable
         if(level.getBlockEntity(pos) instanceof CableBlockEntity cable){
-                // Check the cable has the side provided
-            if(cable.hasSide(side)){
-                // Get the axis' that the side has possible connections from
-                Vec3[] axes = DirectionAxes.fromDirection(side).getAxes();
-                Vec3 dirCenter = modifyCenter(center, side);
-                // Loop through the axis'
-                for (Vec3 axe : axes) {
-                    // Add possible connection points from each axis to the list
-                    addToListIfConnected(null, connected,
-                            (isPositive) -> level instanceof Level l ? l.dimension() : Level.OVERWORLD,
-                            (isPositive, tPos) -> getCableType(level, new BlockPos(tPos)),
-                            getOffsetPos(dirCenter, side, axe, false));
-                    addToListIfConnected(null, connected,
-                            (isPositive) -> level instanceof Level l ? l.dimension() : Level.OVERWORLD,
-                            (isPositive, tPos) -> getCableType(level, new BlockPos(tPos)),
-                            getOffsetPos(dirCenter, side, axe, true));
-                }
+            // Get the axis' that the side has possible connections from
+            Vec3[] axes = DirectionAxes.fromDirection(side).getAxes();
+            Vec3 dirCenter = modifyCenter(center, side);
+            // Loop through the axis'
+            for (Vec3 axe : axes) {
+                // Add possible connection points from each axis to the list
+                addToListIfConnected(null, connected,
+                        (isPositive) -> level instanceof Level l ? l.dimension() : Level.OVERWORLD,
+                        (isPositive, tPos) -> getCableType(level, new BlockPos(tPos)),
+                        getOffsetPos(dirCenter, side, axe, false));
+                addToListIfConnected(null, connected,
+                        (isPositive) -> level instanceof Level l ? l.dimension() : Level.OVERWORLD,
+                        (isPositive, tPos) -> getCableType(level, new BlockPos(tPos)),
+                        getOffsetPos(dirCenter, side, axe, true));
             }
         }
         return connected;

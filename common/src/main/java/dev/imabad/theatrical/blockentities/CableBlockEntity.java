@@ -1,5 +1,6 @@
 package dev.imabad.theatrical.blockentities;
 
+import dev.imabad.theatrical.graphs.GlobalCableManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -58,10 +59,16 @@ public class CableBlockEntity extends ClientSyncBlockEntity {
 
     public void removeSide(Direction direction){
         cableSides[direction.ordinal()] = false;
+        if(!getLevel().isClientSide){
+            GlobalCableManager.onCableSideRemoved(level, getBlockPos(), getBlockState(), direction);
+        }
     }
 
     public void addSide(Direction direction){
         cableSides[direction.ordinal()] = true;
+        if(!getLevel().isClientSide) {
+            getLevel().scheduleTick(getBlockPos(), getBlockState().getBlock(), 1);
+        }
     }
 
     public boolean hasActiveSide(){

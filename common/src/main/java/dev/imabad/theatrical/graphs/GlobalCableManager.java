@@ -4,6 +4,7 @@ import dev.imabad.theatrical.Theatrical;
 import dev.imabad.theatrical.api.CableType;
 import dev.imabad.theatrical.blocks.CableBlock;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
@@ -109,7 +110,52 @@ public class GlobalCableManager {
             return cableNetwork;
         });
     }
+    public static void onCableSideRemoved(LevelAccessor level, BlockPos pos, BlockState state, Direction side){
+        if(!(state.getBlock() instanceof CableBlock cable))
+            return;
 
+        Collection<CableNodePos.DiscoveredPosition> ends = cable.getPossibleNodesForSide(side, level, pos);
+        GlobalCableManager MANAGER = Theatrical.CABLES;
+        CableNetworkSync sync = MANAGER.sync;
+
+        for (CableNodePos.DiscoveredPosition removedLocation : ends) {
+            List<CableNetwork> intersectingNetworks = MANAGER.getIntersectingNetworks(removedLocation);
+            for (CableNetwork network : intersectingNetworks) {
+                CableNode removedNode = network.locateNode(removedLocation);
+                if(removedNode == null){
+                    continue;
+                }
+                network.removeNode(level, removedLocation);
+                sync.nodeRemoved(network, removedNode);
+                if(!network.isEmpty()){
+                    continue;
+                }
+                MANAGER.removeNetwork(network);
+                sync.networkRemoved(network);
+            }
+        }
+
+        Set<BlockPos> endsToUpdate = new HashSet<>();
+        for(CableNodePos.DiscoveredPosition removedEnd : ends){
+            endsToUpdate.addAll(removedEnd.allAdjacent());
+        }
+
+        Set<CableNetwork> toUpdate = new HashSet<>();
+        for(BlockPos bPos : endsToUpdate){
+            if(!bPos.equals(pos)){
+                CableNetwork onCableAdded = onCableAdded(level, bPos, level.getBlockState(bPos));
+                if(onCableAdded != null){
+                    toUpdate.add(onCableAdded);
+                }
+            }
+        }
+
+        for (CableNetwork cableNetwork : toUpdate) {
+            MANAGER.updateSplitNetwork(level, cableNetwork);
+        }
+
+        MANAGER.markDirty();
+    }
     public static void onCableRemoved(LevelAccessor level, BlockPos pos, BlockState state){
         if(!(state.getBlock() instanceof CableBlock cable))
             return;
@@ -287,7 +333,6 @@ public class GlobalCableManager {
 
             continueToSearchWithParent(frontier, entry, parentNode, ends);
         }
-        level.getServer().sendSystemMessage(Component.literal(network.getId().toString()));
         MANAGER.markDirty();
         return network;
     }
@@ -320,13 +365,13 @@ public class GlobalCableManager {
         if(position.isDifferentTypes()){
             return true;
         }
-
-        // TODO: Figure out why this is the way it is?
-        Vec3 vec = position.getLocation();
-        boolean centeredX = !Mth.equal(vec.x, Math.round(vec.x));
-        boolean centeredZ = !Mth.equal(vec.z, Math.round(vec.z));
-        if (centeredX && !centeredZ)
-            return ((int) Math.round(vec.z)) % 16 == 0;
-        return ((int) Math.round(vec.x)) % 16 == 0;
+        return false;
+//        // TODO: Figure out why this is the way it is?
+//        Vec3 vec = position.getLocation();
+//        boolean centeredX = !Mth.equal(vec.x, Math.round(vec.x));
+//        boolean centeredZ = !Mth.equal(vec.z, Math.round(vec.z));
+//        if (centeredX && !centeredZ)
+//            return ((int) Math.round(vec.z)) % 16 == 0;
+//        return ((int) Math.round(vec.x)) % 16 == 0;
     }
 }

@@ -48,10 +48,12 @@ public class CableNodePos extends BlockPos{
         Set<BlockPos> adjacent = new HashSet<>();
         Vec3 vec3 = getLocation();
         double step = 1 / 8f; //TODO: Figure this out?!
-        for (Direction direction : Direction.values()) {
-            Vec3i normal = direction.getNormal();
-            adjacent.add(new BlockPos(vec3.add(normal.getX() * step, normal.getY() * step, normal.getZ() * step)));
-            adjacent.add(new BlockPos(vec3.relative(direction, 1)));
+        for(int x : new int[]{1, -1}){
+            for(int y : new int[]{1, -1}){
+                for(int z : new int[]{1, -1}){
+                    adjacent.add(new BlockPos(vec3.add(x * step, y * step, z * step)));
+                }
+            }
         }
         return adjacent;
     }

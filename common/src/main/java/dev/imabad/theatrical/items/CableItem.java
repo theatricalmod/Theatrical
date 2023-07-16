@@ -4,6 +4,7 @@ import dev.imabad.theatrical.Theatrical;
 import dev.imabad.theatrical.blockentities.CableBlockEntity;
 import dev.imabad.theatrical.blocks.Blocks;
 import dev.imabad.theatrical.blocks.CableBlock;
+import dev.imabad.theatrical.graphs.GlobalCableManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.sounds.SoundSource;
@@ -66,7 +67,6 @@ public class CableItem extends Item {
                     cable.addSide(opposite);
                 }
                 blockEntity.setChanged();
-                //TODO: Refesh graphs
             }
 
             BlockState state = level.getBlockState(pos);
