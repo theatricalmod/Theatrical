@@ -166,7 +166,7 @@ public class CableRenderer implements BlockEntityRenderer<CableBlockEntity> {
                         } else {
                             poseStack.translate(-0.05, 0, 0);
                         }
-                        renderCableLength(vertexConsumer, poseStack, cableLength, cableWidth, cableHeight);
+//                        renderCableLength(vertexConsumer, poseStack, cableLength, cableWidth, cableHeight);
 //                        poseStack.translate(-0.5, 0, -0.5);
                         poseStack.popPose();
                     }

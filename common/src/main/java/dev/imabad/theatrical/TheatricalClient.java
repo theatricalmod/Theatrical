@@ -13,10 +13,7 @@ import dev.imabad.theatrical.blocks.CableBlock;
 import dev.imabad.theatrical.blocks.light.MovingLightBlock;
 import dev.imabad.theatrical.client.blockentities.CableRenderer;
 import dev.imabad.theatrical.client.blockentities.MovingLightRenderer;
-import dev.imabad.theatrical.graphs.CableNetwork;
-import dev.imabad.theatrical.graphs.CableNode;
-import dev.imabad.theatrical.graphs.CableNodePos;
-import dev.imabad.theatrical.graphs.GlobalCableManager;
+import dev.imabad.theatrical.graphs.*;
 import dev.imabad.theatrical.protocols.artnet.ArtNetManager;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
@@ -34,6 +31,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.Shapes;
 
 import java.awt.*;
 import java.nio.ByteBuffer;
@@ -137,9 +135,33 @@ public class TheatricalClient {
                 poseStack.pushPose();
                 //poseStack.translate(0.5, 0.5, 0.5);
                 VertexConsumer buffer = bufferSource.getBuffer(RenderType.lines());
-                LevelRenderer.renderLineBox(poseStack, buffer, AABB.ofSize(new Vec3(0, 0, 0), 0.1d, 0.1d, 0.1d), color.getRed(), color.getGreen(), color.getBlue(), 1);
+//                Matrix4f matrix4f = poseStack.last().pose();
+//                Matrix3f matrix3f = poseStack.last().normal();
+//                buffer.vertex(matrix4f, 0, 0, 0).color(color.getRed(), color.getGreen(), color.getBlue(), 255).normal(matrix3f, 0,1, 0).endVertex();
+//                buffer.vertex(matrix4f, 0, 1, 0).color(color.getRed(), color.getGreen(), color.getBlue(), 255).normal(matrix3f, 0,1, 0).endVertex();
+//                LevelRenderer.renderLineBox(poseStack, buffer, AABB.ofSize(new Vec3(0, 0, 0), 0.1d, 0.1d, 0.1d), color.getRed(), color.getGreen(), color.getBlue(), 1);
+                Map<CableNode, CableEdge> edges = network.getEdges(node);
                 poseStack.popPose();
                 poseStack.popPose();
+                if(edges != null){
+                    poseStack.pushPose();
+                    for (Map.Entry<CableNode, CableEdge> entry : edges.entrySet()) {
+                        CableNode other = entry.getKey();
+                        CableEdge edge = entry.getValue();
+                        if(!edge.node1.getPosition().dimension().equals(edge.node2.getPosition().dimension())){
+                            //don't care
+                        } else {
+                            Vec3 node1Position = edge.node1.getPosition().getLocation();
+                            Vec3 node2Position = edge.node2.getPosition().getLocation();
+                            Matrix4f matrix4f = poseStack.last().pose();
+                            Matrix3f matrix3f = poseStack.last().normal();
+                            Vec3 normal = node2Position.subtract(node1Position).normalize();
+                            buffer.vertex(matrix4f, (float) node1Position.x, (float) node1Position.y + 0.2f, (float) node1Position.z).color(color.getRed(), color.getGreen(), color.getBlue(), 255).normal(matrix3f,0,1 ,0).endVertex();
+                            buffer.vertex(matrix4f, (float) node2Position.x, (float) node2Position.y + 0.2f, (float) node2Position.z).color(color.getRed(), color.getGreen(), color.getBlue(), 255).normal(matrix3f, 0, 1, 0).endVertex();
+                        }
+                    }
+                    poseStack.popPose();
+                }
             }
         }
         bufferSource.endBatch(RenderType.lines());
