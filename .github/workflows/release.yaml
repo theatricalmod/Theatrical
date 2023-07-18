@@ -27,7 +27,7 @@ jobs:
           MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
           CURSEFORGE_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
         with:
-          arguments: "build publish curseforgePublish modrinth"
+          arguments: "build publish curseforge modrinth"
       - name: Store artifacts
         uses: actions/upload-artifact@v3
         with:
