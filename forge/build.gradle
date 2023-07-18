@@ -1,6 +1,10 @@
 plugins {
     id "com.github.johnrengelman.shadow" version "7.1.2"
+    id "com.matthewprenger.cursegradle" version "1.4.0"
+    id "com.modrinth.minotaur" version "2.+"
 }
+
+def ENV = System.getenv()
 
 architectury {
     platformSetupLoomIde()
@@ -31,6 +35,9 @@ dependencies {
     implementation "ch.bildspur:artnet4j:0.6.2"
     forgeRuntimeLibrary "ch.bildspur:artnet4j:0.6.2"
     shadowCommon "ch.bildspur:artnet4j:0.6.2"
+
+    implementation 'com.sun.activation:javax.activation:1.2.0'
+    forgeRuntimeLibrary 'com.sun.activation:javax.activation:1.2.0'
 
     //YAML
     implementation "org.yaml:snakeyaml:1.33"
@@ -88,5 +95,36 @@ publishing {
     // See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
     repositories {
         // Add repositories to publish to here.
+    }
+}
+
+if(ENV.CURSEFORGE_TOKEN){
+    curseforge {
+        apiKey = ENV.NANITE_TOKEN
+        project {
+            id = project.curseforge_id
+            releaseType = project.curseforge_type
+            addGameVersion "Forge"
+            addGameVersion "Java 17"
+            addGameVersion project.minecraft_version
+            mainArtifact(remapJar)
+            relations {
+                requiredDependency 'architectury-api'
+            }
+        }
+    }
+}
+if(ENV.MODRINTH_TOKEN){
+    modrinth {
+        token = ENV.MODRINTH_TOKEN // This is the default. Remember to have the MODRINTH_TOKEN environment variable set or else this will fail, or set it to whatever you want - just make sure it stays private!
+        projectId = project.modrinth_id // This can be the project ID or the slug. Either will work!
+        versionNumber = project.mod_version // You don't need to set this manually. Will fail if Modrinth has this version already
+        versionType = project.modrinth_type // This is the default -- can also be `beta` or `alpha`
+        uploadFile = jar // With Loom, this MUST be set to `remapJar` instead of `jar`!
+        gameVersions = [project.minecraft_version] // Must be an array, even with only one version
+        loaders = ["forge"] // Must also be an array - no need to specify this if you're using Loom or ForgeGradle
+        dependencies { // A special DSL for creating dependencies
+            required.project "architectury-api"
+        }
     }
 }
