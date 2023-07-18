@@ -1,6 +1,8 @@
 plugins {
     id "architectury-plugin" version "3.4-SNAPSHOT"
     id "dev.architectury.loom" version "1.2-SNAPSHOT" apply false
+    id "com.matthewprenger.cursegradle" version "1.4.0" apply false
+    id "com.modrinth.minotaur" version "2.+" apply false
 }
 
 architectury {
@@ -30,6 +32,8 @@ allprojects {
     apply plugin: "java"
     apply plugin: "architectury-plugin"
     apply plugin: "maven-publish"
+    apply plugin: 'com.matthewprenger.cursegradle'
+    apply plugin: 'com.modrinth.minotaur'
 
     ext.ENV = System.getenv()
 
