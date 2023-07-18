@@ -33,7 +33,6 @@ allprojects {
     apply plugin: "architectury-plugin"
     apply plugin: "maven-publish"
     apply plugin: 'com.matthewprenger.cursegradle'
-    apply plugin: 'com.modrinth.minotaur'
 
     ext.ENV = System.getenv()
 

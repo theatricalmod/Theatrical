@@ -1,5 +1,6 @@
 plugins {
     id "com.github.johnrengelman.shadow" version "7.1.2"
+    id "com.modrinth.minotaur"
 }
 
 def ENV = System.getenv()
@@ -125,5 +126,5 @@ modrinth {
     }
 }
 tasks.modrinth.onlyIf {
-    System.getenv("MODRINTH_TOKEN")
+    ENV.MODRINTH_TOKEN != null
 }
