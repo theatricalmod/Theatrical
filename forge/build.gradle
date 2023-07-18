@@ -100,7 +100,7 @@ publishing {
 
 if(ENV.CURSEFORGE_TOKEN){
     curseforge {
-        apiKey = ENV.NANITE_TOKEN
+        apiKey = ENV.CURSEFORGE_TOKEN
         project {
             id = project.curseforge_id
             releaseType = project.curseforge_type
