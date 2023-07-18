@@ -85,10 +85,13 @@ public class ArtNetInterfaceBlockEntity extends ClientSyncBlockEntity {
     public void updateConfig(String ipAddress, int dmxUniverse){
         this.ip = ipAddress;
         this.universe = dmxUniverse;
+        setChanged();
         level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
     }
 
     public void setOwnerUUID(UUID ownerUUID) {
         this.ownerUUID = ownerUUID;
+        setChanged();
+        level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
     }
 }
