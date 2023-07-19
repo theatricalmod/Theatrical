@@ -31,6 +31,7 @@ allprojects {
     apply plugin: "java"
     apply plugin: "architectury-plugin"
     apply plugin: "maven-publish"
+    apply plugin: "me.modmuss50.mod-publish-plugin"
 
     ext.ENV = System.getenv()
 

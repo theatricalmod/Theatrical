@@ -1,6 +1,5 @@
 plugins {
     id "com.github.johnrengelman.shadow" version "7.0.0"
-    id "com.modrinth.minotaur"
 }
 
 architectury {
@@ -94,13 +93,12 @@ publishing {
 
 publishMods {
     file = remapJar.archiveFile
-    type = project.release_type
+    type = project.release_type as me.modmuss50.mpp.PublishOptions.ReleaseType
     modLoaders.add("fabric")
 
     if(ENV.CURSEFORGE_TOKEN) {
         curseforge {
             projectId = project.curseforge_id
-            releaseType = project.curseforge_type
             accessToken = ENV.CURSEFORGE_TOKEN
             minecraftVersions.add(project.minecraft_version)
             requires {
