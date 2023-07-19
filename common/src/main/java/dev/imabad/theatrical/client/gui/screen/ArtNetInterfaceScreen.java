@@ -33,11 +33,15 @@ public class ArtNetInterfaceScreen extends Screen {
         yCenter = (this.height - this.imageHeight) / 2;
         this.dmxUniverse = new EditBox(this.font, xCenter + 62, yCenter + 25, 50, 10, (Component)Component.translatable("artneti.dmxUniverse"));
         this.dmxUniverse.setValue(Integer.toString(this.be.getUniverse()));
+        this.dmxUniverse.setEditable(be.isOwnedByCurrentClient());
         this.addWidget(this.dmxUniverse);
         this.ipAddress = new EditBox(this.font, xCenter + 40, yCenter + 50, 100, 20, (Component)Component.translatable("artneti.ipAddress"));
         this.ipAddress.setValue(this.be.getIp());
+        this.ipAddress.setEditable(be.isOwnedByCurrentClient());
         this.addWidget(this.ipAddress);
-        this.addRenderableWidget(new Button(xCenter + 40,  yCenter + 90, 100, 20, Component.translatable("artneti.save"), button -> this.update()));
+        if(be.isOwnedByCurrentClient()) {
+            this.addRenderableWidget(new Button(xCenter + 40, yCenter + 90, 100, 20, Component.translatable("artneti.save"), button -> this.update()));
+        }
     }
 
     private void update(){
@@ -73,10 +77,20 @@ public class ArtNetInterfaceScreen extends Screen {
         renderLabel(poseStack, "block.theatrical.artnet_interface", 5,5);
         renderLabel(poseStack, "artneti.dmxUniverse", 0,15);
         renderLabel(poseStack, "artneti.ipAddress", 5,40);
+        if(!this.be.isOwnedByCurrentClient()){
+            renderLabel(poseStack, "artneti.notAuthorized", 5,75);
+        } else {
+            if(this.be.hasReceivedPacket()){
+                long inSeconds = Math.round((float) (System.currentTimeMillis() - this.be.getLastReceivedPacket()) / 1000);
+                renderLabel(poseStack, "artneti.lastReceived", 5,75, inSeconds);
+            } else {
+                renderLabel(poseStack, "artneti.notConnected", 5,75);
+            }
+        }
     }
 
-    private void renderLabel(PoseStack stack, String translationKey, int offSetX, int offSetY){
-        MutableComponent translatable = Component.translatable(translationKey);
+    private void renderLabel(PoseStack stack, String translationKey, int offSetX, int offSetY, Object... replacements){
+        MutableComponent translatable = Component.translatable(translationKey, replacements);
         this.font.draw(stack, translatable, xCenter + (this.imageWidth / 2) - (this.font.width(translatable.getString()) / 2), yCenter + offSetY, 0x404040);
     }
 

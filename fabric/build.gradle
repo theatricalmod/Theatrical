@@ -20,7 +20,6 @@ configurations {
     developmentFabric.extendsFrom common
 }
 
-sourceSets.main.resources { srcDir '../forge/src/generated/resources' }
 
 dependencies {
     modImplementation "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
@@ -93,36 +92,39 @@ publishing {
     }
 }
 
-if(ENV.CURSEFORGE_TOKEN){
-    curseforge {
-        apiKey = ENV.CURSEFORGE_TOKEN
-        project {
-            id = project.curseforge_id
+publishMods {
+    file = remapJar.archiveFile
+    type = project.release_type
+    modLoaders.add("fabric")
+
+    if(ENV.CURSEFORGE_TOKEN) {
+        curseforge {
+            projectId = project.curseforge_id
             releaseType = project.curseforge_type
-            addGameVersion "Fabric"
-            addGameVersion "Java 17"
-            addGameVersion project.minecraft_version
-            mainArtifact(remapJar)
-            relations {
-                requiredDependency 'architectury-api'
-                requiredDependency 'fabric-api'
+            accessToken = ENV.CURSEFORGE_TOKEN
+            minecraftVersions.add(project.minecraft_version)
+            requires {
+                slug = "fabric-api"
+                slug = "architectury-api"
             }
         }
     }
-}
-modrinth {
-    token = ENV.MODRINTH_TOKEN // This is the default. Remember to have the MODRINTH_TOKEN environment variable set or else this will fail, or set it to whatever you want - just make sure it stays private!
-    projectId = project.modrinth_id // This can be the project ID or the slug. Either will work!
-    versionNumber = project.mod_version // You don't need to set this manually. Will fail if Modrinth has this version already
-    versionType = project.modrinth_type // This is the default -- can also be `beta` or `alpha`
-    uploadFile = remapJar // With Loom, this MUST be set to `remapJar` instead of `jar`!
-    gameVersions = List.of(project.minecraft_version) // Must be an array, even with only one version
-    loaders = List.of("fabric") // Must also be an array - no need to specify this if you're using Loom or ForgeGradle
-    dependencies { // A special DSL for creating dependencies
-        required.project "architectury-api"
-        required.project "fabric-api"
+    if(ENV.MODRINTH_TOKEN){
+        modrinth {
+            projectId = project.modrinth_id
+            accessToken = ENV.MODRINTH_TOKEN
+            minecraftVersions.add(project.minecraft_version)
+            requires {
+                projectId = "lhGA9TYQ"
+                projectId = "P7dR8mSH"
+            }
+        }
     }
-}
-tasks.modrinth.onlyIf {
-    ENV.MODRINTH_TOKEN != null
+    if(ENV.GITHUB_TOKEN) {
+        github {
+            repository = "theatricalmod/Theatrical"
+            accessToken = providers.environmentVariable("GITHUB_TOKEN")
+            commitish = ENV.GITHUB_REF_NAME
+        }
+    }
 }

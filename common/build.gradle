@@ -1,6 +1,4 @@
-plugins {
-    id "com.modrinth.minotaur" version "2.+" apply false
-}
+
 architectury {
     common(rootProject.enabled_platforms.split(","))
 }
@@ -11,6 +9,12 @@ loom {
 
 configurations {
     shadowCommon
+}
+
+sourceSets {
+    main {
+        resources.srcDir file("src/generated/resources")
+    }
 }
 
 dependencies {
