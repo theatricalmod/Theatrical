@@ -34,7 +34,7 @@ public class ArtNetInterfaceBlockEntity extends ClientSyncBlockEntity {
 //                // dothings
 //
 //            }
-            if(tile.ownerUUID != null && tile.ownerUUID.equals(UUIDTypeAdapter.fromString(Minecraft.getInstance().getUser().getUuid()))){
+            if(tile.isOwnedByCurrentClient()){
                 byte[] data = TheatricalClient.getArtNetManager().getClient(tile.ip).readDmxData(tile.subnet, tile.universe);
                 new SendArtNetData(pos, data).sendToServer();
             }
@@ -45,6 +45,7 @@ public class ArtNetInterfaceBlockEntity extends ClientSyncBlockEntity {
     private int subnet, universe, tickTimer = 0;
     private String ip = "127.0.0.1";
     private UUID ownerUUID;
+
     public ArtNetInterfaceBlockEntity(BlockPos blockPos, BlockState blockState) {
         super(BlockEntities.ART_NET_INTERFACE.get(), blockPos, blockState);
     }
@@ -74,6 +75,27 @@ public class ArtNetInterfaceBlockEntity extends ClientSyncBlockEntity {
         }
     }
 
+    public boolean isOwnedByCurrentClient(){
+        if(level != null && level.isClientSide){
+            return ownerUUID != null && ownerUUID.equals(UUIDTypeAdapter.fromString(Minecraft.getInstance().getUser().getUuid()));
+        }
+        return false;
+    }
+
+    public boolean hasReceivedPacket(){
+        if(level != null && level.isClientSide){
+            return TheatricalClient.getArtNetManager().getClient(this.ip).hasReceivedPacket();
+        }
+        return false;
+    }
+
+    public long getLastReceivedPacket(){
+        if(level != null && level.isClientSide){
+            return TheatricalClient.getArtNetManager().getClient(this.ip).getLastPacketMS();
+        }
+        return 0;
+    }
+
     public int getUniverse() {
         return universe;
     }
@@ -82,13 +104,20 @@ public class ArtNetInterfaceBlockEntity extends ClientSyncBlockEntity {
         return ip;
     }
 
+    public UUID getOwnerUUID() {
+        return ownerUUID;
+    }
+
     public void updateConfig(String ipAddress, int dmxUniverse){
         this.ip = ipAddress;
         this.universe = dmxUniverse;
+        setChanged();
         level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
     }
 
     public void setOwnerUUID(UUID ownerUUID) {
         this.ownerUUID = ownerUUID;
+        setChanged();
+        level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
     }
 }

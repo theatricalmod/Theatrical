@@ -19,7 +19,6 @@ configurations {
     developmentFabric.extendsFrom common
 }
 
-sourceSets.main.resources { srcDir '../forge/src/generated/resources' }
 
 dependencies {
     modImplementation "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
@@ -89,5 +88,42 @@ publishing {
     // See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
     repositories {
         // Add repositories to publish to here.
+    }
+}
+
+publishMods {
+    file = remapJar.archiveFile
+    changelog = rootProject.file("CHANGELOG.md").text
+    type = project.release_type as me.modmuss50.mpp.PublishOptions.ReleaseType
+    modLoaders.add("fabric")
+
+    if(ENV.CURSEFORGE_TOKEN) {
+        curseforge {
+            projectId = project.curseforge_id
+            accessToken = ENV.CURSEFORGE_TOKEN
+            minecraftVersions.add(project.minecraft_version)
+            requires {
+                slug = "fabric-api"
+                slug = "architectury-api"
+            }
+        }
+    }
+    if(ENV.MODRINTH_TOKEN){
+        modrinth {
+            projectId = project.modrinth_id
+            accessToken = ENV.MODRINTH_TOKEN
+            minecraftVersions.add(project.minecraft_version)
+            requires {
+                projectId = "lhGA9TYQ"
+                projectId = "P7dR8mSH"
+            }
+        }
+    }
+    if(ENV.GITHUB_TOKEN) {
+        github {
+            repository = "theatricalmod/Theatrical"
+            accessToken = providers.environmentVariable("GITHUB_TOKEN")
+            commitish = ENV.GITHUB_REF_NAME
+        }
     }
 }

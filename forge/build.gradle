@@ -2,6 +2,8 @@ plugins {
     id "com.github.johnrengelman.shadow" version "7.1.2"
 }
 
+def ENV = System.getenv()
+
 architectury {
     platformSetupLoomIde()
     forge()
@@ -9,6 +11,17 @@ architectury {
 
 loom {
     accessWidenerPath = project(":common").loom.accessWidenerPath
+
+    runs {
+        data {
+            data()
+            programArgs "--all", "--mod", "theatrical"
+            programArgs '--output', project(':common').file('src/generated/resources').absolutePath
+            programArgs '--existing', file('src/main/resources').absolutePath
+            programArgs '--existing', project(':common').file('src/main/resources').absolutePath
+            programArgs '--existing-mod', 'theatrical'
+        }
+    }
 }
 
 configurations {
@@ -31,6 +44,9 @@ dependencies {
     implementation "ch.bildspur:artnet4j:0.6.2"
     forgeRuntimeLibrary "ch.bildspur:artnet4j:0.6.2"
     shadowCommon "ch.bildspur:artnet4j:0.6.2"
+
+    implementation 'com.sun.activation:javax.activation:1.2.0'
+    forgeRuntimeLibrary 'com.sun.activation:javax.activation:1.2.0'
 
     //YAML
     implementation "org.yaml:snakeyaml:1.33"
@@ -88,5 +104,40 @@ publishing {
     // See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
     repositories {
         // Add repositories to publish to here.
+    }
+}
+
+publishMods {
+    file = remapJar.archiveFile
+    changelog = rootProject.file("CHANGELOG.md").text
+    type = project.release_type as me.modmuss50.mpp.PublishOptions.ReleaseType
+    modLoaders.add("forge")
+
+    if(ENV.CURSEFORGE_TOKEN) {
+        curseforge {
+            projectId = project.curseforge_id
+            accessToken = ENV.CURSEFORGE_TOKEN
+            minecraftVersions.add(project.minecraft_version)
+            requires {
+                slug = "architectury-api"
+            }
+        }
+    }
+    if(ENV.MODRINTH_TOKEN){
+        modrinth {
+            projectId = project.modrinth_id
+            accessToken = ENV.MODRINTH_TOKEN
+            minecraftVersions.add(project.minecraft_version)
+            requires {
+                projectId = "lhGA9TYQ"
+            }
+        }
+    }
+    if(ENV.GITHUB_TOKEN) {
+        github {
+            repository = "theatricalmod/Theatrical"
+            accessToken = providers.environmentVariable("GITHUB_TOKEN")
+            commitish = ENV.GITHUB_REF_NAME
+        }
     }
 }

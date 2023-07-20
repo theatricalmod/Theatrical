@@ -15,6 +15,8 @@ import dev.imabad.theatrical.registry.FixtureRegistry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Theatrical {
     public static final String MOD_ID = "theatrical";
@@ -24,6 +26,7 @@ public class Theatrical {
 
     public static final GlobalCableManager CABLES = new GlobalCableManager();
 
+    public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
     public static void init() {
         ConfigHandler configHandler = new ConfigHandler(Platform.getConfigFolder());
         TheatricalConfig.INSTANCE.register(configHandler);

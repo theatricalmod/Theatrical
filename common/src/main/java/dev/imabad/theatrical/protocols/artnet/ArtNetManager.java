@@ -1,22 +1,23 @@
 package dev.imabad.theatrical.protocols.artnet;
 
 import ch.bildspur.artnet.ArtNetClient;
+import dev.imabad.theatrical.dmx.TheatricalArtNetClient;
 
 import java.util.HashMap;
 
 public class ArtNetManager {
 
-    private final HashMap<String, ArtNetClient> clients = new HashMap<>();
+    private final HashMap<String, TheatricalArtNetClient> clients = new HashMap<>();
 
-    public ArtNetClient getClient(String ip){
+    public TheatricalArtNetClient getClient(String ip){
         if(!this.clients.containsKey(ip)){
             return this.newClient(ip);
         }
         return this.clients.get(ip);
     }
 
-    private ArtNetClient newClient(String ip){
-        ArtNetClient client = new ArtNetClient();
+    private TheatricalArtNetClient newClient(String ip){
+        TheatricalArtNetClient client = new TheatricalArtNetClient();
         clients.put(ip, client);
         client.start(ip);
         return client;

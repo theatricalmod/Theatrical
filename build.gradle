@@ -2,6 +2,7 @@ plugins {
     id "architectury-plugin" version "3.4-SNAPSHOT"
     id "dev.architectury.loom" version "1.2-SNAPSHOT" apply false
     id 'io.github.juuxel.loom-quiltflower' version '1.10.0' apply false
+    id "me.modmuss50.mod-publish-plugin" version "0.0.10" apply false
 }
 
 architectury {
@@ -32,6 +33,7 @@ allprojects {
     apply plugin: "java"
     apply plugin: "architectury-plugin"
     apply plugin: "maven-publish"
+    apply plugin: "me.modmuss50.mod-publish-plugin"
 
     ext.ENV = System.getenv()
 

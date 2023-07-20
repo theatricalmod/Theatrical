@@ -3,6 +3,8 @@ package dev.imabad.theatrical.blocks.interfaces;
 import dev.imabad.theatrical.blockentities.interfaces.ArtNetInterfaceBlockEntity;
 import dev.imabad.theatrical.blocks.Blocks;
 import dev.imabad.theatrical.client.gui.screen.ArtNetInterfaceScreen;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
@@ -43,6 +45,7 @@ public class ArtNetInterfaceBlock extends Block implements EntityBlock {
     }
 
     @Override
+    @Environment(EnvType.CLIENT)
     public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
         if(level.isClientSide){
             ArtNetInterfaceBlockEntity be = (ArtNetInterfaceBlockEntity)level.getBlockEntity(pos);
@@ -53,9 +56,11 @@ public class ArtNetInterfaceBlock extends Block implements EntityBlock {
 
     @Override
     public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
-        BlockEntity be = level.getBlockEntity(pos);
-        if(be instanceof ArtNetInterfaceBlockEntity interfaceBlock && placer != null){
-            interfaceBlock.setOwnerUUID(placer.getUUID());
+        if(!level.isClientSide){
+            BlockEntity be = level.getBlockEntity(pos);
+            if(be instanceof ArtNetInterfaceBlockEntity interfaceBlock && placer != null){
+                interfaceBlock.setOwnerUUID(placer.getUUID());
+            }
         }
         super.setPlacedBy(level, pos, state, placer, stack);
     }

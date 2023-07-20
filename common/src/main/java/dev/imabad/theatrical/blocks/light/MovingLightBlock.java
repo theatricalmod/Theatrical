@@ -6,6 +6,8 @@ import dev.imabad.theatrical.blockentities.light.MovingLightBlockEntity;
 import dev.imabad.theatrical.blocks.Blocks;
 import dev.imabad.theatrical.client.gui.screen.ArtNetInterfaceScreen;
 import dev.imabad.theatrical.client.gui.screen.MovingLightScreen;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -88,6 +90,7 @@ public class MovingLightBlock extends BaseLightBlock{
     }
 
     @Override
+    @Environment(EnvType.CLIENT)
     public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
         if(level.isClientSide){
             MovingLightBlockEntity be = (MovingLightBlockEntity)level.getBlockEntity(pos);

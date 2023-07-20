@@ -3,6 +3,7 @@ package dev.imabad.theatrical.net;
 import dev.architectury.networking.NetworkManager;
 import dev.architectury.networking.simple.BaseC2SMessage;
 import dev.architectury.networking.simple.MessageType;
+import dev.imabad.theatrical.Theatrical;
 import dev.imabad.theatrical.blockentities.interfaces.ArtNetInterfaceBlockEntity;
 import dev.imabad.theatrical.net.TheatricalNet;
 import net.minecraft.core.BlockPos;
@@ -40,8 +41,16 @@ public class SendArtNetData extends BaseC2SMessage {
         Level level = context.getPlayer().level;
         BlockEntity be = level.getBlockEntity(pos);
         if(be instanceof ArtNetInterfaceBlockEntity artnetInterface) {
-            if(level.getServer() != null && context.getPlayer().hasPermissions(level.getServer().getOperatorUserPermissionLevel())){
-                artnetInterface.update(artNetData);
+            if(level.getServer() != null ){
+                if(artnetInterface.getOwnerUUID().equals(context.getPlayer().getUUID())){
+                    if(context.getPlayer().hasPermissions(level.getServer().getOperatorUserPermissionLevel())){
+                        artnetInterface.update(artNetData);
+                    } else {
+                        Theatrical.LOGGER.info("{} tried to send ArtNet data but is not authorized!", context.getPlayer().getName());
+                    }
+                } else {
+                    Theatrical.LOGGER.info("{} tried to send ArtNet data using a block they do not own!", context.getPlayer().getName());
+                }
             }
         }
     }

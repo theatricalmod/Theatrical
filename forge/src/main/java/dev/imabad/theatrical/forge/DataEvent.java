@@ -63,6 +63,9 @@ public class DataEvent {
             add("artneti.dmxUniverse", "DMX Universe");
             add("artneti.ipAddress", "IP Address");
             add("artneti.save", "Save");
+            add("artneti.notConnected", "No data received");
+            add("artneti.notAuthorized", "You're not authorized!");
+            add("artneti.lastReceived", "Data received %d second(s) ago");
             add("fixture.dmxStart", "DMX Address");
             add("screen.movinglight", "Moving Light");
         }

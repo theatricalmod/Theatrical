@@ -1,3 +1,4 @@
+
 architectury {
     common(rootProject.enabled_platforms.split(","))
 }
@@ -8,6 +9,12 @@ loom {
 
 configurations {
     shadowCommon
+}
+
+sourceSets {
+    main {
+        resources.srcDir file("src/generated/resources")
+    }
 }
 
 dependencies {
