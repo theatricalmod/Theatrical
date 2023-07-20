@@ -93,7 +93,7 @@ publishing {
 
 publishMods {
     file = remapJar.archiveFile
-    changelog = rootProject.file("changelog.md").text
+    changelog = rootProject.file("CHANGELOG.md").text
     type = project.release_type as me.modmuss50.mpp.PublishOptions.ReleaseType
     modLoaders.add("fabric")
 
