@@ -1,6 +1,7 @@
 package dev.imabad.theatrical.items;
 
 import dev.imabad.theatrical.Theatrical;
+import dev.imabad.theatrical.api.CableType;
 import dev.imabad.theatrical.blockentities.CableBlockEntity;
 import dev.imabad.theatrical.blocks.Blocks;
 import dev.imabad.theatrical.blocks.CableBlock;
@@ -21,14 +22,21 @@ import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
-public class CableItem extends Item {
-    public CableItem() {
+public abstract class CableItem extends Item {
+
+    private CableType cableType;
+
+    public CableItem(CableType cableType){
         super(new Item.Properties().tab(Theatrical.THEATRICAL_TAB));
+        this.cableType = cableType;
     }
 
     @Override
     public InteractionResult useOn(UseOnContext context) {
         Level level = context.getLevel();
+        if(level.isClientSide){
+            return InteractionResult.PASS;
+        }
         BlockPos pos = context.getClickedPos();
         if (!(level.getBlockState(context.getClickedPos()).getBlock() instanceof CableBlock) && !level.getBlockState(pos).getBlock().canBeReplaced(level.getBlockState(pos), new BlockPlaceContext(context)))
         {
@@ -41,15 +49,15 @@ public class CableItem extends Item {
 
         if (player.mayUseItemAt(pos, context.getClickedFace(), stack))
         {
+            boolean haveAdded = false;
             if (!(blockEntity instanceof CableBlockEntity))
             {
-                level.setBlock(pos, Blocks.CABLE.get().defaultBlockState(), 11);
+                level.setBlock(pos, Blocks.CABLE.get().defaultBlockState().setValue(CableBlock.CABLE_TYPE, cableType), 11);
                 blockEntity = level.getBlockEntity(pos);
             }
 
-            if (blockEntity instanceof CableBlockEntity)
+            if (level.getBlockState(pos).getValue(CableBlock.CABLE_TYPE).equals(cableType) && blockEntity instanceof CableBlockEntity cable)
             {
-                CableBlockEntity cable = (CableBlockEntity) blockEntity;
                 Direction opposite = context.getClickedFace().getOpposite();
 
                 if (cable.hasSide(opposite))
@@ -63,19 +71,23 @@ public class CableItem extends Item {
                         }
                     }
                 }else{
-                    boolean haveAdded = false;
                     cable.addSide(opposite);
+                    haveAdded = true;
                 }
                 blockEntity.setChanged();
             }
 
-            BlockState state = level.getBlockState(pos);
-            level.onBlockStateChange(pos, state, state);
+            if(haveAdded) {
+                BlockState state = level.getBlockState(pos);
+                level.onBlockStateChange(pos, state, state);
 
-            SoundType soundtype = state.getBlock().getSoundType(state);
-            level.playSound(player, pos, soundtype.getPlaceSound(), SoundSource.BLOCKS, (soundtype.getVolume() + 1.0F) / 2.0F, soundtype.getPitch() * 0.8F);
-            stack.shrink(1);
-            return InteractionResult.SUCCESS;
+                SoundType soundtype = state.getBlock().getSoundType(state);
+                level.playSound(player, pos, soundtype.getPlaceSound(), SoundSource.BLOCKS, (soundtype.getVolume() + 1.0F) / 2.0F, soundtype.getPitch() * 0.8F);
+                stack.shrink(1);
+                return InteractionResult.SUCCESS;
+            } else {
+                return InteractionResult.FAIL;
+            }
         }
 
         return InteractionResult.FAIL;

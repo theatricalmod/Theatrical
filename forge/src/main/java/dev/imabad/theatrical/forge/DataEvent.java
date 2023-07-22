@@ -2,12 +2,11 @@ package dev.imabad.theatrical.forge;
 
 import dev.imabad.theatrical.Theatrical;
 import dev.imabad.theatrical.blocks.Blocks;
+import dev.imabad.theatrical.forge.client.model.TheatricalForgeModelLoader;
 import dev.imabad.theatrical.items.Items;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.client.model.generators.BlockStateProvider;
-import net.minecraftforge.client.model.generators.ItemModelProvider;
-import net.minecraftforge.client.model.generators.ModelFile;
+import net.minecraftforge.client.model.generators.*;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.common.data.LanguageProvider;
 import net.minecraftforge.data.event.GatherDataEvent;
@@ -30,7 +29,18 @@ public class DataEvent {
         @Override
         protected void registerStatesAndModels() {
             simpleBlock(Blocks.ART_NET_INTERFACE.get());
+            registerCable();
 //            horizontalBlock(Blocks.PIPE_BLOCK.get(), new ModelFile.UncheckedModelFile(new ResourceLocation("theatrical:block/pipe")));
+        }
+
+        private void registerCable() {
+            // Using CustomLoaderBuilder we can define a JSON file for our model that will use our baked model
+            BlockModelBuilder generatorModel = models().getBuilder(Blocks.CABLE.getId().getPath())
+                    .parent(models().getExistingFile(mcLoc("cube")))
+                    .customLoader((blockModelBuilder, helper) -> new CustomLoaderBuilder<BlockModelBuilder>(TheatricalForgeModelLoader.CABLE_MODEL_LOADER,
+                            blockModelBuilder, helper) { })
+                    .end();
+            simpleBlock(Blocks.CABLE.get(), generatorModel);
         }
     }
 
@@ -45,6 +55,8 @@ public class DataEvent {
             cubeAll(Blocks.ART_NET_INTERFACE.getId().getPath(), new ResourceLocation(Theatrical.MOD_ID, "block/artnet_interface"));
             withExistingParent(Blocks.PIPE_BLOCK.getId().getPath(), new ResourceLocation(Theatrical.MOD_ID, "block/pipe"));
             withExistingParent(Blocks.MOVING_LIGHT_BLOCK.getId().getPath(), new ResourceLocation(Theatrical.MOD_ID, "block/moving_light/moving_head_whole"));
+            basicItem(Items.DMX_CABLE.getId());
+            basicItem(Items.BUNDLED_CABLE.getId());
         }
     }
 
@@ -59,6 +71,8 @@ public class DataEvent {
             addBlock(Blocks.ART_NET_INTERFACE, "ArtNet Interface");
             addBlock(Blocks.MOVING_LIGHT_BLOCK, "Moving Light");
             addBlock(Blocks.PIPE_BLOCK, "Rigging Pipe");
+            addItem(Items.DMX_CABLE, "DMX Cable");
+            addItem(Items.BUNDLED_CABLE, "Bundled Cable");
             add("itemGroup.theatrical.theatrical", "Theatrical");
             add("artneti.dmxUniverse", "DMX Universe");
             add("artneti.ipAddress", "IP Address");

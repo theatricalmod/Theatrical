@@ -1,1 +1,2 @@
 accessWidener   v2  named
+accessible field net/minecraft/client/renderer/block/model/BlockModel textureMap Ljava/util/Map;

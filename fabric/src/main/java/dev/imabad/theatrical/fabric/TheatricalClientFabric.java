@@ -3,7 +3,7 @@ package dev.imabad.theatrical.fabric;
 import dev.architectury.platform.Platform;
 import dev.imabad.theatrical.TheatricalClient;
 import dev.imabad.theatrical.api.Fixture;
-import dev.imabad.theatrical.fixtures.Fixtures;
+import dev.imabad.theatrical.fabric.client.model.TheatricalFabricModelLoader;
 import dev.imabad.theatrical.registry.FixtureRegistry;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.model.ModelLoadingRegistry;
@@ -21,6 +21,7 @@ public class TheatricalClientFabric implements ClientModInitializer {
                 out.accept(fixture.getTiltModel());
             }
         });
+        ModelLoadingRegistry.INSTANCE.registerResourceProvider(rm -> new TheatricalFabricModelLoader());
         WorldRenderEvents.BLOCK_OUTLINE.register(this::renderBlockOutline);
         if(Platform.isDevelopmentEnvironment()) {
             WorldRenderEvents.AFTER_TRANSLUCENT.register(this::renderWorldLastFabric);

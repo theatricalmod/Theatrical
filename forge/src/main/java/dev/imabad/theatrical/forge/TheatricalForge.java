@@ -5,6 +5,9 @@ import dev.architectury.platform.forge.EventBuses;
 import dev.imabad.theatrical.Theatrical;
 import dev.imabad.theatrical.TheatricalClient;
 import dev.imabad.theatrical.api.Fixture;
+import dev.imabad.theatrical.client.model.CableModelBase;
+import dev.imabad.theatrical.forge.client.TheatricalForgeClient;
+import dev.imabad.theatrical.forge.client.model.TheatricalForgeModelLoader;
 import dev.imabad.theatrical.registry.FixtureRegistry;
 import net.minecraftforge.client.event.ModelEvent;
 import net.minecraftforge.client.event.RenderHighlightEvent;
@@ -32,6 +35,7 @@ public class TheatricalForge {
                 additionalEvent.register(fixture.getStaticModel());
                 additionalEvent.register(fixture.getTiltModel());
             }
+            CableModelBase.getModelDependencies().forEach(additionalEvent::register);
         });
         MinecraftForge.EVENT_BUS.addListener((RenderHighlightEvent.Block renderHighlight) -> {
             TheatricalClient.renderHitBox(renderHighlight.getPoseStack(),renderHighlight.getCamera().getEntity().getLevel(), renderHighlight.getTarget().getBlockPos(), renderHighlight.getCamera().getEntity(), renderHighlight.getCamera());

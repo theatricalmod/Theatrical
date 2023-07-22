@@ -2,25 +2,16 @@ package dev.imabad.theatrical;
 
 import dev.architectury.injectables.annotations.ExpectPlatform;
 import dev.architectury.platform.Platform;
+import dev.imabad.theatrical.blockentities.CableBlockEntity;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 
 import java.nio.file.Path;
 
 public class TheatricalExpectPlatform {
-    /**
-     * We can use {@link Platform#getConfigFolder()} but this is just an example of {@link ExpectPlatform}.
-     * <p>
-     * This must be a <b>public static</b> method. The platform-implemented solution must be placed under a
-     * platform sub-package, with its class suffixed with {@code Impl}.
-     * <p>
-     * Example:
-     * Expect: net.examplemod.ExampleExpectPlatform#getConfigDirectory()
-     * Actual Fabric: net.examplemod.fabric.ExampleExpectPlatformImpl#getConfigDirectory()
-     * Actual Forge: net.examplemod.forge.ExampleExpectPlatformImpl#getConfigDirectory()
-     * <p>
-     * <a href="https://plugins.jetbrains.com/plugin/16210-architectury">You should also get the IntelliJ plugin to help with @ExpectPlatform.</a>
-     */
+
     @ExpectPlatform
     public static Path getConfigDirectory() {
         // Just throw an error, the content should get replaced at runtime.
@@ -29,6 +20,11 @@ public class TheatricalExpectPlatform {
 
     @ExpectPlatform
     public static BakedModel getBakedModel(ResourceLocation modelLocation){
+        throw new AssertionError();
+    }
+
+    @ExpectPlatform
+    public static BlockEntityType.BlockEntitySupplier<CableBlockEntity> getCableBlockEntity() {
         throw new AssertionError();
     }
 }

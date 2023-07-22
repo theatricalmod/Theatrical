@@ -3,6 +3,7 @@ package dev.imabad.theatrical.blocks;
 import com.mojang.authlib.minecraft.client.MinecraftClient;
 import com.mojang.math.Vector3d;
 import com.mojang.math.Vector3f;
+import dev.imabad.theatrical.TheatricalExpectPlatform;
 import dev.imabad.theatrical.api.CableType;
 import dev.imabad.theatrical.blockentities.CableBlockEntity;
 import dev.imabad.theatrical.graphs.CableNodePos;
@@ -15,6 +16,8 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -102,7 +105,7 @@ public class CableBlock extends Block implements EntityBlock {
 
     @Override
     public RenderShape getRenderShape(BlockState blockState) {
-        return RenderShape.ENTITYBLOCK_ANIMATED;
+        return RenderShape.MODEL;
     }
 
     @Override
@@ -118,7 +121,15 @@ public class CableBlock extends Block implements EntityBlock {
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-        return new CableBlockEntity(pos, state);
+        return TheatricalExpectPlatform.getCableBlockEntity().create(pos, state);
+    }
+
+    @Override
+    public void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, BlockPos fromPos, boolean isMoving) {
+        super.neighborChanged(state, level, pos, block, fromPos, isMoving);
+        if(level.getBlockEntity(pos) instanceof CableBlockEntity cbe){
+            cbe.neighboursUpdated();
+        }
     }
 
     @Override
@@ -150,6 +161,12 @@ public class CableBlock extends Block implements EntityBlock {
     public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
         GlobalCableManager.onCableRemoved(level, pos, state);
         super.onRemove(state, level, pos, newState, isMoving);
+    }
+
+
+    @Override
+    public void attack(BlockState state, Level level, BlockPos pos, Player player) {
+        super.attack(state, level, pos, player);
     }
 
     public static int getSubShapeHit(CableBlockEntity cableBlockEntity, Entity entity, BlockPos pos, VoxelShape... shapes)

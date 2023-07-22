@@ -45,7 +45,7 @@ public class TheatricalClient {
 
     public static void init() {
         BlockEntityRendererRegistry.register(BlockEntities.MOVING_LIGHT.get(), MovingLightRenderer::new);
-        BlockEntityRendererRegistry.register(BlockEntities.CABLE.get(), CableRenderer::new);
+//        BlockEntityRendererRegistry.register(BlockEntities.CABLE.get(), CableRenderer::new);
         artNetManager = new ArtNetManager();
     }
 

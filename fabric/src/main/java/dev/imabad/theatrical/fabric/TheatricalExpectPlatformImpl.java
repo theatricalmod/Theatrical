@@ -1,11 +1,14 @@
 package dev.imabad.theatrical.fabric;
 
 import dev.imabad.theatrical.TheatricalExpectPlatform;
+import dev.imabad.theatrical.blockentities.CableBlockEntity;
 import net.fabricmc.fabric.api.client.model.BakedModelManagerHelper;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 
 import java.nio.file.Path;
 
@@ -19,5 +22,9 @@ public class TheatricalExpectPlatformImpl {
 
     public static BakedModel getBakedModel(ResourceLocation modelLocation){
         return BakedModelManagerHelper.getModel(Minecraft.getInstance().getModelManager(), modelLocation);
+    }
+
+    public static <T extends BlockEntity> BlockEntityType.BlockEntitySupplier<CableBlockEntity> getCableBlockEntity() {
+        return CableBlockEntity::new;
     }
 }

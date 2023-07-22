@@ -2,10 +2,14 @@ package dev.imabad.theatrical.graphs;
 
 import dev.imabad.theatrical.Theatrical;
 import dev.imabad.theatrical.api.CableType;
+import dev.imabad.theatrical.util.ClientUtils;
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.phys.Vec3;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.*;
@@ -165,6 +169,9 @@ public class CableNetwork {
     }
 
     public boolean removeNode(LevelAccessor level, CableNodePos nodePos) {
+        if(level == null){
+            level = Minecraft.getInstance().level;
+        }
         // Attempt to remove the node from the position list.
         CableNode removed = nodesByPosition.remove(nodePos);
         if(removed == null) {
@@ -178,13 +185,20 @@ public class CableNetwork {
         if(!edgesByNode.containsKey(removed)) {
             return true;
         }
-
+        HashSet<BlockPos> affectedBlocks = new HashSet<>();
         // Remove any edges that existed to this node.
         Map<CableNode, CableEdge> edges = edgesByNode.remove(removed);
         for (CableNode cableNode : edges.keySet()) {
             if(edgesByNode.containsKey(cableNode)){
+                Vec3 location = cableNode.getPosition().getLocation();
+                affectedBlocks.add(ClientUtils.fromVec(location));
                 edgesByNode.get(cableNode)
                         .remove(removed);
+            }
+        }
+        if(level != null && level.isClientSide()){
+            for(BlockPos pos : affectedBlocks){
+                Minecraft.getInstance().levelRenderer.setBlocksDirty(pos.getX(), pos.getY(), pos.getZ(), pos.getX(), pos.getY(), pos.getZ());
             }
         }
         return true;

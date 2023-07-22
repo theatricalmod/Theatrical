@@ -4,6 +4,7 @@ import dev.imabad.theatrical.graphs.GlobalCableManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -16,7 +17,7 @@ public class CableBlockEntity extends ClientSyncBlockEntity {
     // 3 - south
     // 4 - west
     // 5 - east
-    private boolean[] cableSides = new boolean[6];
+    protected boolean[] cableSides = new boolean[6];
 
     public CableBlockEntity(BlockPos blockPos, BlockState blockState) {
         super(BlockEntities.CABLE.get(), blockPos, blockState);
@@ -60,16 +61,25 @@ public class CableBlockEntity extends ClientSyncBlockEntity {
     public void removeSide(Direction direction){
         cableSides[direction.ordinal()] = false;
         if(!getLevel().isClientSide){
-            GlobalCableManager.onCableSideRemoved(level, getBlockPos(), getBlockState(), direction);
+            triggerUpdates();
         }
     }
 
     public void addSide(Direction direction){
         cableSides[direction.ordinal()] = true;
         if(!getLevel().isClientSide) {
-            getLevel().scheduleTick(getBlockPos(), getBlockState().getBlock(), 1);
+            triggerUpdates();
         }
     }
+
+    protected void triggerUpdates(){
+        getLevel().scheduleTick(getBlockPos(), getBlockState().getBlock(), 1);
+        setChanged();
+        getLevel().sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), Block.UPDATE_ALL);
+        getLevel().updateNeighborsAt(getBlockPos(), getBlockState().getBlock());
+    }
+
+    public void neighboursUpdated(){}
 
     public boolean hasActiveSide(){
         for(boolean b : cableSides){

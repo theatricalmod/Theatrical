@@ -2,9 +2,13 @@ package dev.imabad.theatrical.net;
 
 import dev.architectury.networking.simple.MessageType;
 import dev.imabad.theatrical.api.CableType;
+import dev.imabad.theatrical.blockentities.CableBlockEntity;
 import dev.imabad.theatrical.graphs.*;
+import dev.imabad.theatrical.util.ClientUtils;
 import it.unimi.dsi.fastutil.Pair;
 import it.unimi.dsi.fastutil.ints.IntIntPair;
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 
 import java.util.*;
@@ -142,6 +146,18 @@ public class SyncCableNetwork extends CableNetworkPacket {
             CableNode node2 = network.getNodeById(ids.rightInt());
             if(node1 != null && node2 != null){
                 network.putEdge(node1, node2, new CableEdge(node1, node2, addedEdge.right()));
+                BlockPos node1Pos = ClientUtils.fromVec(node1.getPosition().getLocation());
+                BlockPos node2Pos = ClientUtils.fromVec(node2.getPosition().getLocation());
+                if(Minecraft.getInstance().level.getBlockEntity(node1Pos) instanceof CableBlockEntity cbe){
+                    cbe.neighboursUpdated();
+                }
+                if(Minecraft.getInstance().level.getBlockEntity(node2Pos) instanceof CableBlockEntity cbe){
+                    cbe.neighboursUpdated();
+                }
+                Minecraft.getInstance().levelRenderer.setBlocksDirty(node1Pos.getX(), node1Pos.getY(), node1Pos.getZ(),
+                        node1Pos.getX(), node1Pos.getY(), node1Pos.getZ());
+                Minecraft.getInstance().levelRenderer.setBlocksDirty(node2Pos.getX(), node2Pos.getY(), node2Pos.getZ(),
+                        node2Pos.getX(), node2Pos.getY(), node2Pos.getZ());
             }
         }
 
