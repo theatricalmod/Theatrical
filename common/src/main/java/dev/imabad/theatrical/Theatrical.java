@@ -48,30 +48,36 @@ public class Theatrical {
         BlockEntities.BLOCK_ENTITIES.register();
         dev.imabad.theatrical.items.Items.ITEMS.register();
         PlayerEvent.PLAYER_JOIN.register(CABLES::playerLogin);
-        BlockEvent.BREAK.register((Level level, BlockPos pos, BlockState state, ServerPlayer player, @Nullable IntValue xp) -> {
-            if(state.getBlock() instanceof CableBlock ){
-                if(level.getBlockEntity(pos) instanceof CableBlockEntity cbe) {
-                    int shapeIndex = CableBlock.getSubShapeHit(cbe, player, pos, CableBlock.BOXES);
-
-                    if (shapeIndex >= 0 && shapeIndex < CableBlock.BOXES.length) {
-                        Direction direction = Direction.values()[shapeIndex];
-                        if(cbe.hasSide(direction)){
-                            cbe.removeSide(direction);
-                            if(!cbe.hasActiveSide()){
-                                return EventResult.pass();
-                            } else {
-                                return EventResult.interruptFalse();
-                            }
-                        }
-                    }
-                }
-            }
-            return EventResult.pass();
-        });
     }
 
     private static void registerFixtures(){
         FixtureRegistry.buildRegistry();
         Fixtures.FIXTURES.register();
+    }
+
+    /**
+     * Handle breaking a cable
+     * @param level
+     * @param pos
+     * @param state
+     * @param player
+     * @return true = cancel the event
+     */
+    public static boolean handleBlockBreak(Level level, BlockPos pos, BlockState state, ServerPlayer player){
+        if(state.getBlock() instanceof CableBlock ){
+            if(level.getBlockEntity(pos) instanceof CableBlockEntity cbe) {
+                int shapeIndex = CableBlock.getSubShapeHit(cbe, player, pos, CableBlock.BOXES);
+
+                if (shapeIndex >= 0 && shapeIndex < CableBlock.BOXES.length) {
+                    Direction direction = Direction.values()[shapeIndex];
+                    if(cbe.hasSide(direction)){
+                        cbe.removeSide(direction);
+                        GlobalCableManager.onCableSideRemoved(level, pos, state, direction);
+                        return cbe.hasActiveSide();
+                    }
+                }
+            }
+        }
+        return false;
     }
 }

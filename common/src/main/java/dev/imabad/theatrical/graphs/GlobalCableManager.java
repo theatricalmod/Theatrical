@@ -3,6 +3,7 @@ package dev.imabad.theatrical.graphs;
 import dev.imabad.theatrical.Theatrical;
 import dev.imabad.theatrical.api.CableType;
 import dev.imabad.theatrical.blocks.CableBlock;
+import dev.imabad.theatrical.graphs.api.Node;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -111,7 +112,7 @@ public class GlobalCableManager {
         });
     }
     public static void onCableSideRemoved(LevelAccessor level, BlockPos pos, BlockState state, Direction side){
-        if(!(state.getBlock() instanceof CableBlock cable))
+        if(!(state.getBlock() instanceof Node cable))
             return;
 
         Collection<CableNodePos.DiscoveredPosition> ends = cable.getPossibleNodesForSide(side, level, pos);
@@ -143,7 +144,12 @@ public class GlobalCableManager {
         Set<CableNetwork> toUpdate = new HashSet<>();
         for(BlockPos bPos : endsToUpdate){
             if(!bPos.equals(pos)){
-                CableNetwork onCableAdded = onCableAdded(level, bPos, level.getBlockState(bPos));
+                CableType cableType = CableType.BUNDLED;
+                if(level.getBlockState(bPos).hasProperty(CableBlock.CABLE_TYPE)){
+                    cableType = level.getBlockState(bPos).getValue(CableBlock.CABLE_TYPE);
+                }
+                CableNetwork onCableAdded = onCableAdded(level, bPos, level.getBlockState(bPos),
+                        cableType);
                 if(onCableAdded != null){
                     toUpdate.add(onCableAdded);
                 }
@@ -157,7 +163,7 @@ public class GlobalCableManager {
         MANAGER.markDirty();
     }
     public static void onCableRemoved(LevelAccessor level, BlockPos pos, BlockState state){
-        if(!(state.getBlock() instanceof CableBlock cable))
+        if(!(state.getBlock() instanceof Node cable))
             return;
 
         Collection<CableNodePos.DiscoveredPosition> ends = cable.getConnected(null, level, pos, state);
@@ -189,7 +195,12 @@ public class GlobalCableManager {
         Set<CableNetwork> toUpdate = new HashSet<>();
         for(BlockPos bPos : endsToUpdate){
             if(!bPos.equals(pos)){
-                CableNetwork onCableAdded = onCableAdded(level, bPos, level.getBlockState(bPos));
+                CableType cableType = CableType.BUNDLED;
+                if(level.getBlockState(bPos).hasProperty(CableBlock.CABLE_TYPE)){
+                    cableType = level.getBlockState(bPos).getValue(CableBlock.CABLE_TYPE);
+                }
+                CableNetwork onCableAdded = onCableAdded(level, bPos, level.getBlockState(bPos),
+                        cableType);
                 if(onCableAdded != null){
                     toUpdate.add(onCableAdded);
                 }
@@ -212,9 +223,9 @@ public class GlobalCableManager {
         }
     }
 
-    public static CableNetwork onCableAdded(LevelAccessor level, BlockPos pos, BlockState state){
+    public static CableNetwork onCableAdded(LevelAccessor level, BlockPos pos, BlockState state, CableType cableType){
         // We only care about blocks that are cables.
-        if(!(state.getBlock() instanceof CableBlock cable))
+        if(!(state.getBlock() instanceof Node cable))
             return null;
 
         // First step
@@ -283,7 +294,7 @@ public class GlobalCableManager {
         } else if(connectedNetworks.size() == 1){
             network = connectedNetworks.stream().findFirst().get();
         } else{
-            MANAGER.putNetwork(network = new CableNetwork(UUID.randomUUID(), state.getValue(CableBlock.CABLE_TYPE)));
+            MANAGER.putNetwork(network = new CableNetwork(UUID.randomUUID(), cableType));
         }
 
         CableNodePos.DiscoveredPosition startNode = null;
@@ -343,7 +354,7 @@ public class GlobalCableManager {
         }
     }
 
-    private static void addInitialEndsOf(LevelAccessor level, BlockPos pos, BlockState state, CableBlock cable, List<FrontierEntry> frontier){
+    private static void addInitialEndsOf(LevelAccessor level, BlockPos pos, BlockState state, Node cable, List<FrontierEntry> frontier){
         for(CableNodePos.DiscoveredPosition initial : cable.getConnected(null, level, pos, state)){
             frontier.add(new FrontierEntry(null, null, initial));
         }

@@ -11,6 +11,10 @@ architectury {
 
 loom {
     accessWidenerPath = project(":common").loom.accessWidenerPath
+    forge {
+        mixinConfig "theatrical-common.mixins.json"
+        mixinConfig "theatrical-forge.mixins.json"
+    }
 
     runs {
         data {

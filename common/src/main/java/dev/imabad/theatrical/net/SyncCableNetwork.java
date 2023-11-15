@@ -130,7 +130,20 @@ public class SyncCableNetwork extends CableNetworkPacket {
         for(int nodeId: removedNodes){
             CableNode node = network.getNodeById(nodeId);
             if(node != null){
-                network.removeNode(null, node.getPosition());
+                Map<CableNode, CableEdge> edges = network.getEdges(node);
+                if(edges != null) {
+                    edges.forEach((node2, edge) -> {
+                        BlockPos node2Pos = ClientUtils.fromVec(node2.getPosition().getLocation());
+                        if (Minecraft.getInstance().level.getBlockEntity(node2Pos) instanceof CableBlockEntity cbe) {
+                            cbe.neighboursUpdated();
+                        }
+                    });
+                    BlockPos node2Pos = ClientUtils.fromVec(node.getPosition().getLocation());
+                    if (Minecraft.getInstance().level.getBlockEntity(node2Pos) instanceof CableBlockEntity cbe) {
+                        cbe.neighboursUpdated();
+                    }
+                    network.removeNode(null, node.getPosition());
+                }
             }
         }
 

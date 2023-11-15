@@ -22,7 +22,10 @@
       "dev.imabad.theatrical.fabric.TheatricalClientFabric"
     ]
   },
-  "mixins": ["theatrical.mixins.json"],
+  "mixins": [
+    "theatrical-common.mixins.json",
+    "theatrical-fabric.mixins.json"
+  ],
   "depends": {
     "fabric": "*",
     "minecraft": ">=1.19.2",

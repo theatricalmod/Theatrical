@@ -8,6 +8,7 @@ import dev.imabad.theatrical.api.CableType;
 import dev.imabad.theatrical.blockentities.CableBlockEntity;
 import dev.imabad.theatrical.graphs.CableNodePos;
 import dev.imabad.theatrical.graphs.GlobalCableManager;
+import dev.imabad.theatrical.graphs.api.Node;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -21,6 +22,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.RenderShape;
@@ -44,7 +47,7 @@ import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-public class CableBlock extends Block implements EntityBlock {
+public class CableBlock extends NetworkNodeBlock implements EntityBlock, Node {
 
     public static enum DirectionAxes {
         DOWN(new Vec3(1, 0, 0), new Vec3(0, 0, 1)),
@@ -118,6 +121,36 @@ public class CableBlock extends Block implements EntityBlock {
         return true;
     }
 
+    @Override
+    public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos currentPos, BlockPos neighborPos) {
+        if(!level.isClientSide() && level.getBlockEntity(currentPos) instanceof CableBlockEntity cbe) {
+            if(cbe.hasSide(direction) && !this.canSurvive(state, level, currentPos)){
+                return net.minecraft.world.level.block.Blocks.AIR.defaultBlockState();
+            }
+        }
+        return super.updateShape(state, direction, neighborState, level, currentPos, neighborPos);
+    }
+
+    @Override
+    public boolean canSurvive(BlockState state, LevelReader level, BlockPos pos) {
+        if(!level.isClientSide() && level.getBlockEntity(pos) instanceof CableBlockEntity cbe) {
+            for (Direction d : Direction.values()) {
+                if(cbe.hasSide(d)){
+                    if(!level.getBlockState(pos.relative(d)).getMaterial().isSolid()){
+                        cbe.removeSide(d);
+                        GlobalCableManager.onCableSideRemoved(cbe.getLevel(), pos, state, d);
+                    }
+                }
+            }
+            if(!cbe.hasActiveSide()){
+                return false;
+            } else {
+                return true;
+            }
+        }
+        return super.canSurvive(state, level, pos);
+    }
+
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
@@ -144,25 +177,9 @@ public class CableBlock extends Block implements EntityBlock {
     }
 
     @Override
-    public void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
-        GlobalCableManager.onCableAdded(level, pos, state);
+    public CableType getAcceptedCableType(LevelAccessor level, BlockPos pos) {
+        return level.getBlockState(pos).getValue(CABLE_TYPE);
     }
-
-    @Override
-    public void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean isMoving) {
-        if (level.isClientSide)
-            return;
-        LevelTickAccess<Block> blockTicks = level.getBlockTicks();
-        if (!blockTicks.hasScheduledTick(pos, this))
-            level.scheduleTick(pos, this, 1);
-    }
-
-    @Override
-    public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
-        GlobalCableManager.onCableRemoved(level, pos, state);
-        super.onRemove(state, level, pos, newState, isMoving);
-    }
-
 
     @Override
     public void attack(BlockState state, Level level, BlockPos pos, Player player) {
@@ -214,11 +231,11 @@ public class CableBlock extends Block implements EntityBlock {
                         addToListIfConnected(from, connected,
                                 (isPositive) -> level instanceof Level l ? l.dimension() : Level.OVERWORLD,
                                 (isPositive, tPos) -> getCableType(level, new BlockPos(tPos)),
-                                getOffsetPos(dirCenter, direction, axe, false));
+                                getOffsetPos(dirCenter, axe, false));
                         addToListIfConnected(from, connected,
                                 (isPositive) -> level instanceof Level l ? l.dimension() : Level.OVERWORLD,
                                 (isPositive, tPos) -> getCableType(level, new BlockPos(tPos)),
-                                getOffsetPos(dirCenter, direction, axe, true));
+                                getOffsetPos(dirCenter, axe, true));
                     }
                 }
             }
@@ -241,24 +258,19 @@ public class CableBlock extends Block implements EntityBlock {
                 addToListIfConnected(null, connected,
                         (isPositive) -> level instanceof Level l ? l.dimension() : Level.OVERWORLD,
                         (isPositive, tPos) -> getCableType(level, new BlockPos(tPos)),
-                        getOffsetPos(dirCenter, side, axe, false));
+                        getOffsetPos(dirCenter, axe, false));
                 addToListIfConnected(null, connected,
                         (isPositive) -> level instanceof Level l ? l.dimension() : Level.OVERWORLD,
                         (isPositive, tPos) -> getCableType(level, new BlockPos(tPos)),
-                        getOffsetPos(dirCenter, side, axe, true));
+                        getOffsetPos(dirCenter, axe, true));
             }
         }
         return connected;
     }
 
     @NotNull
-    private static BiFunction<Double, Boolean, Vec3> getOffsetPos(Vec3 center, Direction direction, Vec3 axe, boolean isNeg) {
-        return (distance, isPositive) -> modifyAxis(axe, direction).scale(isPositive ? 0 : isNeg ? -distance : distance).add(center);
-    }
-
-    public static Vec3 modifyAxis(Vec3 axe, Direction direction){
-        Vector3f xyzDegrees = direction.getRotation().toXYZDegrees();
-        return axe;
+    public static BiFunction<Double, Boolean, Vec3> getOffsetPos(Vec3 center, Vec3 axe, boolean isNeg) {
+        return (distance, isPositive) -> axe.scale(isPositive ? 0 : isNeg ? -distance : distance).add(center);
     }
 
     public static Vec3 modifyCenter(Vec3 center, Direction direction){
@@ -291,13 +303,13 @@ public class CableBlock extends Block implements EntityBlock {
         CableNodePos.DiscoveredPosition firstLocation = new CableNodePos.DiscoveredPosition(dimensionGetter.apply(true),
                 firstOffset)
                 .typeA(typeGetter.apply(true, posGetter.apply(0.0d, true)))
-                .typeB(typeGetter.apply(true, posGetter.apply(1.0d, true)));
+                .typeB(typeGetter.apply(true, posGetter.apply(1d, true)));
         // Our first position is offset by 0.5 in the negative axis
         Vec3 secondOffset = posGetter.apply(0.5, false);
         CableNodePos.DiscoveredPosition secondLocation = new CableNodePos.DiscoveredPosition(dimensionGetter.apply(false),
                 secondOffset)
                 .typeA(typeGetter.apply(false, posGetter.apply(0.0d, false)))
-                .typeB(typeGetter.apply(false, posGetter.apply(1.0d, false)));
+                .typeB(typeGetter.apply(false, posGetter.apply(1d, false)));
 
         boolean skipFirst = false;
         boolean skipSecond = false;
@@ -328,12 +340,11 @@ public class CableBlock extends Block implements EntityBlock {
     public static Collection<CableNodePos.DiscoveredPosition> walkCable(BlockGetter level, CableNodePos cablePos){
         List<CableNodePos.DiscoveredPosition> foundCables = new ArrayList<>();
         if(cablePos == null){
-            System.out.println("Oh my god, where the fuck is this null cablepos");
             return foundCables;
         }
         for(BlockPos pos : cablePos.allAdjacent()){
             BlockState blockState = level.getBlockState(pos);
-            if(blockState.getBlock() instanceof CableBlock cable){
+            if(blockState.getBlock() instanceof Node cable){
                 foundCables.addAll(cable.getConnected(cablePos, level, pos, blockState));
             }
         }

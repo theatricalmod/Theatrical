@@ -176,7 +176,7 @@ public class CableBakedModelFabric extends CableBakedModelBase implements BakedM
                                         Map<Direction, List<BakedQuad>> directionListMap = cornerPieces.get(side).get(cableType);
                                         if(directionListMap.containsKey(nodeConnectionDirection)){
                                             for (BakedQuad quad : directionListMap.get(nodeConnectionDirection)) {
-                                                emitter.fromVanilla(quad, renderMaterial, side.getOpposite());
+                                                emitter.fromVanilla(quad, renderMaterial, null);
                                                 emitter.emit();
                                             }
                                         }
@@ -213,11 +213,10 @@ public class CableBakedModelFabric extends CableBakedModelBase implements BakedM
                                     Map<Direction, List<BakedQuad>> directionListMap = directionToTypeToSide.get(side)
                                             .get(cableType);
                                     if(directionListMap.containsKey(nodeConnectionDirection)){
-                                        directionListMap
-                                                .get(nodeConnectionDirection).forEach((quad) -> {
-                                                    emitter.fromVanilla(quad, renderMaterial, side.getOpposite());
-                                                    emitter.emit();
-                                                });
+                                        for (BakedQuad quad : directionListMap.get(nodeConnectionDirection)) {
+                                            emitter.fromVanilla(quad, renderMaterial, null);
+                                            emitter.emit();
+                                        }
                                         renderedEdges++;
                                     }
                                 }

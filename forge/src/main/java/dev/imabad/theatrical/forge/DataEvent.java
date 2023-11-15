@@ -55,7 +55,6 @@ public class DataEvent {
             cubeAll(Blocks.ART_NET_INTERFACE.getId().getPath(), new ResourceLocation(Theatrical.MOD_ID, "block/artnet_interface"));
             withExistingParent(Blocks.PIPE_BLOCK.getId().getPath(), new ResourceLocation(Theatrical.MOD_ID, "block/pipe"));
             withExistingParent(Blocks.MOVING_LIGHT_BLOCK.getId().getPath(), new ResourceLocation(Theatrical.MOD_ID, "block/moving_light/moving_head_whole"));
-            basicItem(Items.DMX_CABLE.getId());
             basicItem(Items.BUNDLED_CABLE.getId());
         }
     }
@@ -71,7 +70,6 @@ public class DataEvent {
             addBlock(Blocks.ART_NET_INTERFACE, "ArtNet Interface");
             addBlock(Blocks.MOVING_LIGHT_BLOCK, "Moving Light");
             addBlock(Blocks.PIPE_BLOCK, "Rigging Pipe");
-            addItem(Items.DMX_CABLE, "DMX Cable");
             addItem(Items.BUNDLED_CABLE, "Bundled Cable");
             add("itemGroup.theatrical.theatrical", "Theatrical");
             add("artneti.dmxUniverse", "DMX Universe");

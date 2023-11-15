@@ -50,5 +50,8 @@ public class CableBlockEntityForge extends CableBlockEntity {
         requestModelDataUpdate();
     }
 
-
+    @Override
+    public void setRemoved() {
+        super.setRemoved();
+    }
 }

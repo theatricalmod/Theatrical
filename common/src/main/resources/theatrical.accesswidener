@@ -1,2 +1,3 @@
 accessWidener   v2  named
 accessible field net/minecraft/client/renderer/block/model/BlockModel textureMap Ljava/util/Map;
+accessible field net/minecraft/server/network/ServerGamePacketListenerImpl ackBlockChangesUpTo I

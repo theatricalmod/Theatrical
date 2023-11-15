@@ -13,6 +13,7 @@ import net.minecraftforge.client.event.ModelEvent;
 import net.minecraftforge.client.event.RenderHighlightEvent;
 import net.minecraftforge.client.event.RenderLevelStageEvent;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -38,7 +39,11 @@ public class TheatricalForge {
             CableModelBase.getModelDependencies().forEach(additionalEvent::register);
         });
         MinecraftForge.EVENT_BUS.addListener((RenderHighlightEvent.Block renderHighlight) -> {
-            TheatricalClient.renderHitBox(renderHighlight.getPoseStack(),renderHighlight.getCamera().getEntity().getLevel(), renderHighlight.getTarget().getBlockPos(), renderHighlight.getCamera().getEntity(), renderHighlight.getCamera());
+            if(!TheatricalClient.renderHitBox(renderHighlight.getPoseStack(),
+                    renderHighlight.getCamera().getEntity().getLevel(), renderHighlight.getTarget().getBlockPos(),
+                    renderHighlight.getCamera().getEntity(), renderHighlight.getCamera())){
+                renderHighlight.setCanceled(true);
+            }
         });
         if(Platform.isDevelopmentEnvironment()) {
             MinecraftForge.EVENT_BUS.addListener((RenderLevelStageEvent renderLevelStageEvent) -> {
