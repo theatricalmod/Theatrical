@@ -12,6 +12,9 @@ loom {
     forge {
         mixinConfig "theatrical-common.mixins.json"
         mixinConfig "theatrical-forge.mixins.json"
+
+        convertAccessWideners = true
+        extraAccessWideners.add loom.accessWidenerPath.get().asFile.name
     }
 
     runs {
@@ -43,17 +46,17 @@ dependencies {
     shadowCommon(project(path: ":common", configuration: "transformProductionForge")) { transitive = false }
 
     //ArtNet
-    implementation "ch.bildspur:artnet4j:0.6.2"
-    forgeRuntimeLibrary "ch.bildspur:artnet4j:0.6.2"
-    shadowCommon "ch.bildspur:artnet4j:0.6.2"
+    implementation "ch.bildspur:artnet4j:${rootProject.artnet4j_version}"
+    forgeRuntimeLibrary "ch.bildspur:artnet4j:${rootProject.artnet4j_version}"
+    shadowCommon "ch.bildspur:artnet4j:${rootProject.artnet4j_version}"
 
     implementation 'com.sun.activation:javax.activation:1.2.0'
     forgeRuntimeLibrary 'com.sun.activation:javax.activation:1.2.0'
 
     //YAML
-    implementation "org.yaml:snakeyaml:1.33"
-    forgeRuntimeLibrary "org.yaml:snakeyaml:1.33"
-    shadowCommon "org.yaml:snakeyaml:1.33"
+    implementation "org.yaml:snakeyaml:${rootProject.snakeyaml_version}"
+    forgeRuntimeLibrary "org.yaml:snakeyaml:${rootProject.snakeyaml_version}"
+    shadowCommon "org.yaml:snakeyaml:${rootProject.snakeyaml_version}"
 }
 
 processResources {

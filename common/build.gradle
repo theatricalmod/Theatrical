@@ -1,4 +1,3 @@
-
 architectury {
     common(rootProject.enabled_platforms.split(","))
 }
@@ -25,12 +24,12 @@ dependencies {
     modApi "dev.architectury:architectury:${rootProject.architectury_version}"
 
     //Artnet
-    implementation "ch.bildspur:artnet4j:0.6.2"
-    shadowCommon "ch.bildspur:artnet4j:0.6.2"
+    implementation "ch.bildspur:artnet4j:${rootProject.artnet4j_version}"
+    shadowCommon "ch.bildspur:artnet4j:${rootProject.artnet4j_version}"
 
     //YAML
-    implementation "org.yaml:snakeyaml:1.33"
-    shadowCommon "org.yaml:snakeyaml:1.33"
+    implementation "org.yaml:snakeyaml:${rootProject.snakeyaml_version}"
+    shadowCommon "org.yaml:snakeyaml:${rootProject.snakeyaml_version}"
 }
 
 publishing {

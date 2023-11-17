@@ -1,5 +1,5 @@
 plugins {
-    id "com.github.johnrengelman.shadow" version "7.0.0"
+    id "com.github.johnrengelman.shadow" version "7.1.2"
 }
 
 architectury {
@@ -30,12 +30,12 @@ dependencies {
     shadowCommon(project(path: ":common", configuration: "transformProductionFabric")) { transitive false }
 
     //ArtNet
-    implementation "ch.bildspur:artnet4j:0.6.2"
-    shadowCommon "ch.bildspur:artnet4j:0.6.2"
+    implementation "ch.bildspur:artnet4j:${rootProject.artnet4j_version}"
+    shadowCommon "ch.bildspur:artnet4j:${rootProject.artnet4j_version}"
 
     //YAML
-    implementation "org.yaml:snakeyaml:1.33"
-    shadowCommon "org.yaml:snakeyaml:1.33"
+    implementation "org.yaml:snakeyaml:${rootProject.snakeyaml_version}"
+    shadowCommon "org.yaml:snakeyaml:${rootProject.snakeyaml_version}"
 }
 
 processResources {
