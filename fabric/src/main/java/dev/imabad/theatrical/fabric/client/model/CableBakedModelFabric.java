@@ -1,8 +1,5 @@
 package dev.imabad.theatrical.fabric.client.model;
 
-import com.mojang.datafixers.util.Either;
-import com.mojang.math.Quaternion;
-import com.mojang.math.Transformation;
 import dev.imabad.theatrical.TheatricalClient;
 import dev.imabad.theatrical.api.CableType;
 import dev.imabad.theatrical.blockentities.CableBlockEntity;
@@ -25,13 +22,10 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.model.BakedQuad;
-import net.minecraft.client.renderer.block.model.ItemOverrides;
-import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.resources.model.*;
+import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockAndTintGetter;
@@ -39,7 +33,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Supplier;
 
 @Environment(EnvType.CLIENT)

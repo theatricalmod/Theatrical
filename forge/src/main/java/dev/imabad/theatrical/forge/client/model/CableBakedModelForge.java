@@ -2,7 +2,6 @@ package dev.imabad.theatrical.forge.client.model;
 
 import dev.imabad.theatrical.TheatricalClient;
 import dev.imabad.theatrical.api.CableType;
-import dev.imabad.theatrical.blockentities.CableBlockEntity;
 import dev.imabad.theatrical.blocks.CableBlock;
 import dev.imabad.theatrical.client.model.CableBakedModelBase;
 import dev.imabad.theatrical.client.model.CableModelBase;
@@ -12,11 +11,8 @@ import dev.imabad.theatrical.graphs.CableNetwork;
 import dev.imabad.theatrical.graphs.CableNode;
 import dev.imabad.theatrical.graphs.CableNodePos;
 import dev.imabad.theatrical.util.ClientUtils;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.model.BakedQuad;
-import net.minecraft.client.renderer.block.model.ItemOverrides;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -30,7 +26,10 @@ import net.minecraftforge.client.model.data.ModelData;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 public class CableBakedModelForge extends CableBakedModelBase implements IDynamicBakedModel {
     public CableBakedModelForge(CableModelBase cable, TextureAtlasSprite p, CableModelBase.ModelCallback c) {

@@ -3,7 +3,6 @@ package dev.imabad.theatrical.net;
 import dev.architectury.networking.NetworkManager;
 import dev.architectury.networking.simple.BaseC2SMessage;
 import dev.architectury.networking.simple.MessageType;
-import dev.imabad.theatrical.blockentities.interfaces.ArtNetInterfaceBlockEntity;
 import dev.imabad.theatrical.blockentities.light.BaseDMXConsumerLightBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;

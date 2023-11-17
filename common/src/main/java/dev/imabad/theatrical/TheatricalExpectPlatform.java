@@ -1,11 +1,9 @@
 package dev.imabad.theatrical;
 
 import dev.architectury.injectables.annotations.ExpectPlatform;
-import dev.architectury.platform.Platform;
 import dev.imabad.theatrical.blockentities.CableBlockEntity;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 
 import java.nio.file.Path;

@@ -1,12 +1,9 @@
 package dev.imabad.theatrical.blockentities;
 
-import dev.imabad.theatrical.graphs.GlobalCableManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class CableBlockEntity extends ClientSyncBlockEntity {

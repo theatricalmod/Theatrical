@@ -5,7 +5,6 @@ import dev.architectury.networking.simple.BaseC2SMessage;
 import dev.architectury.networking.simple.MessageType;
 import dev.imabad.theatrical.Theatrical;
 import dev.imabad.theatrical.blockentities.interfaces.ArtNetInterfaceBlockEntity;
-import dev.imabad.theatrical.net.TheatricalNet;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.level.Level;

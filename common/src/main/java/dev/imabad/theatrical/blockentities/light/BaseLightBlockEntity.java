@@ -1,13 +1,11 @@
 package dev.imabad.theatrical.blockentities.light;
 
-import dev.architectury.injectables.annotations.ExpectPlatform;
 import dev.imabad.theatrical.api.FixtureProvider;
 import dev.imabad.theatrical.blockentities.ClientSyncBlockEntity;
 import dev.imabad.theatrical.blocks.HangableBlock;
 import dev.imabad.theatrical.config.TheatricalConfig;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.ClipContext;

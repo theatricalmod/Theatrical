@@ -1,11 +1,8 @@
 package dev.imabad.theatrical;
 
-import dev.architectury.event.EventResult;
-import dev.architectury.event.events.common.BlockEvent;
 import dev.architectury.event.events.common.PlayerEvent;
 import dev.architectury.platform.Platform;
 import dev.architectury.registry.CreativeTabRegistry;
-import dev.architectury.utils.value.IntValue;
 import dev.imabad.theatrical.blockentities.BlockEntities;
 import dev.imabad.theatrical.blockentities.CableBlockEntity;
 import dev.imabad.theatrical.blocks.Blocks;
@@ -24,9 +21,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
-import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
