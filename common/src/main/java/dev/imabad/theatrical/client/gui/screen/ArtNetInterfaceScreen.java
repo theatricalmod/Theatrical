@@ -1,10 +1,9 @@
 package dev.imabad.theatrical.client.gui.screen;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
 import dev.imabad.theatrical.Theatrical;
 import dev.imabad.theatrical.blockentities.interfaces.ArtNetInterfaceBlockEntity;
 import dev.imabad.theatrical.net.UpdateArtNetInterface;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
@@ -40,7 +39,12 @@ public class ArtNetInterfaceScreen extends Screen {
         this.ipAddress.setEditable(be.isOwnedByCurrentClient());
         this.addWidget(this.ipAddress);
         if(be.isOwnedByCurrentClient()) {
-            this.addRenderableWidget(new Button(xCenter + 40, yCenter + 90, 100, 20, Component.translatable("artneti.save"), button -> this.update()));
+            this.addRenderableWidget(
+                new Button.Builder(Component.translatable("artneti.save"), button -> this.update())
+                    .pos(xCenter + 40, yCenter + 90)
+                    .size(100, 20)
+                    .build()
+            );
         }
     }
 
@@ -57,41 +61,40 @@ public class ArtNetInterfaceScreen extends Screen {
     }
 
     @Override
-    public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
-        this.renderBackground(poseStack);
-        this.renderWindow(poseStack);
-        super.render(poseStack, mouseX, mouseY, partialTick);
-        this.dmxUniverse.render(poseStack, mouseX, mouseY, partialTick);
-        this.ipAddress.render(poseStack, mouseX, mouseY, partialTick);
-        this.renderLabels(poseStack);
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        this.renderBackground(guiGraphics);
+        this.renderWindow(guiGraphics);
+        super.render(guiGraphics, mouseX, mouseY, partialTick);
+        this.dmxUniverse.render(guiGraphics, mouseX, mouseY, partialTick);
+        this.ipAddress.render(guiGraphics, mouseX, mouseY, partialTick);
+        this.renderLabels(guiGraphics);
     }
 
-    private void renderWindow(PoseStack poseStack){
-        RenderSystem.setShaderTexture(0, GUI);
+    private void renderWindow(GuiGraphics guiGraphics){
         int relX = (this.width - this.imageWidth) / 2;
         int relY = (this.height - this.imageHeight) / 2;
-        this.blit(poseStack, relX, relY, 0, 0, this.imageWidth, this.imageHeight);
+        guiGraphics.blit(GUI, relX, relY, 0, 0, this.imageWidth, this.imageHeight);
     }
 
-    private void renderLabels(PoseStack poseStack) {
-        renderLabel(poseStack, "block.theatrical.artnet_interface", 5,5);
-        renderLabel(poseStack, "artneti.dmxUniverse", 0,15);
-        renderLabel(poseStack, "artneti.ipAddress", 5,40);
+    private void renderLabels(GuiGraphics guiGraphics) {
+        renderLabel(guiGraphics, "block.theatrical.artnet_interface", 5,5);
+        renderLabel(guiGraphics, "artneti.dmxUniverse", 0,15);
+        renderLabel(guiGraphics, "artneti.ipAddress", 5,40);
         if(!this.be.isOwnedByCurrentClient()){
-            renderLabel(poseStack, "artneti.notAuthorized", 5,75);
+            renderLabel(guiGraphics, "artneti.notAuthorized", 5,75);
         } else {
             if(this.be.hasReceivedPacket()){
                 long inSeconds = Math.round((float) (System.currentTimeMillis() - this.be.getLastReceivedPacket()) / 1000);
-                renderLabel(poseStack, "artneti.lastReceived", 5,75, inSeconds);
+                renderLabel(guiGraphics, "artneti.lastReceived", 5,75, inSeconds);
             } else {
-                renderLabel(poseStack, "artneti.notConnected", 5,75);
+                renderLabel(guiGraphics, "artneti.notConnected", 5,75);
             }
         }
     }
 
-    private void renderLabel(PoseStack stack, String translationKey, int offSetX, int offSetY, Object... replacements){
+    private void renderLabel(GuiGraphics guiGraphics, String translationKey, int offSetX, int offSetY, Object... replacements){
         MutableComponent translatable = Component.translatable(translationKey, replacements);
-        this.font.draw(stack, translatable, xCenter + (this.imageWidth / 2) - (this.font.width(translatable.getString()) / 2), yCenter + offSetY, 0x404040);
+        guiGraphics.drawString(font, translatable, xCenter + (this.imageWidth / 2) - (this.font.width(translatable.getString()) / 2), yCenter + offSetY, 0x404040);
     }
 
     @Override

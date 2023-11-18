@@ -24,7 +24,7 @@ public abstract class CableItem extends Item {
     private CableType cableType;
 
     public CableItem(CableType cableType){
-        super(new Item.Properties().tab(Theatrical.THEATRICAL_TAB));
+        super(new Item.Properties().arch$tab(Theatrical.TAB));
         this.cableType = cableType;
     }
 

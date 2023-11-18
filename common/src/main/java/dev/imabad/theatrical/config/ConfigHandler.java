@@ -2,6 +2,7 @@ package dev.imabad.theatrical.config;
 
 import dev.architectury.platform.Platform;
 import dev.architectury.utils.Env;
+import dev.imabad.theatrical.Theatrical;
 import dev.imabad.theatrical.config.api.TheatricalConfigItem;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
@@ -19,13 +20,13 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 public class ConfigHandler {
-    enum ConfigSide {
+    public enum ConfigSide {
         COMMON,
         CLIENT
     }
 
     private final Path configFolder;
-    private Yaml yaml;
+    private final Yaml yaml;
 
     private final Map<ResourceLocation, BaseConfig> registered_configs = new HashMap<>();
 
@@ -65,8 +66,11 @@ public class ConfigHandler {
         try {
             yaml.dump(yamlMap, new FileWriter(output));
         } catch(Exception e) {
-            //TODO: log
-            e.printStackTrace();
+            Theatrical.LOGGER.atError().setCause(e)
+                .setMessage("Error saving config {} to {}")
+                .addArgument(() -> config.getClass().getSimpleName())
+                .addArgument(output)
+                .log();
         }
     }
 
@@ -75,15 +79,17 @@ public class ConfigHandler {
             Map<String, Object> parsedYaml = yaml.load(new FileReader(input.getPath()));
             magicLoad(config, parsedYaml);
         } catch (Exception e) {
-            //TODO: log
-            e.printStackTrace();
+            Theatrical.LOGGER.atError().setCause(e)
+                .setMessage("Error loading config {} from {}")
+                .addArgument(() -> config.getClass().getSimpleName())
+                .addArgument(input)
+                .log();
         }
     }
 
     private <T> void magicLoad(T config, Map<String, Object> inputMap){
         Field[] fields = config.getClass().getFields();
-        for (Field f :
-                fields) {
+        for (Field f : fields) {
             if(f.isAnnotationPresent(TheatricalConfigItem.class)) {
                 TheatricalConfigItem annotation = f.getAnnotation(TheatricalConfigItem.class);
                 String fieldName = annotation.name().length > 0 ? annotation.name()[0] : f.getName();
@@ -95,11 +101,21 @@ public class ConfigHandler {
                 if(annotation.maxValue().length > 0 || annotation.minValue().length > 0){
                     if(fieldType.isPrimitive() && value instanceof Number number){
                         if(annotation.maxValue().length > 0 && number.doubleValue() > Double.parseDouble(annotation.maxValue()[0])){
-                            //TODO: Log bad!
+                            Theatrical.LOGGER.atError()
+                                .setMessage("Config '{}' value '{}' is larger than the max '{}'")
+                                .addArgument(fieldName)
+                                .addArgument(number)
+                                .addArgument(() -> annotation.maxValue()[0])
+                                .log();
                             break;
                         }
                         if(annotation.minValue().length > 0 && number.doubleValue() < Double.parseDouble(annotation.minValue()[0])){
-                            //TODO: Log bad!
+                            Theatrical.LOGGER.atError()
+                                .setMessage("Config '{}' value '{}' is smaller than the min '{}'")
+                                .addArgument(fieldName)
+                                .addArgument(number)
+                                .addArgument(() -> annotation.minValue()[0])
+                                .log();
                             break;
                         }
                     }
@@ -107,24 +123,29 @@ public class ConfigHandler {
                 try {
                     f.set(config, value);
                 } catch (IllegalAccessException e) {
-                    //TODO: log
-                    e.printStackTrace();
+                    Theatrical.LOGGER.atError().setCause(e)
+                        .setMessage("Error updating config field '{}' with value '{}'")
+                        .addArgument(fieldName)
+                        .addArgument(value)
+                        .log();
                 }
             }
         }
     }
+
     private <T> void magicWrite(T config, Map<String, Object> outputMap){
         Field[] fields = config.getClass().getFields();
-        for (Field f :
-                fields) {
+        for (Field f : fields) {
             if(f.isAnnotationPresent(TheatricalConfigItem.class)) {
                 TheatricalConfigItem annotation = f.getAnnotation(TheatricalConfigItem.class);
                 String fieldName = annotation.name().length > 0 ? annotation.name()[0] : f.getName();
                 try {
                     outputMap.put(fieldName, f.get(config));
                 } catch (IllegalAccessException e) {
-                    //TODO: log
-                    e.printStackTrace();
+                    Theatrical.LOGGER.atError().setCause(e)
+                        .setMessage("Error getting config field '{}'")
+                        .addArgument(fieldName)
+                        .log();
                 }
             }
         }

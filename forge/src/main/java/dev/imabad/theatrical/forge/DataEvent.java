@@ -5,6 +5,7 @@ import dev.imabad.theatrical.blocks.Blocks;
 import dev.imabad.theatrical.forge.client.model.TheatricalForgeModelLoader;
 import dev.imabad.theatrical.items.Items;
 import net.minecraft.data.DataGenerator;
+import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.client.model.generators.BlockModelBuilder;
 import net.minecraftforge.client.model.generators.BlockStateProvider;
@@ -15,18 +16,18 @@ import net.minecraftforge.common.data.LanguageProvider;
 import net.minecraftforge.data.event.GatherDataEvent;
 
 public class DataEvent {
-
-
     public static void onData(GatherDataEvent event) {
-        event.getGenerator().addProvider(true, new BlockState(event.getGenerator(), event.getExistingFileHelper()));
-        event.getGenerator().addProvider(true, new Item(event.getGenerator(), event.getExistingFileHelper()));
-        event.getGenerator().addProvider(true, new Lang(event.getGenerator(), "en_us"));
+        DataGenerator gen = event.getGenerator();
+        PackOutput output = gen.getPackOutput();
+
+        gen.addProvider(event.includeClient(), new BlockState(output, event.getExistingFileHelper()));
+        gen.addProvider(event.includeClient(), new Item(output, event.getExistingFileHelper()));
+        gen.addProvider(event.includeClient(), new Lang(output, "en_us"));
     }
 
-
     public static class BlockState extends BlockStateProvider  {
-        public BlockState(DataGenerator dataGen, ExistingFileHelper exFileHelper) {
-            super(dataGen, Theatrical.MOD_ID, exFileHelper);
+        public BlockState(PackOutput output, ExistingFileHelper exFileHelper) {
+            super(output, Theatrical.MOD_ID, exFileHelper);
         }
 
         @Override
@@ -49,8 +50,8 @@ public class DataEvent {
 
     public static class Item extends ItemModelProvider {
 
-        public Item(DataGenerator dataGen, ExistingFileHelper existingFileHelper) {
-            super(dataGen, Theatrical.MOD_ID, existingFileHelper);
+        public Item(PackOutput output, ExistingFileHelper existingFileHelper) {
+            super(output, Theatrical.MOD_ID, existingFileHelper);
         }
 
         @Override
@@ -64,8 +65,8 @@ public class DataEvent {
 
     public static class Lang extends LanguageProvider {
 
-        public Lang(DataGenerator gen, String locale) {
-            super(gen, Theatrical.MOD_ID, locale);
+        public Lang(PackOutput output, String locale) {
+            super(output, Theatrical.MOD_ID, locale);
         }
 
         @Override

@@ -1,7 +1,6 @@
 package dev.imabad.theatrical.client.model;
 
 import com.mojang.datafixers.util.Either;
-import com.mojang.math.Quaternion;
 import com.mojang.math.Transformation;
 import dev.imabad.theatrical.api.CableType;
 import net.minecraft.client.renderer.block.model.BakedQuad;
@@ -12,6 +11,7 @@ import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.BlockModelRotation;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
+import org.joml.Quaternionf;
 
 import java.util.AbstractMap;
 import java.util.HashMap;
@@ -25,7 +25,7 @@ public abstract class CableBakedModelBase implements BakedModel {
     public final Map<Direction, Map<CableType, Map<Direction, List<BakedQuad>>>> cornerPieces;
 
     private static Transformation mulBlockModelRotations(BlockModelRotation pos1, BlockModelRotation pos2){
-        Quaternion rotation = pos1.getRotation().getLeftRotation();
+        Quaternionf rotation = pos1.getRotation().getLeftRotation();
         rotation.mul(pos2.getRotation().getLeftRotation());
         return new Transformation(null, rotation, null, null);
     }

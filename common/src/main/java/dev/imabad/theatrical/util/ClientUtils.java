@@ -3,7 +3,7 @@ package dev.imabad.theatrical.util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.phys.Vec3;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -19,10 +19,14 @@ public class ClientUtils {
             return Collections.singletonList(list.get(0));
         }
 
-        return Arrays.asList(list.toArray((E[]) new Object[0]));
+        return new ArrayList<>(list);
     }
 
-    public static BlockPos fromVec(Vec3 vec3){
-        return new BlockPos(Math.round(vec3.x), Math.floor(vec3.y), Math.round(vec3.z));
+    public static BlockPos blockPos(Vec3 vec3){
+        return new BlockPos((int) Math.round(vec3.x), (int) Math.floor(vec3.y), (int) Math.round(vec3.z));
+    }
+
+    public static BlockPos blockPosFloored(Vec3 vec3){
+        return new BlockPos((int) Math.floor(vec3.x), (int) Math.floor(vec3.y), (int) Math.floor(vec3.z));
     }
 }

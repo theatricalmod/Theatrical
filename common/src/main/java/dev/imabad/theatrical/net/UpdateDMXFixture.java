@@ -36,7 +36,7 @@ public class UpdateDMXFixture extends BaseC2SMessage {
 
     @Override
     public void handle(NetworkManager.PacketContext context) {
-        BlockEntity be = context.getPlayer().getLevel().getBlockEntity(pos);
+        BlockEntity be = context.getPlayer().level().getBlockEntity(pos);
         if(be instanceof BaseDMXConsumerLightBlockEntity dmxConsumerLightBlock){
             dmxConsumerLightBlock.setChannelStartPoint(dmxAddress);
         }

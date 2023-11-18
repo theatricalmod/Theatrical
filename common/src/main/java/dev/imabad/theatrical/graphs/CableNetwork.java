@@ -190,7 +190,7 @@ public class CableNetwork {
         for (CableNode cableNode : edges.keySet()) {
             if(edgesByNode.containsKey(cableNode)){
                 Vec3 location = cableNode.getPosition().getLocation();
-                affectedBlocks.add(ClientUtils.fromVec(location));
+                affectedBlocks.add(ClientUtils.blockPos(location));
                 edgesByNode.get(cableNode)
                         .remove(removed);
             }

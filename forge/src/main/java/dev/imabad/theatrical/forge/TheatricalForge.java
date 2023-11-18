@@ -37,7 +37,7 @@ public class TheatricalForge {
         });
         MinecraftForge.EVENT_BUS.addListener((RenderHighlightEvent.Block renderHighlight) -> {
             if(!TheatricalClient.renderHitBox(renderHighlight.getPoseStack(),
-                    renderHighlight.getCamera().getEntity().getLevel(), renderHighlight.getTarget().getBlockPos(),
+                    renderHighlight.getCamera().getEntity().level(), renderHighlight.getTarget().getBlockPos(),
                     renderHighlight.getCamera().getEntity(), renderHighlight.getCamera())){
                 renderHighlight.setCanceled(true);
             }

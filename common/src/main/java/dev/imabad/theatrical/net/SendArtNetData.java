@@ -37,7 +37,7 @@ public class SendArtNetData extends BaseC2SMessage {
 
     @Override
     public void handle(NetworkManager.PacketContext context) {
-        Level level = context.getPlayer().level;
+        Level level = context.getPlayer().level();
         BlockEntity be = level.getBlockEntity(pos);
         if(be instanceof ArtNetInterfaceBlockEntity artnetInterface) {
             if(level.getServer() != null ){
