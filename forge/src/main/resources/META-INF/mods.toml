@@ -1,5 +1,5 @@
 modLoader = "javafml"
-loaderVersion = "[43,)"
+loaderVersion = "[46,)"
 #issueTrackerURL = ""
 license = "Apache-2.0"
 
@@ -16,20 +16,20 @@ Theatrical, bringing the theatre to Minecraft.
 [[dependencies.theatrical]]
 modId = "forge"
 mandatory = true
-versionRange = "[43,)"
+versionRange = "[46,)"
 ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.theatrical]]
 modId = "minecraft"
 mandatory = true
-versionRange = "[1.19.2,)"
+versionRange = "[1.20,)"
 ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.theatrical]]
 modId = "architectury"
 mandatory = true
-versionRange = "[6.2.43,)"
+versionRange = "[9.1.12,)"
 ordering = "AFTER"
 side = "BOTH"
