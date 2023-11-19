@@ -14,7 +14,7 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class Blocks {
 
-    public static final DeferredRegister<Block> BLOCKS = TheatricalRegistry.register(Registries.BLOCK);
+    public static final DeferredRegister<Block> BLOCKS = TheatricalRegistry.get(Registries.BLOCK);
     public static final RegistrySupplier<Block> MOVING_LIGHT_BLOCK = BLOCKS.register("moving_light", MovingLightBlock::new);
     public static final RegistrySupplier<Block> PIPE_BLOCK = BLOCKS.register("pipe", dev.imabad.theatrical.blocks.rigging.PipeBlock::new);
     public static final RegistrySupplier<Block> ART_NET_INTERFACE = BLOCKS.register("artnet_interface", ArtNetInterfaceBlock::new);

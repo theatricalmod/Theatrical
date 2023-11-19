@@ -100,7 +100,7 @@ public class CableBakedModelForge extends CableBakedModelBase implements IDynami
                                     if(deciZ == 0.5 && deciX == 0){
                                         node2Position = new Vec3(node1Position.x, highestPoint.y, node2Position.z);
                                         Vec3 nodesNormal = node2Position.subtract(node1Position).normalize();
-                                        Direction nodeConnectionDirection = Direction.fromNormal((int) Math.round(nodesNormal.x), (int) Math.round(nodesNormal.y), (int) Math.round(nodesNormal.z));
+                                        Direction nodeConnectionDirection = Direction.getNearest(nodesNormal.x, nodesNormal.y, nodesNormal.z);
                                         if(nodeConnectionDirection == Direction.UP){
                                             nodeConnectionDirection = Direction.SOUTH;
                                         } else if(nodeConnectionDirection == Direction.DOWN){
@@ -115,7 +115,7 @@ public class CableBakedModelForge extends CableBakedModelBase implements IDynami
                                     } else if(deciZ == 0 && deciX == 0.5){
                                         node2Position = new Vec3(node2Position.x, highestPoint.y, node1Position.z);
                                         Vec3 nodesNormal = node2Position.subtract(node1Position).normalize();
-                                        Direction nodeConnectionDirection = Direction.fromNormal((int) Math.round(nodesNormal.x), (int) Math.round(nodesNormal.y), (int) Math.round(nodesNormal.z));
+                                        Direction nodeConnectionDirection = Direction.getNearest(nodesNormal.x, nodesNormal.y, nodesNormal.z);
                                         if(nodeConnectionDirection == Direction.UP){
                                             nodeConnectionDirection = Direction.SOUTH;
                                         } else if(nodeConnectionDirection == Direction.DOWN){
@@ -140,7 +140,7 @@ public class CableBakedModelForge extends CableBakedModelBase implements IDynami
                                 if(deciZ == 0.5){
                                     node2Position = new Vec3(node2Position.x, node2Position.y, node1Position.z);
                                     Vec3 nodesNormal = node2Position.subtract(node1Position).normalize();
-                                    Direction nodeConnectionDirection = Direction.fromNormal((int) Math.round(nodesNormal.x), (int) Math.round(nodesNormal.y), (int) Math.round(nodesNormal.z));
+                                    Direction nodeConnectionDirection = Direction.getNearest(nodesNormal.x, nodesNormal.y, nodesNormal.z);
                                     if(side.getAxis() == Direction.Axis.Z){
                                         if(nodeConnectionDirection == Direction.EAST){
                                             nodeConnectionDirection = side == Direction.NORTH ? Direction.WEST : Direction.EAST;
@@ -168,7 +168,7 @@ public class CableBakedModelForge extends CableBakedModelBase implements IDynami
                             }
                             if(shouldRender) {
                                 Vec3 nodesNormal = node2Position.subtract(node1Position).normalize();
-                                Direction nodeConnectionDirection = Direction.fromNormal((int) Math.round(nodesNormal.x), (int) Math.round(nodesNormal.y), (int) Math.round(nodesNormal.z));
+                                Direction nodeConnectionDirection = Direction.getNearest(nodesNormal.x, nodesNormal.y, nodesNormal.z);
                                 if(side.getAxis() == Direction.Axis.X){
                                     if(nodeConnectionDirection == Direction.NORTH){
                                         nodeConnectionDirection = side == Direction.EAST ? Direction.EAST : Direction.WEST;
@@ -204,7 +204,7 @@ public class CableBakedModelForge extends CableBakedModelBase implements IDynami
                                 node1Position = node1Position.subtract(blockPosAsVec);
                                 node2Position = node2Position.subtract(blockPosAsVec);
                                 Vec3 nodesNormal = node1Position.subtract(node2Position).normalize();
-                                Direction nodeConnectionDirection = Direction.fromNormal((int) Math.round(nodesNormal.x), (int) Math.round(nodesNormal.y), (int) Math.round(nodesNormal.z));
+                                Direction nodeConnectionDirection = Direction.getNearest(nodesNormal.x, nodesNormal.y, nodesNormal.z);
                                 if(nodeConnectionDirection == Direction.UP){
                                     nodeConnectionDirection = Direction.SOUTH;
                                 } else if(nodeConnectionDirection == Direction.DOWN){

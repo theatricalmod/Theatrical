@@ -6,7 +6,7 @@ import dev.imabad.theatrical.Theatrical;
 import dev.imabad.theatrical.TheatricalClient;
 import dev.imabad.theatrical.api.Fixture;
 import dev.imabad.theatrical.client.model.CableModelBase;
-import dev.imabad.theatrical.registry.FixtureRegistry;
+import dev.imabad.theatrical.fixtures.Fixtures;
 import net.minecraftforge.client.event.ModelEvent;
 import net.minecraftforge.client.event.RenderHighlightEvent;
 import net.minecraftforge.client.event.RenderLevelStageEvent;
@@ -28,7 +28,7 @@ public class TheatricalForge {
     public void onClient(FMLClientSetupEvent event){
         TheatricalClient.init();
         FMLJavaModLoadingContext.get().getModEventBus().addListener((ModelEvent.RegisterAdditional additionalEvent) -> {
-            for(Fixture fixture : FixtureRegistry.entries()){
+            for(Fixture fixture : Fixtures.FIXTURES){
                 additionalEvent.register(fixture.getPanModel());
                 additionalEvent.register(fixture.getStaticModel());
                 additionalEvent.register(fixture.getTiltModel());

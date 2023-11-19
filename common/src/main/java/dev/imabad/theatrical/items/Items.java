@@ -10,7 +10,7 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 
 public class Items {
-    public static final DeferredRegister<Item> ITEMS = TheatricalRegistry.register(Registries.ITEM);
+    public static final DeferredRegister<Item> ITEMS = TheatricalRegistry.get(Registries.ITEM);
     public static final RegistrySupplier<Item> MOVING_LIGHT = ITEMS.register(
         "moving_light",
         () -> new BlockItem(Blocks.MOVING_LIGHT_BLOCK.get(), new Item.Properties().arch$tab(Theatrical.TAB))
