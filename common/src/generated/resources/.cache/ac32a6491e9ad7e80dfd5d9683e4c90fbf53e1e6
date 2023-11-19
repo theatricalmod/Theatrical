@@ -1,6 +1,5 @@
-// 1.19.2	2023-07-22T00:39:39.8755722	Item Models: theatrical
+// 1.20.1	2023-11-19T17:05:44.3489973	Item Models: theatrical
 b61dea162dac1064778fccd83e00b34aeea3d2b7 assets/theatrical/models/item/artnet_interface.json
 18785e6dda4fc97439d01b8f89808d1a665def67 assets/theatrical/models/item/bundled_cable.json
-02fb81d2ee6bcd36af7997b28a7632c814475e01 assets/theatrical/models/item/dmx_cable.json
 e6b312509e9a1cfcd5730624d5cbd9f04781d7f7 assets/theatrical/models/item/moving_light.json
 c6f2fb6f5773f7d2dfde0ef62b68d7793abf8bc2 assets/theatrical/models/item/pipe.json
