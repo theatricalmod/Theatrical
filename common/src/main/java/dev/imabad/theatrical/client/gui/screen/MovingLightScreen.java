@@ -75,7 +75,7 @@ public class MovingLightScreen extends Screen {
 
     private void renderLabel(GuiGraphics guiGraphics, String translationKey, int offSetX, int offSetY){
         MutableComponent translatable = Component.translatable(translationKey);
-        guiGraphics.drawString(font, translatable, xCenter + (this.imageWidth / 2) - (this.font.width(translatable.getString()) / 2), yCenter + offSetY, 0x404040);
+        guiGraphics.drawString(font, translatable, xCenter + (this.imageWidth / 2) - (this.font.width(translatable.getString()) / 2), yCenter + offSetY, 0x404040, false);
     }
 
     @Override
