@@ -23,5 +23,4 @@ public class Items {
         "artnet_interface",
         () -> new BlockItem(Blocks.ART_NET_INTERFACE.get(), new Item.Properties().arch$tab(Theatrical.TAB))
     );
-    public static final RegistrySupplier<Item> BUNDLED_CABLE = ITEMS.register("bundled_cable", BundledCableItem::new);
 }

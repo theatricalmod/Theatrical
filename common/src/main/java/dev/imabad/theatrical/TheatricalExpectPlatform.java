@@ -1,7 +1,6 @@
 package dev.imabad.theatrical;
 
 import dev.architectury.injectables.annotations.ExpectPlatform;
-import dev.imabad.theatrical.blockentities.CableBlockEntity;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -21,8 +20,4 @@ public class TheatricalExpectPlatform {
         throw new AssertionError();
     }
 
-    @ExpectPlatform
-    public static BlockEntityType.BlockEntitySupplier<CableBlockEntity> getCableBlockEntity() {
-        throw new AssertionError();
-    }
 }

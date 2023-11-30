@@ -1,27 +1,19 @@
 package dev.imabad.theatrical.blocks.interfaces;
 
-import dev.imabad.theatrical.api.CableType;
 import dev.imabad.theatrical.blockentities.interfaces.ArtNetInterfaceBlockEntity;
 import dev.imabad.theatrical.blocks.Blocks;
-import dev.imabad.theatrical.blocks.CableBlock;
-import dev.imabad.theatrical.blocks.NetworkNodeBlock;
 import dev.imabad.theatrical.client.gui.screen.ArtNetInterfaceScreen;
-import dev.imabad.theatrical.graphs.CableNodePos;
-import dev.imabad.theatrical.graphs.api.Node;
-import dev.imabad.theatrical.util.ClientUtils;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -30,14 +22,9 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-
-public class ArtNetInterfaceBlock extends NetworkNodeBlock implements EntityBlock, Node {
+public class ArtNetInterfaceBlock extends Block implements EntityBlock {
     public ArtNetInterfaceBlock() {
         super(Properties.of()
             .requiresCorrectToolForDrops()
@@ -81,38 +68,4 @@ public class ArtNetInterfaceBlock extends NetworkNodeBlock implements EntityBloc
         super.setPlacedBy(level, pos, state, placer, stack);
     }
 
-    @Override
-    public Collection<CableNodePos.DiscoveredPosition> getConnected(@Nullable CableNodePos from, BlockGetter level, BlockPos pos, BlockState state) {
-        Set<CableNodePos.DiscoveredPosition> connected = new HashSet<>();
-        // Grab center of the position provided
-        Vec3 center = Vec3.atBottomCenterOf(pos);
-        // Check if the tile is an actual cable
-        for(Direction direction : Direction.values()){
-            Vec3[] axes = CableBlock.DirectionAxes.fromDirection(direction).getAxes();
-            Vec3 dirCenter = CableBlock.modifyCenter(center, direction);
-            // Loop through the axis'
-               for (Vec3 axe : axes) {
-                // Add possible connection points from each axis to the list
-                CableBlock.addToListIfConnected(from, connected,
-                        (isPositive) -> level instanceof Level l ? l.dimension() : Level.OVERWORLD,
-                        (isPositive, tPos) -> CableBlock.getCableType(level, ClientUtils.blockPosFloored(tPos)),
-                        CableBlock.getOffsetPos(dirCenter, axe, false));
-                CableBlock.addToListIfConnected(from, connected,
-                        (isPositive) -> level instanceof Level l ? l.dimension() : Level.OVERWORLD,
-                        (isPositive, tPos) -> CableBlock.getCableType(level, ClientUtils.blockPosFloored(tPos)),
-                        CableBlock.getOffsetPos(dirCenter, axe, true));
-            }
-        }
-        return connected;
-    }
-
-    @Override
-    public Collection<CableNodePos.DiscoveredPosition> getPossibleNodesForSide(Direction side, BlockGetter level, BlockPos pos) {
-        return getConnected(null, level, pos, level.getBlockState(pos));
-    }
-
-    @Override
-    public CableType getAcceptedCableType(LevelAccessor level, BlockPos pos) {
-        return CableType.BUNDLED;
-    }
 }

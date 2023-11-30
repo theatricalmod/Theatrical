@@ -1,7 +1,6 @@
 package dev.imabad.theatrical.fabric;
 
 import dev.imabad.theatrical.TheatricalExpectPlatform;
-import dev.imabad.theatrical.blockentities.CableBlockEntity;
 import net.fabricmc.fabric.api.client.model.BakedModelManagerHelper;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.Minecraft;
@@ -24,7 +23,4 @@ public class TheatricalExpectPlatformImpl {
         return BakedModelManagerHelper.getModel(Minecraft.getInstance().getModelManager(), modelLocation);
     }
 
-    public static <T extends BlockEntity> BlockEntityType.BlockEntitySupplier<CableBlockEntity> getCableBlockEntity() {
-        return CableBlockEntity::new;
-    }
 }

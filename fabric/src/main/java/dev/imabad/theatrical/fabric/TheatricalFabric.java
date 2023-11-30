@@ -13,33 +13,5 @@ public class TheatricalFabric implements ModInitializer {
     @Override
     public void onInitialize() {
         Theatrical.init();
-        ServerWorldEvents.LOAD.register((server, world) -> {
-            Theatrical.CABLES.levelLoaded(world);
-        });
-        ServerTickEvents.END_SERVER_TICK.register(server -> {
-            Theatrical.CABLES.sync.serverTick(server);
-        });
-        PlayerBlockBreakEvents.BEFORE.register((level, player, blockPos, blockState, blockEntity) -> {
-            if(player instanceof ServerPlayer serverPlayer){
-                return !Theatrical.handleBlockBreak(level, blockPos, blockState, serverPlayer);
-            }
-            return true;
-        });
-        PlayerBlockBreakEvents.CANCELED.register((level, player, pos, state, blockEntity) -> {
-            if(player instanceof ServerPlayer serverPlayer) {
-                if (((ExtServerPlayerGameMode) serverPlayer.gameMode).shouldCaptureSentBlockEntities()) {
-                    ((ExtServerPlayerGameMode) serverPlayer.gameMode).setCapturedBlockEntity(true);
-                } else {
-                    if (blockEntity != null)
-                    {
-                        Packet<?> pkt = blockEntity.getUpdatePacket();
-                        if (pkt != null)
-                        {
-                            serverPlayer.connection.send(pkt);
-                        }
-                    }
-                }
-            }
-        });
     }
 }
