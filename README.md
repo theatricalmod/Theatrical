@@ -10,3 +10,8 @@ The mod is currently Work In Progress and is being developed by Rushmead with su
 
 Pull Requests are welcome and will be reviewed by Rushmead.
 
+## Contributors
+
+* Rushmead
+* bright_spark
+* FreneticScribbler

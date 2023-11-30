@@ -5,7 +5,8 @@
   "name": "Theatrical",
   "description": "Theatrical, bringing the theatre to Minecraft.",
   "authors": [
-    "Rushmead"
+    "Rushmead",
+    "bright_spark"
   ],
   "contact": {
     "homepage": "https://github.com/theatricalmod",

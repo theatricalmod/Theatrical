@@ -7,7 +7,7 @@ license = "Apache-2.0"
 modId = "theatrical"
 version = "${version}"
 displayName = "Theatrical"
-authors = "Rushmead"
+authors = "Rushmead,bright_spark"
 description = '''
 Theatrical, bringing the theatre to Minecraft.
 '''

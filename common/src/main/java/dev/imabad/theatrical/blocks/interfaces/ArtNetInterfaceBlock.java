@@ -54,7 +54,7 @@ public class ArtNetInterfaceBlock extends Block implements EntityBlock {
             ArtNetInterfaceBlockEntity be = (ArtNetInterfaceBlockEntity)level.getBlockEntity(pos);
             Minecraft.getInstance().setScreen(new ArtNetInterfaceScreen(be));
         }
-        return super.use(state, level, pos, player, hand, hit);
+        return InteractionResult.SUCCESS;
     }
 
     @Override

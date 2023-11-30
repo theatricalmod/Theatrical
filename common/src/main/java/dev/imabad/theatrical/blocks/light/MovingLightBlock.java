@@ -96,7 +96,7 @@ public class MovingLightBlock extends BaseLightBlock{
             MovingLightBlockEntity be = (MovingLightBlockEntity)level.getBlockEntity(pos);
             Minecraft.getInstance().setScreen(new MovingLightScreen(be));
         }
-        return super.use(state, level, pos, player, hand, hit);
+        return InteractionResult.SUCCESS;
     }
 
 }
