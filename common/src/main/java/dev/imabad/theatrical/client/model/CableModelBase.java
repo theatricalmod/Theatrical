@@ -2,7 +2,6 @@ package dev.imabad.theatrical.client.model;
 
 import com.google.common.collect.ImmutableMap;
 import com.mojang.datafixers.util.Either;
-import com.mojang.datafixers.util.Pair;
 import com.mojang.math.Transformation;
 import dev.imabad.theatrical.Theatrical;
 import dev.imabad.theatrical.api.CableType;
@@ -16,7 +15,6 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.*;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.Function;
@@ -60,13 +58,7 @@ public abstract class CableModelBase implements UnbakedModel {
         return getModelDependencies();
     }
 
-    @Override
-    public @NotNull Collection<Material> getMaterials(Function<ResourceLocation, UnbakedModel> modelGetter,
-                                                      Set<Pair<String, String>> missingTextureErrors) {
-        return textures;
-    }
-
-    public ModelCallback getModelCallback(ModelBakery modelBakery, Function<Material, TextureAtlasSprite> spriteGetter,
+    public ModelCallback getModelCallback(ModelBaker baker, Function<Material, TextureAtlasSprite> spriteGetter,
                                           ModelState transform, ResourceLocation location){
         return  (id, rotation, uvlock, retextures) -> {
             ImmutableMap.Builder<String, Material> builder = ImmutableMap.builder();
@@ -77,7 +69,7 @@ public abstract class CableModelBase implements UnbakedModel {
                         new Material(TextureAtlas.LOCATION_BLOCKS, entry.getValue())));
             }
             ImmutableMap<String, Material> builtRemapper = builder.build();
-            UnbakedModel model = modelBakery.getModel(id);
+            UnbakedModel model = baker.getModel(id);
             if(model instanceof BlockModel blockModel){
                 builtRemapper.forEach((key, material) -> {
                     blockModel.textureMap.remove(key);
@@ -89,7 +81,7 @@ public abstract class CableModelBase implements UnbakedModel {
                 } else{
                     basicModelState = new BasicModelState(rotation.right().get(), uvlock);
                 }
-                BakedModel bakedModel = blockModel.bake(modelBakery, spriteGetter, basicModelState, id);
+                BakedModel bakedModel = blockModel.bake(baker, spriteGetter, basicModelState, id);
                 return ClientUtils.optimize(bakedModel.getQuads(null, null, null));
             }
             return Collections.emptyList();

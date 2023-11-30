@@ -4,7 +4,7 @@ import dev.architectury.platform.Platform;
 import dev.imabad.theatrical.TheatricalClient;
 import dev.imabad.theatrical.api.Fixture;
 import dev.imabad.theatrical.fabric.client.model.TheatricalFabricModelLoader;
-import dev.imabad.theatrical.registry.FixtureRegistry;
+import dev.imabad.theatrical.fixtures.Fixtures;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.model.ModelLoadingRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
@@ -15,7 +15,7 @@ public class TheatricalClientFabric implements ClientModInitializer {
     public void onInitializeClient() {
         TheatricalClient.init();
         ModelLoadingRegistry.INSTANCE.registerModelProvider((manager, out) -> {
-            for(Fixture fixture : FixtureRegistry.entries()){
+            for(Fixture fixture : Fixtures.FIXTURES){
                 out.accept(fixture.getPanModel());
                 out.accept(fixture.getStaticModel());
                 out.accept(fixture.getTiltModel());

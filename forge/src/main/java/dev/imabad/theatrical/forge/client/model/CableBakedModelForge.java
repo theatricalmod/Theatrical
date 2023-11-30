@@ -2,7 +2,6 @@ package dev.imabad.theatrical.forge.client.model;
 
 import dev.imabad.theatrical.TheatricalClient;
 import dev.imabad.theatrical.api.CableType;
-import dev.imabad.theatrical.blockentities.CableBlockEntity;
 import dev.imabad.theatrical.blocks.CableBlock;
 import dev.imabad.theatrical.client.model.CableBakedModelBase;
 import dev.imabad.theatrical.client.model.CableModelBase;
@@ -12,11 +11,8 @@ import dev.imabad.theatrical.graphs.CableNetwork;
 import dev.imabad.theatrical.graphs.CableNode;
 import dev.imabad.theatrical.graphs.CableNodePos;
 import dev.imabad.theatrical.util.ClientUtils;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.model.BakedQuad;
-import net.minecraft.client.renderer.block.model.ItemOverrides;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -30,7 +26,10 @@ import net.minecraftforge.client.model.data.ModelData;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 public class CableBakedModelForge extends CableBakedModelBase implements IDynamicBakedModel {
     public CableBakedModelForge(CableModelBase cable, TextureAtlasSprite p, CableModelBase.ModelCallback c) {
@@ -101,7 +100,7 @@ public class CableBakedModelForge extends CableBakedModelBase implements IDynami
                                     if(deciZ == 0.5 && deciX == 0){
                                         node2Position = new Vec3(node1Position.x, highestPoint.y, node2Position.z);
                                         Vec3 nodesNormal = node2Position.subtract(node1Position).normalize();
-                                        Direction nodeConnectionDirection = Direction.fromNormal((int) Math.round(nodesNormal.x), (int) Math.round(nodesNormal.y), (int) Math.round(nodesNormal.z));
+                                        Direction nodeConnectionDirection = Direction.getNearest(nodesNormal.x, nodesNormal.y, nodesNormal.z);
                                         if(nodeConnectionDirection == Direction.UP){
                                             nodeConnectionDirection = Direction.SOUTH;
                                         } else if(nodeConnectionDirection == Direction.DOWN){
@@ -116,7 +115,7 @@ public class CableBakedModelForge extends CableBakedModelBase implements IDynami
                                     } else if(deciZ == 0 && deciX == 0.5){
                                         node2Position = new Vec3(node2Position.x, highestPoint.y, node1Position.z);
                                         Vec3 nodesNormal = node2Position.subtract(node1Position).normalize();
-                                        Direction nodeConnectionDirection = Direction.fromNormal((int) Math.round(nodesNormal.x), (int) Math.round(nodesNormal.y), (int) Math.round(nodesNormal.z));
+                                        Direction nodeConnectionDirection = Direction.getNearest(nodesNormal.x, nodesNormal.y, nodesNormal.z);
                                         if(nodeConnectionDirection == Direction.UP){
                                             nodeConnectionDirection = Direction.SOUTH;
                                         } else if(nodeConnectionDirection == Direction.DOWN){
@@ -141,7 +140,7 @@ public class CableBakedModelForge extends CableBakedModelBase implements IDynami
                                 if(deciZ == 0.5){
                                     node2Position = new Vec3(node2Position.x, node2Position.y, node1Position.z);
                                     Vec3 nodesNormal = node2Position.subtract(node1Position).normalize();
-                                    Direction nodeConnectionDirection = Direction.fromNormal((int) Math.round(nodesNormal.x), (int) Math.round(nodesNormal.y), (int) Math.round(nodesNormal.z));
+                                    Direction nodeConnectionDirection = Direction.getNearest(nodesNormal.x, nodesNormal.y, nodesNormal.z);
                                     if(side.getAxis() == Direction.Axis.Z){
                                         if(nodeConnectionDirection == Direction.EAST){
                                             nodeConnectionDirection = side == Direction.NORTH ? Direction.WEST : Direction.EAST;
@@ -169,7 +168,7 @@ public class CableBakedModelForge extends CableBakedModelBase implements IDynami
                             }
                             if(shouldRender) {
                                 Vec3 nodesNormal = node2Position.subtract(node1Position).normalize();
-                                Direction nodeConnectionDirection = Direction.fromNormal((int) Math.round(nodesNormal.x), (int) Math.round(nodesNormal.y), (int) Math.round(nodesNormal.z));
+                                Direction nodeConnectionDirection = Direction.getNearest(nodesNormal.x, nodesNormal.y, nodesNormal.z);
                                 if(side.getAxis() == Direction.Axis.X){
                                     if(nodeConnectionDirection == Direction.NORTH){
                                         nodeConnectionDirection = side == Direction.EAST ? Direction.EAST : Direction.WEST;
@@ -205,7 +204,7 @@ public class CableBakedModelForge extends CableBakedModelBase implements IDynami
                                 node1Position = node1Position.subtract(blockPosAsVec);
                                 node2Position = node2Position.subtract(blockPosAsVec);
                                 Vec3 nodesNormal = node1Position.subtract(node2Position).normalize();
-                                Direction nodeConnectionDirection = Direction.fromNormal((int) Math.round(nodesNormal.x), (int) Math.round(nodesNormal.y), (int) Math.round(nodesNormal.z));
+                                Direction nodeConnectionDirection = Direction.getNearest(nodesNormal.x, nodesNormal.y, nodesNormal.z);
                                 if(nodeConnectionDirection == Direction.UP){
                                     nodeConnectionDirection = Direction.SOUTH;
                                 } else if(nodeConnectionDirection == Direction.DOWN){

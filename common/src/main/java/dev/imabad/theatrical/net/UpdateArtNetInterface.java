@@ -40,7 +40,7 @@ public class UpdateArtNetInterface extends BaseC2SMessage {
 
     @Override
     public void handle(NetworkManager.PacketContext context) {
-        BlockEntity be = context.getPlayer().getLevel().getBlockEntity(pos);
+        BlockEntity be = context.getPlayer().level().getBlockEntity(pos);
         if(be instanceof ArtNetInterfaceBlockEntity artNetInterfaceBlockEntity){
             if(artNetInterfaceBlockEntity.getOwnerUUID().equals(context.getPlayer().getUUID())){
                 artNetInterfaceBlockEntity.updateConfig(ipAddress, dmxUniverse);

@@ -10,7 +10,6 @@
   "block.theatrical.pipe": "Rigging Pipe",
   "fixture.dmxStart": "DMX Address",
   "item.theatrical.bundled_cable": "Bundled Cable",
-  "item.theatrical.dmx_cable": "DMX Cable",
   "itemGroup.theatrical.theatrical": "Theatrical",
   "screen.movinglight": "Moving Light"
 }

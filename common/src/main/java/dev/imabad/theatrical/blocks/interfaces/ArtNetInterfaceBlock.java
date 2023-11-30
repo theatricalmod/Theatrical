@@ -1,22 +1,19 @@
 package dev.imabad.theatrical.blocks.interfaces;
 
 import dev.imabad.theatrical.api.CableType;
-import dev.imabad.theatrical.blockentities.CableBlockEntity;
 import dev.imabad.theatrical.blockentities.interfaces.ArtNetInterfaceBlockEntity;
 import dev.imabad.theatrical.blocks.Blocks;
 import dev.imabad.theatrical.blocks.CableBlock;
 import dev.imabad.theatrical.blocks.NetworkNodeBlock;
 import dev.imabad.theatrical.client.gui.screen.ArtNetInterfaceScreen;
 import dev.imabad.theatrical.graphs.CableNodePos;
-import dev.imabad.theatrical.graphs.GlobalCableManager;
 import dev.imabad.theatrical.graphs.api.Node;
+import dev.imabad.theatrical.util.ClientUtils;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
@@ -25,16 +22,15 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Material;
+import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.world.ticks.LevelTickAccess;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
@@ -43,11 +39,13 @@ import java.util.Set;
 
 public class ArtNetInterfaceBlock extends NetworkNodeBlock implements EntityBlock, Node {
     public ArtNetInterfaceBlock() {
-        super(Properties.of(Material.HEAVY_METAL)
-                .requiresCorrectToolForDrops()
-                .strength(3, 3)
-                .noOcclusion()
-                .isValidSpawn(Blocks::neverAllowSpawn));
+        super(Properties.of()
+            .requiresCorrectToolForDrops()
+            .strength(3, 3)
+            .noOcclusion()
+            .isValidSpawn(Blocks::neverAllowSpawn)
+            .mapColor(MapColor.METAL)
+            .sound(SoundType.METAL));
     }
 
     @Nullable
@@ -97,11 +95,11 @@ public class ArtNetInterfaceBlock extends NetworkNodeBlock implements EntityBloc
                 // Add possible connection points from each axis to the list
                 CableBlock.addToListIfConnected(from, connected,
                         (isPositive) -> level instanceof Level l ? l.dimension() : Level.OVERWORLD,
-                        (isPositive, tPos) -> CableBlock.getCableType(level, new BlockPos(tPos)),
+                        (isPositive, tPos) -> CableBlock.getCableType(level, ClientUtils.blockPosFloored(tPos)),
                         CableBlock.getOffsetPos(dirCenter, axe, false));
                 CableBlock.addToListIfConnected(from, connected,
                         (isPositive) -> level instanceof Level l ? l.dimension() : Level.OVERWORLD,
-                        (isPositive, tPos) -> CableBlock.getCableType(level, new BlockPos(tPos)),
+                        (isPositive, tPos) -> CableBlock.getCableType(level, ClientUtils.blockPosFloored(tPos)),
                         CableBlock.getOffsetPos(dirCenter, axe, true));
             }
         }

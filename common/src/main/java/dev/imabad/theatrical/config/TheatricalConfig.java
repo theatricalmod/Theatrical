@@ -2,9 +2,6 @@ package dev.imabad.theatrical.config;
 
 import dev.imabad.theatrical.Theatrical;
 import dev.imabad.theatrical.config.api.TheatricalConfigItem;
-import org.apache.logging.log4j.core.jmx.Server;
-
-import java.util.Map;
 
 public class TheatricalConfig {
 

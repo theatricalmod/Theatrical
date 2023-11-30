@@ -2,9 +2,7 @@ package dev.imabad.theatrical.client.blockentities;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.math.Matrix3f;
-import com.mojang.math.Matrix4f;
-import com.mojang.math.Vector3f;
+import com.mojang.math.Axis;
 import dev.imabad.theatrical.TheatricalExpectPlatform;
 import dev.imabad.theatrical.api.HangType;
 import dev.imabad.theatrical.api.Support;
@@ -21,6 +19,8 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.state.BlockState;
+import org.joml.Matrix3f;
+import org.joml.Matrix4f;
 
 public class MovingLightRenderer implements BlockEntityRenderer<MovingLightBlockEntity> {
     private final Double beamOpacity = TheatricalConfig.INSTANCE.CLIENT.beamOpacity;
@@ -67,9 +67,9 @@ public class MovingLightRenderer implements BlockEntityRenderer<MovingLightBlock
         }
         poseStack.translate(0.5F, 0, .5F);
         if(facing.getAxis() == Direction.Axis.Z) {
-            poseStack.mulPose(Vector3f.YP.rotationDegrees(facing.getOpposite().toYRot()));
+            poseStack.mulPose(Axis.YP.rotationDegrees(facing.getOpposite().toYRot()));
         } else  {
-            poseStack.mulPose(Vector3f.YP.rotationDegrees(facing.toYRot()));
+            poseStack.mulPose(Axis.YP.rotationDegrees(facing.toYRot()));
         }
         poseStack.translate(-0.5F, 0, -.5F);
         if (blockEntity.getFixture().getHangType() == HangType.BRACE_BAR && isHanging) {
@@ -82,7 +82,7 @@ public class MovingLightRenderer implements BlockEntityRenderer<MovingLightBlock
         }
         if (isFlipped) {
             poseStack.translate(0.5F, 0.5, .5F);
-            poseStack.mulPose(Vector3f.ZP.rotationDegrees(180));
+            poseStack.mulPose(Axis.ZP.rotationDegrees(180));
             poseStack.translate(-0.5F, -0.5, -.5F);
         }
         if (blockEntity.getFixture().getHangType() == HangType.BRACE_BAR && isHanging) {
@@ -95,13 +95,13 @@ public class MovingLightRenderer implements BlockEntityRenderer<MovingLightBlock
         float[] pans = blockEntity.getFixture().getPanRotationPosition();
 //        float[] pans = new float[]{0.5F, 0, 0.41F};
         poseStack.translate(pans[0], pans[1], pans[2]);
-        poseStack.mulPose(Vector3f.YP.rotationDegrees((blockEntity.getPrevPan() + ((blockEntity.getPan()) - blockEntity.getPrevPan()) * partialTicks)));
+        poseStack.mulPose(Axis.YP.rotationDegrees((blockEntity.getPrevPan() + ((blockEntity.getPan()) - blockEntity.getPrevPan()) * partialTicks)));
         poseStack.translate(-pans[0], -pans[1], -pans[2]);
         Minecraft.getInstance().getBlockRenderer().getModelRenderer().renderModel(poseStack.last(), vertexConsumer, blockState, cachedPanModel, 1, 1, 1, packedLight, packedOverlay);
         float[] tilts = blockEntity.getFixture().getTiltRotationPosition();
 //        float[] tilts = new float[]{0.5F, 0.3F, 0.39F};
         poseStack.translate(tilts[0], tilts[1], tilts[2]);
-        poseStack.mulPose(Vector3f.XP.rotationDegrees((blockEntity.getPrevTilt() + ((blockEntity.getTilt()) - blockEntity.getPrevTilt()) * partialTicks)));
+        poseStack.mulPose(Axis.XP.rotationDegrees((blockEntity.getPrevTilt() + ((blockEntity.getTilt()) - blockEntity.getPrevTilt()) * partialTicks)));
         poseStack.translate(-tilts[0], -tilts[1], -tilts[2]);
         Minecraft.getInstance().getBlockRenderer().getModelRenderer().renderModel(poseStack.last(), vertexConsumer, blockState, cachedTiltModel, 1, 1, 1, packedLight, packedOverlay);
     }

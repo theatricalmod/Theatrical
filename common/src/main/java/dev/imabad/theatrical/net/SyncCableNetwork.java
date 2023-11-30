@@ -133,12 +133,12 @@ public class SyncCableNetwork extends CableNetworkPacket {
                 Map<CableNode, CableEdge> edges = network.getEdges(node);
                 if(edges != null) {
                     edges.forEach((node2, edge) -> {
-                        BlockPos node2Pos = ClientUtils.fromVec(node2.getPosition().getLocation());
+                        BlockPos node2Pos = ClientUtils.blockPos(node2.getPosition().getLocation());
                         if (Minecraft.getInstance().level.getBlockEntity(node2Pos) instanceof CableBlockEntity cbe) {
                             cbe.neighboursUpdated();
                         }
                     });
-                    BlockPos node2Pos = ClientUtils.fromVec(node.getPosition().getLocation());
+                    BlockPos node2Pos = ClientUtils.blockPos(node.getPosition().getLocation());
                     if (Minecraft.getInstance().level.getBlockEntity(node2Pos) instanceof CableBlockEntity cbe) {
                         cbe.neighboursUpdated();
                     }
@@ -159,8 +159,8 @@ public class SyncCableNetwork extends CableNetworkPacket {
             CableNode node2 = network.getNodeById(ids.rightInt());
             if(node1 != null && node2 != null){
                 network.putEdge(node1, node2, new CableEdge(node1, node2, addedEdge.right()));
-                BlockPos node1Pos = ClientUtils.fromVec(node1.getPosition().getLocation());
-                BlockPos node2Pos = ClientUtils.fromVec(node2.getPosition().getLocation());
+                BlockPos node1Pos = ClientUtils.blockPos(node1.getPosition().getLocation());
+                BlockPos node2Pos = ClientUtils.blockPos(node2.getPosition().getLocation());
                 if(Minecraft.getInstance().level.getBlockEntity(node1Pos) instanceof CableBlockEntity cbe){
                     cbe.neighboursUpdated();
                 }

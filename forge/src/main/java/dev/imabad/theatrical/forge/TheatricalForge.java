@@ -6,14 +6,11 @@ import dev.imabad.theatrical.Theatrical;
 import dev.imabad.theatrical.TheatricalClient;
 import dev.imabad.theatrical.api.Fixture;
 import dev.imabad.theatrical.client.model.CableModelBase;
-import dev.imabad.theatrical.forge.client.TheatricalForgeClient;
-import dev.imabad.theatrical.forge.client.model.TheatricalForgeModelLoader;
-import dev.imabad.theatrical.registry.FixtureRegistry;
+import dev.imabad.theatrical.fixtures.Fixtures;
 import net.minecraftforge.client.event.ModelEvent;
 import net.minecraftforge.client.event.RenderHighlightEvent;
 import net.minecraftforge.client.event.RenderLevelStageEvent;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -31,7 +28,7 @@ public class TheatricalForge {
     public void onClient(FMLClientSetupEvent event){
         TheatricalClient.init();
         FMLJavaModLoadingContext.get().getModEventBus().addListener((ModelEvent.RegisterAdditional additionalEvent) -> {
-            for(Fixture fixture : FixtureRegistry.entries()){
+            for(Fixture fixture : Fixtures.FIXTURES){
                 additionalEvent.register(fixture.getPanModel());
                 additionalEvent.register(fixture.getStaticModel());
                 additionalEvent.register(fixture.getTiltModel());
@@ -40,7 +37,7 @@ public class TheatricalForge {
         });
         MinecraftForge.EVENT_BUS.addListener((RenderHighlightEvent.Block renderHighlight) -> {
             if(!TheatricalClient.renderHitBox(renderHighlight.getPoseStack(),
-                    renderHighlight.getCamera().getEntity().getLevel(), renderHighlight.getTarget().getBlockPos(),
+                    renderHighlight.getCamera().getEntity().level(), renderHighlight.getTarget().getBlockPos(),
                     renderHighlight.getCamera().getEntity(), renderHighlight.getCamera())){
                 renderHighlight.setCanceled(true);
             }

@@ -1,11 +1,9 @@
 package dev.imabad.theatrical;
 
-import dev.architectury.event.EventResult;
-import dev.architectury.event.events.common.BlockEvent;
 import dev.architectury.event.events.common.PlayerEvent;
 import dev.architectury.platform.Platform;
 import dev.architectury.registry.CreativeTabRegistry;
-import dev.architectury.utils.value.IntValue;
+import dev.architectury.registry.registries.RegistrySupplier;
 import dev.imabad.theatrical.blockentities.BlockEntities;
 import dev.imabad.theatrical.blockentities.CableBlockEntity;
 import dev.imabad.theatrical.blocks.Blocks;
@@ -16,43 +14,43 @@ import dev.imabad.theatrical.fixtures.Fixtures;
 import dev.imabad.theatrical.graphs.GlobalCableManager;
 import dev.imabad.theatrical.items.Items;
 import dev.imabad.theatrical.net.TheatricalNet;
-import dev.imabad.theatrical.registry.FixtureRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
-import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class Theatrical {
     public static final String MOD_ID = "theatrical";
     // Registering a new creative tab
-    public static final CreativeModeTab THEATRICAL_TAB = CreativeTabRegistry.create(new ResourceLocation(MOD_ID, "theatrical"), () ->
-            new ItemStack(Items.ART_NET_INTERFACE.get()));
+    public static final RegistrySupplier<CreativeModeTab> TAB =
+        TheatricalRegistry.get(Registries.CREATIVE_MODE_TAB).register(
+            Theatrical.MOD_ID,
+            () -> CreativeTabRegistry.create(
+                Component.translatable("itemGroup." + Theatrical.MOD_ID),
+                () -> new ItemStack(Items.ART_NET_INTERFACE.get())
+            )
+        );
 
     public static final GlobalCableManager CABLES = new GlobalCableManager();
 
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
+
     public static void init() {
         ConfigHandler configHandler = new ConfigHandler(Platform.getConfigFolder());
         TheatricalConfig.INSTANCE.register(configHandler);
-        registerFixtures();
+        Fixtures.init();
         TheatricalNet.init();
         Blocks.BLOCKS.register();
         BlockEntities.BLOCK_ENTITIES.register();
         dev.imabad.theatrical.items.Items.ITEMS.register();
         PlayerEvent.PLAYER_JOIN.register(CABLES::playerLogin);
-    }
-
-    private static void registerFixtures(){
-        FixtureRegistry.buildRegistry();
-        Fixtures.FIXTURES.register();
     }
 
     /**

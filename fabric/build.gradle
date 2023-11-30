@@ -1,5 +1,5 @@
 plugins {
-    id "com.github.johnrengelman.shadow" version "7.0.0"
+    id "com.github.johnrengelman.shadow" version "7.1.2"
 }
 
 architectury {
@@ -30,12 +30,12 @@ dependencies {
     shadowCommon(project(path: ":common", configuration: "transformProductionFabric")) { transitive false }
 
     //ArtNet
-    implementation "ch.bildspur:artnet4j:0.6.2"
-    shadowCommon "ch.bildspur:artnet4j:0.6.2"
+    implementation "ch.bildspur:artnet4j:${rootProject.artnet4j_version}"
+    shadowCommon "ch.bildspur:artnet4j:${rootProject.artnet4j_version}"
 
     //YAML
-    implementation "org.yaml:snakeyaml:1.33"
-    shadowCommon "org.yaml:snakeyaml:1.33"
+    implementation "org.yaml:snakeyaml:${rootProject.snakeyaml_version}"
+    shadowCommon "org.yaml:snakeyaml:${rootProject.snakeyaml_version}"
 }
 
 processResources {
@@ -97,10 +97,10 @@ publishMods {
     type = project.release_type as me.modmuss50.mpp.PublishOptions.ReleaseType
     modLoaders.add("fabric")
 
-    if(ENV.CURSEFORGE_TOKEN) {
+    if(System.getenv("CURSEFORGE_TOKEN") != null) {
         curseforge {
             projectId = project.curseforge_id
-            accessToken = ENV.CURSEFORGE_TOKEN
+            accessToken = System.getenv("CURSEFORGE_TOKEN")
             minecraftVersions.add(project.minecraft_version)
             requires {
                 slug = "fabric-api"
@@ -108,10 +108,10 @@ publishMods {
             }
         }
     }
-    if(ENV.MODRINTH_TOKEN){
+    if(System.getenv("MODRINTH_TOKEN") != null){
         modrinth {
             projectId = project.modrinth_id
-            accessToken = ENV.MODRINTH_TOKEN
+            accessToken = System.getenv("MODRINTH_TOKEN")
             minecraftVersions.add(project.minecraft_version)
             requires {
                 projectId = "lhGA9TYQ"
@@ -119,11 +119,11 @@ publishMods {
             }
         }
     }
-    if(ENV.GITHUB_TOKEN) {
+    if(System.getenv("GITHUB_TOKEN") != null) {
         github {
             repository = "theatricalmod/Theatrical"
             accessToken = providers.environmentVariable("GITHUB_TOKEN")
-            commitish = ENV.GITHUB_REF_NAME
+            commitish = System.getenv("GITHUB_REF_NAME")
         }
     }
 }

@@ -5,13 +5,10 @@ import dev.imabad.theatrical.api.CableType;
 import dev.imabad.theatrical.blockentities.CableBlockEntity;
 import dev.imabad.theatrical.blocks.Blocks;
 import dev.imabad.theatrical.blocks.CableBlock;
-import dev.imabad.theatrical.graphs.GlobalCableManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -27,7 +24,7 @@ public abstract class CableItem extends Item {
     private CableType cableType;
 
     public CableItem(CableType cableType){
-        super(new Item.Properties().tab(Theatrical.THEATRICAL_TAB));
+        super(new Item.Properties().arch$tab(Theatrical.TAB));
         this.cableType = cableType;
     }
 

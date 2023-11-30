@@ -1,24 +1,17 @@
 package dev.imabad.theatrical.blocks;
 
-import com.mojang.authlib.minecraft.client.MinecraftClient;
-import com.mojang.math.Vector3d;
-import com.mojang.math.Vector3f;
 import dev.imabad.theatrical.TheatricalExpectPlatform;
 import dev.imabad.theatrical.api.CableType;
 import dev.imabad.theatrical.blockentities.CableBlockEntity;
 import dev.imabad.theatrical.graphs.CableNodePos;
 import dev.imabad.theatrical.graphs.GlobalCableManager;
 import dev.imabad.theatrical.graphs.api.Node;
-import net.minecraft.client.Minecraft;
+import dev.imabad.theatrical.util.ClientUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.Vec3i;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -27,19 +20,18 @@ import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
-import net.minecraft.world.level.material.Material;
+import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraft.world.ticks.LevelTickAccess;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -87,11 +79,13 @@ public class CableBlock extends NetworkNodeBlock implements EntityBlock, Node {
         BOXES[5] = Shapes.create(new AABB(v1, h0, h0, 1D, h1, h1));
     }
     public CableBlock() {
-        super(Properties.of(Material.METAL)
-                .requiresCorrectToolForDrops()
-                .strength(3, 3)
-                .noOcclusion()
-                .isValidSpawn(Blocks::neverAllowSpawn));
+        super(Properties.of()
+            .requiresCorrectToolForDrops()
+            .strength(3, 3)
+            .noOcclusion()
+            .isValidSpawn(Blocks::neverAllowSpawn)
+            .mapColor(MapColor.METAL)
+            .sound(SoundType.METAL));
         this.registerDefaultState(this.getStateDefinition().any().setValue(CABLE_TYPE, CableType.BUNDLED));
     }
 
@@ -136,17 +130,13 @@ public class CableBlock extends NetworkNodeBlock implements EntityBlock, Node {
         if(!level.isClientSide() && level.getBlockEntity(pos) instanceof CableBlockEntity cbe) {
             for (Direction d : Direction.values()) {
                 if(cbe.hasSide(d)){
-                    if(!level.getBlockState(pos.relative(d)).getMaterial().isSolid()){
+                    if(!level.getBlockState(pos.relative(d)).isSolid()){
                         cbe.removeSide(d);
                         GlobalCableManager.onCableSideRemoved(cbe.getLevel(), pos, state, d);
                     }
                 }
             }
-            if(!cbe.hasActiveSide()){
-                return false;
-            } else {
-                return true;
-            }
+			return cbe.hasActiveSide();
         }
         return super.canSurvive(state, level, pos);
     }
@@ -230,11 +220,11 @@ public class CableBlock extends NetworkNodeBlock implements EntityBlock, Node {
                         // Add possible connection points from each axis to the list
                         addToListIfConnected(from, connected,
                                 (isPositive) -> level instanceof Level l ? l.dimension() : Level.OVERWORLD,
-                                (isPositive, tPos) -> getCableType(level, new BlockPos(tPos)),
+                                (isPositive, tPos) -> getCableType(level, ClientUtils.blockPosFloored(tPos)),
                                 getOffsetPos(dirCenter, axe, false));
                         addToListIfConnected(from, connected,
                                 (isPositive) -> level instanceof Level l ? l.dimension() : Level.OVERWORLD,
-                                (isPositive, tPos) -> getCableType(level, new BlockPos(tPos)),
+                                (isPositive, tPos) -> getCableType(level, ClientUtils.blockPosFloored(tPos)),
                                 getOffsetPos(dirCenter, axe, true));
                     }
                 }
@@ -257,11 +247,11 @@ public class CableBlock extends NetworkNodeBlock implements EntityBlock, Node {
                 // Add possible connection points from each axis to the list
                 addToListIfConnected(null, connected,
                         (isPositive) -> level instanceof Level l ? l.dimension() : Level.OVERWORLD,
-                        (isPositive, tPos) -> getCableType(level, new BlockPos(tPos)),
+                        (isPositive, tPos) -> getCableType(level, ClientUtils.blockPosFloored(tPos)),
                         getOffsetPos(dirCenter, axe, false));
                 addToListIfConnected(null, connected,
                         (isPositive) -> level instanceof Level l ? l.dimension() : Level.OVERWORLD,
-                        (isPositive, tPos) -> getCableType(level, new BlockPos(tPos)),
+                        (isPositive, tPos) -> getCableType(level, ClientUtils.blockPosFloored(tPos)),
                         getOffsetPos(dirCenter, axe, true));
             }
         }

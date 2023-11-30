@@ -10,7 +10,6 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.phys.Vec3;
-import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -191,7 +190,7 @@ public class CableNetwork {
         for (CableNode cableNode : edges.keySet()) {
             if(edgesByNode.containsKey(cableNode)){
                 Vec3 location = cableNode.getPosition().getLocation();
-                affectedBlocks.add(ClientUtils.fromVec(location));
+                affectedBlocks.add(ClientUtils.blockPos(location));
                 edgesByNode.get(cableNode)
                         .remove(removed);
             }

@@ -1,10 +1,8 @@
 package dev.imabad.theatrical.graphs;
 
 import dev.imabad.theatrical.api.CableType;
+import dev.imabad.theatrical.util.ClientUtils;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.core.Registry;
-import net.minecraft.core.Vec3i;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.network.FriendlyByteBuf;
@@ -24,7 +22,7 @@ public class CableNodePos extends BlockPos{
         super(x, y, z);
     }
     public CableNodePos(double x, double y, double z){
-        super(Math.round(x * 2), Math.round(y * 2), Math.round(z * 2));
+        super((int) Math.round(x * 2), (int) Math.round(y * 2), (int) Math.round(z * 2));
     }
     public CableNodePos(Vec3 vec){this(vec.x, vec.y, vec.z);}
     public CableNodePos(BlockPos pos){
@@ -46,12 +44,13 @@ public class CableNodePos extends BlockPos{
 
     public Collection<BlockPos> allAdjacent(){
         Set<BlockPos> adjacent = new HashSet<>();
-        Vec3 vec3 = getLocation();
+        Vec3 loc = getLocation();
         double step = 1 / 8f; //TODO: Figure this out?!
         for(int x : new int[]{1, -1}){
             for(int y : new int[]{1, -1}){
                 for(int z : new int[]{1, -1}){
-                    adjacent.add(new BlockPos(vec3.add(x * step, y * step, z * step)));
+                    Vec3 vec = loc.add(x * step, y * step, z * step);
+                    adjacent.add(ClientUtils.blockPosFloored(vec));
                 }
             }
         }

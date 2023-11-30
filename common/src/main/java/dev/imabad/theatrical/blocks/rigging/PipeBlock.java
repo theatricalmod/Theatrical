@@ -18,10 +18,11 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.HorizontalDirectionalBlock;
+import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
-import net.minecraft.world.level.material.Material;
+import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
@@ -36,11 +37,13 @@ public class PipeBlock extends HorizontalDirectionalBlock implements Support {
     private final VoxelShape X_BOX = Shapes.create(new AABB(0, 0, 0.4, 1, 0.2, 0.6));
 
     public PipeBlock() {
-        super(Properties.of(Material.HEAVY_METAL)
-                .requiresCorrectToolForDrops()
-                .strength(3, 3)
-                .noOcclusion()
-                .isValidSpawn(Blocks::neverAllowSpawn));
+        super(Properties.of()
+            .requiresCorrectToolForDrops()
+            .strength(3, 3)
+            .noOcclusion()
+            .isValidSpawn(Blocks::neverAllowSpawn)
+            .mapColor(MapColor.METAL)
+            .sound(SoundType.METAL));
         this.registerDefaultState(this.getStateDefinition().any().setValue(FACING, Direction.NORTH));
     }
 

@@ -3,7 +3,10 @@ package dev.imabad.theatrical.dmx;
 import dev.imabad.theatrical.api.dmx.DMXConsumer;
 import net.minecraft.core.BlockPos;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 
 public class DMXNetworkData {
     private static final DMXNetworkData INSTANCE = new DMXNetworkData();

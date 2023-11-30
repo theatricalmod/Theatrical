@@ -42,7 +42,7 @@ public abstract class MixinServerGamePacketListenerImpl{
 
             ((ExtServerPlayerGameMode) player.gameMode).setCapturedBlockEntity(false);
             // Update any tile entity data for this block
-            BlockEntity blockEntity = this.player.level.getBlockEntity(blockPos);
+            BlockEntity blockEntity = this.player.level().getBlockEntity(blockPos);
             if (blockEntity != null)
             {
                 Packet<?> pkt = blockEntity.getUpdatePacket();
