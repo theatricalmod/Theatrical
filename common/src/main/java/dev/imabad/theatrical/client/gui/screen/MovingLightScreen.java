@@ -52,11 +52,14 @@ public class MovingLightScreen extends Screen {
             //We need a nicer way to show that this is invalid?
         }
     }
+    @Override
+    public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        super.renderBackground(guiGraphics, mouseX, mouseY, partialTick);
+        this.renderWindow(guiGraphics);
+    }
 
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        this.renderBackground(guiGraphics);
-        this.renderWindow(guiGraphics);
         super.render(guiGraphics, mouseX, mouseY, partialTick);
         this.dmxAddress.render(guiGraphics, mouseX, mouseY, partialTick);
         this.renderLabels(guiGraphics);
@@ -80,6 +83,6 @@ public class MovingLightScreen extends Screen {
 
     @Override
     public void tick() {
-        this.dmxAddress.tick();
+//        this.dmxAddress.tick();
     }
 }

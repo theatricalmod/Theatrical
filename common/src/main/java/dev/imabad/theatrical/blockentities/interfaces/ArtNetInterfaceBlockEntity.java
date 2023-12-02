@@ -1,6 +1,7 @@
 package dev.imabad.theatrical.blockentities.interfaces;
 
 import com.mojang.util.UUIDTypeAdapter;
+import com.mojang.util.UndashedUuid;
 import dev.imabad.theatrical.TheatricalClient;
 import dev.imabad.theatrical.blockentities.BlockEntities;
 import dev.imabad.theatrical.blockentities.ClientSyncBlockEntity;
@@ -69,7 +70,7 @@ public class ArtNetInterfaceBlockEntity extends ClientSyncBlockEntity {
 
     public boolean isOwnedByCurrentClient(){
         if(level != null && level.isClientSide){
-            return ownerUUID != null && ownerUUID.equals(UUIDTypeAdapter.fromString(Minecraft.getInstance().getUser().getUuid()));
+            return ownerUUID != null && ownerUUID.equals(Minecraft.getInstance().getUser().getProfileId());
         }
         return false;
     }

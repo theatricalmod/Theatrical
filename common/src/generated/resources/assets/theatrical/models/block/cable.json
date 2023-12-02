@@ -1,4 +1,0 @@
-{
-  "parent": "minecraft:block/cube",
-  "loader": "theatrical:cable_model_loader"
-}

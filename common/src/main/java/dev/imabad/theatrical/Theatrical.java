@@ -2,6 +2,7 @@ package dev.imabad.theatrical;
 
 import dev.architectury.platform.Platform;
 import dev.architectury.registry.CreativeTabRegistry;
+import dev.architectury.registry.registries.DeferredRegister;
 import dev.architectury.registry.registries.RegistrySupplier;
 import dev.imabad.theatrical.blockentities.BlockEntities;
 import dev.imabad.theatrical.blocks.Blocks;
@@ -20,8 +21,9 @@ import org.slf4j.LoggerFactory;
 public class Theatrical {
     public static final String MOD_ID = "theatrical";
     // Registering a new creative tab
-    public static final RegistrySupplier<CreativeModeTab> TAB =
-        TheatricalRegistry.get(Registries.CREATIVE_MODE_TAB).register(
+
+    public static final DeferredRegister<CreativeModeTab> TABS = TheatricalRegistry.get(Registries.CREATIVE_MODE_TAB);
+    public static final RegistrySupplier<CreativeModeTab> TAB = TABS.register(
             Theatrical.MOD_ID,
             () -> CreativeTabRegistry.create(
                 Component.translatable("itemGroup." + Theatrical.MOD_ID),
@@ -34,6 +36,7 @@ public class Theatrical {
     public static void init() {
         ConfigHandler configHandler = new ConfigHandler(Platform.getConfigFolder());
         TheatricalConfig.INSTANCE.register(configHandler);
+        TABS.register();
         Fixtures.init();
         TheatricalNet.init();
         Blocks.BLOCKS.register();

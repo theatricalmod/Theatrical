@@ -6,6 +6,7 @@ import dev.imabad.theatrical.net.UpdateArtNetInterface;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -61,9 +62,13 @@ public class ArtNetInterfaceScreen extends Screen {
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        this.renderBackground(guiGraphics);
+    public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        super.renderBackground(guiGraphics, mouseX, mouseY, partialTick);
         this.renderWindow(guiGraphics);
+    }
+
+    @Override
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         super.render(guiGraphics, mouseX, mouseY, partialTick);
         this.dmxUniverse.render(guiGraphics, mouseX, mouseY, partialTick);
         this.ipAddress.render(guiGraphics, mouseX, mouseY, partialTick);
@@ -99,7 +104,7 @@ public class ArtNetInterfaceScreen extends Screen {
 
     @Override
     public void tick() {
-        this.dmxUniverse.tick();
-        this.ipAddress.tick();
+//        this.dmxUniverse.tick();
+//        this.ipAddress.tick();
     }
 }
