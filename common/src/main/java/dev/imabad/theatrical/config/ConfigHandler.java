@@ -16,6 +16,7 @@ import java.lang.reflect.Field;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.function.Supplier;
 
@@ -46,14 +47,14 @@ public class ConfigHandler {
     @Nullable
     public <T extends BaseConfig> T registerConfig(String modID, ConfigSide side, Supplier<T> configCreator){
         if((Platform.getEnvironment() == Env.SERVER && side == ConfigSide.COMMON) || Platform.getEnvironment() == Env.CLIENT){
-            File sideConfig = Paths.get(this.configFolder.toString(), modID + "-" + side.name().toLowerCase() + ".yml").toFile();
+            File sideConfig = Paths.get(this.configFolder.toString(), modID + "-" + side.name().toLowerCase(Locale.ENGLISH) + ".yml").toFile();
             T config = configCreator.get();
             if(sideConfig.exists()){
                 load(config, sideConfig);
             } else {
                 save(config, sideConfig);
             }
-            ResourceLocation location = new ResourceLocation(modID, side.name().toLowerCase());
+            ResourceLocation location = new ResourceLocation(modID, side.name().toLowerCase(Locale.ENGLISH));
             registered_configs.put(location, config);
             return config;
         }
