@@ -116,7 +116,7 @@ publishMods {
     file = remapJar.archiveFile
     changelog = rootProject.file("CHANGELOG.md").text
     type = project.release_type as me.modmuss50.mpp.PublishOptions.ReleaseType
-    modLoaders.add("forge")
+    modLoaders.add("neoforge")
 
     if(System.getenv("CURSEFORGE_TOKEN") != null) {
         curseforge {
