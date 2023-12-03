@@ -123,6 +123,7 @@ publishMods {
     changelog = rootProject.file("CHANGELOG.md").text
     type = project.release_type as ReleaseType
     modLoaders.add("neoforge")
+    displayName = "Theatrical-${project.name}-${version}"
 
     if(System.getenv("CURSEFORGE_TOKEN") != null) {
         curseforge {
