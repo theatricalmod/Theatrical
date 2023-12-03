@@ -300,4 +300,14 @@ public abstract class BaseLightBlockEntity extends ClientSyncBlockEntity impleme
         }
         super.setRemoved();
     }
+
+    public void setTilt(int tilt){
+        this.tilt = tilt;
+        this.prevTilt = tilt;
+    }
+
+    public void setPan(int pan){
+        this.pan = pan;
+        this.prevPan = pan;
+    }
 }

@@ -48,6 +48,7 @@ public class DataEvent {
             cubeAll(Blocks.ART_NET_INTERFACE.getId().getPath(), new ResourceLocation(Theatrical.MOD_ID, "block/artnet_interface"));
             withExistingParent(Blocks.PIPE_BLOCK.getId().getPath(), new ResourceLocation(Theatrical.MOD_ID, "block/pipe"));
             withExistingParent(Blocks.MOVING_LIGHT_BLOCK.getId().getPath(), new ResourceLocation(Theatrical.MOD_ID, "block/moving_light/moving_head_whole"));
+            withExistingParent(Blocks.LED_FRESNEL.getId().getPath(), new ResourceLocation(Theatrical.MOD_ID, "block/fresnel/fresnel_whole"));
         }
     }
 
@@ -62,6 +63,7 @@ public class DataEvent {
             addBlock(Blocks.ART_NET_INTERFACE, "ArtNet Interface");
             addBlock(Blocks.MOVING_LIGHT_BLOCK, "Moving Light");
             addBlock(Blocks.PIPE_BLOCK, "Rigging Pipe");
+            addBlock(Blocks.LED_FRESNEL, "LED Fresnel");
             add("itemGroup.theatrical", "Theatrical");
             add("artneti.dmxUniverse", "DMX Universe");
             add("artneti.ipAddress", "IP Address");
@@ -70,6 +72,8 @@ public class DataEvent {
             add("artneti.notAuthorized", "You're not authorized!");
             add("artneti.lastReceived", "Data received %d second(s) ago");
             add("fixture.dmxStart", "DMX Address");
+            add("fixture.pan", "Pan");
+            add("fixture.tilt", "Tilt");
             add("screen.movinglight", "Moving Light");
         }
     }

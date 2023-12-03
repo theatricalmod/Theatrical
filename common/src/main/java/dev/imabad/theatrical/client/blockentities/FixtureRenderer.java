@@ -6,7 +6,7 @@ import com.mojang.math.Axis;
 import dev.imabad.theatrical.TheatricalExpectPlatform;
 import dev.imabad.theatrical.api.HangType;
 import dev.imabad.theatrical.api.Support;
-import dev.imabad.theatrical.blockentities.light.MovingLightBlockEntity;
+import dev.imabad.theatrical.blockentities.light.BaseLightBlockEntity;
 import dev.imabad.theatrical.blocks.HangableBlock;
 import dev.imabad.theatrical.blocks.light.MovingLightBlock;
 import dev.imabad.theatrical.config.TheatricalConfig;
@@ -22,18 +22,18 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 
-public class MovingLightRenderer implements BlockEntityRenderer<MovingLightBlockEntity> {
+public class FixtureRenderer<T extends BaseLightBlockEntity> implements BlockEntityRenderer<T> {
     private final Double beamOpacity = TheatricalConfig.INSTANCE.CLIENT.beamOpacity;
     private BakedModel cachedPanModel, cachedTiltModel, cachedStaticModel;
 
-    public MovingLightRenderer(BlockEntityRendererProvider.Context context) {
+    public FixtureRenderer(BlockEntityRendererProvider.Context context) {
     }
     @Override
-    public void render(MovingLightBlockEntity blockEntity, float partialTick, PoseStack poseStack, MultiBufferSource multiBufferSource, int packedLight, int packedOverlay) {
+    public void render(T blockEntity, float partialTick, PoseStack poseStack, MultiBufferSource multiBufferSource, int packedLight, int packedOverlay) {
         poseStack.pushPose();
         VertexConsumer vertexConsumer = multiBufferSource.getBuffer(RenderType.cutout());
         BlockState blockState = blockEntity.getBlockState();
-        boolean isFlipped = blockState.getValue(MovingLightBlock.HANGING);
+        boolean isFlipped = blockEntity.isUpsideDown();
         boolean isHanging = ((HangableBlock) blockState.getBlock()).isHanging(blockEntity.getLevel(), blockEntity.getBlockPos());
         renderLight(blockEntity, poseStack, vertexConsumer, blockState.getValue(MovingLightBlock.FACING), partialTick, isFlipped, blockState, isHanging, packedLight, packedOverlay);
         if(blockEntity.getIntensity() > 0){
@@ -49,7 +49,7 @@ public class MovingLightRenderer implements BlockEntityRenderer<MovingLightBlock
         poseStack.popPose();
     }
 
-    public void renderLight(MovingLightBlockEntity blockEntity, PoseStack poseStack, VertexConsumer vertexConsumer, Direction facing, float partialTicks, boolean isFlipped, BlockState blockState, boolean isHanging, int packedLight, int packedOverlay) {
+    public void renderLight(T blockEntity, PoseStack poseStack, VertexConsumer vertexConsumer, Direction facing, float partialTicks, boolean isFlipped, BlockState blockState, boolean isHanging, int packedLight, int packedOverlay) {
         if (cachedPanModel == null){
             cachedPanModel = TheatricalExpectPlatform.getBakedModel(blockEntity.getFixture().getPanModel());
         }
@@ -106,7 +106,7 @@ public class MovingLightRenderer implements BlockEntityRenderer<MovingLightBlock
         Minecraft.getInstance().getBlockRenderer().getModelRenderer().renderModel(poseStack.last(), vertexConsumer, blockState, cachedTiltModel, 1, 1, 1, packedLight, packedOverlay);
     }
 
-    public void renderLightBeam(VertexConsumer builder, PoseStack stack, MovingLightBlockEntity tileEntityFixture, float partialTicks, float alpha, float beamSize, float length, int color) {
+    public void renderLightBeam(VertexConsumer builder, PoseStack stack, T tileEntityFixture, float partialTicks, float alpha, float beamSize, float length, int color) {
         int r = (color >> 16) & 0xFF;
         int g = (color >> 8) & 0xFF;
         int b = color & 0xFF;
@@ -140,7 +140,7 @@ public class MovingLightRenderer implements BlockEntityRenderer<MovingLightBlock
     }
 
     @Override
-    public boolean shouldRenderOffScreen(MovingLightBlockEntity blockEntity) {
+    public boolean shouldRenderOffScreen(T blockEntity) {
         return true;
     }
 

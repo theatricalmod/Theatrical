@@ -6,9 +6,12 @@
   "artneti.notConnected": "No data received",
   "artneti.save": "Save",
   "block.theatrical.artnet_interface": "ArtNet Interface",
+  "block.theatrical.led_fresnel": "LED Fresnel",
   "block.theatrical.moving_light": "Moving Light",
   "block.theatrical.pipe": "Rigging Pipe",
   "fixture.dmxStart": "DMX Address",
+  "fixture.pan": "Pan",
+  "fixture.tilt": "Tilt",
   "itemGroup.theatrical": "Theatrical",
   "screen.movinglight": "Moving Light"
 }

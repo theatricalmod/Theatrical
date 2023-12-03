@@ -4,6 +4,7 @@ import dev.architectury.registry.registries.DeferredRegister;
 import dev.architectury.registry.registries.RegistrySupplier;
 import dev.imabad.theatrical.TheatricalRegistry;
 import dev.imabad.theatrical.blocks.interfaces.ArtNetInterfaceBlock;
+import dev.imabad.theatrical.blocks.light.FresnelBlock;
 import dev.imabad.theatrical.blocks.light.MovingLightBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
@@ -18,6 +19,7 @@ public class Blocks {
     public static final RegistrySupplier<Block> MOVING_LIGHT_BLOCK = BLOCKS.register("moving_light", MovingLightBlock::new);
     public static final RegistrySupplier<Block> PIPE_BLOCK = BLOCKS.register("pipe", dev.imabad.theatrical.blocks.rigging.PipeBlock::new);
     public static final RegistrySupplier<Block> ART_NET_INTERFACE = BLOCKS.register("artnet_interface", ArtNetInterfaceBlock::new);
+    public static final RegistrySupplier<Block> LED_FRESNEL = BLOCKS.register("led_fresnel", FresnelBlock::new);
     public static Boolean neverAllowSpawn(BlockState blockState, BlockGetter blockGetter, BlockPos blockPos, EntityType<?> entity) {
         return false;
     }

@@ -23,4 +23,8 @@ public class Items {
         "artnet_interface",
         () -> new BlockItem(Blocks.ART_NET_INTERFACE.get(), new Item.Properties().arch$tab(Theatrical.TAB))
     );
+    public static final RegistrySupplier<Item> LED_FRESNEL = ITEMS.register(
+            "led_fresnel",
+            () -> new BlockItem(Blocks.LED_FRESNEL.get(), new Item.Properties().arch$tab(Theatrical.TAB))
+    );
 }
