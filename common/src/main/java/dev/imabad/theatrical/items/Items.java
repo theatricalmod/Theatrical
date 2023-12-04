@@ -27,4 +27,8 @@ public class Items {
             "led_fresnel",
             () -> new BlockItem(Blocks.LED_FRESNEL.get(), new Item.Properties().arch$tab(Theatrical.TAB))
     );
+    public static final RegistrySupplier<Item> TRUSS = ITEMS.register(
+            "truss",
+            () -> new BlockItem(Blocks.TRUSS_BLOCK.get(), new Item.Properties().arch$tab(Theatrical.TAB))
+    );
 }

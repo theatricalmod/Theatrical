@@ -18,7 +18,6 @@ public class TheatricalForge {
     public TheatricalForge() {
         // Submit our event bus to let architectury register our content on the right time
         EventBuses.registerModEventBus(Theatrical.MOD_ID, FMLJavaModLoadingContext.get().getModEventBus());
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(DataEvent::onData);
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onClient);
         Theatrical.init();
     }

@@ -1,5 +1,6 @@
-// 1.20.2	2023-12-03T15:38:25.556919	Item Models: theatrical
+// 1.20.2	2023-12-04T01:19:06.9995917	Item Models: theatrical
 b61dea162dac1064778fccd83e00b34aeea3d2b7 assets/theatrical/models/item/artnet_interface.json
 0dc3e30a7627a40ada8a4b8e20249c809067a337 assets/theatrical/models/item/led_fresnel.json
 e6b312509e9a1cfcd5730624d5cbd9f04781d7f7 assets/theatrical/models/item/moving_light.json
 c6f2fb6f5773f7d2dfde0ef62b68d7793abf8bc2 assets/theatrical/models/item/pipe.json
+0c09e3fd7a3467c9cf202c1bcaaaf2954dd0347e assets/theatrical/models/item/truss.json

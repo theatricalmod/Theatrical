@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "axis=x": {
+      "model": "theatrical:block/truss",
+      "x": 90,
+      "y": 90
+    },
+    "axis=y": {
+      "model": "theatrical:block/truss"
+    },
+    "axis=z": {
+      "model": "theatrical:block/truss",
+      "x": 90
+    }
+  }
+}
