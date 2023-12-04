@@ -31,4 +31,8 @@ public class Items {
             "truss",
             () -> new BlockItem(Blocks.TRUSS_BLOCK.get(), new Item.Properties().arch$tab(Theatrical.TAB))
     );
+    public static final RegistrySupplier<Item> REDSTONE_INTERFACE = ITEMS.register(
+            "redstone_interface",
+            () -> new BlockItem(Blocks.REDSTONE_INTERFACE.get(), new Item.Properties().arch$tab(Theatrical.TAB))
+    );
 }

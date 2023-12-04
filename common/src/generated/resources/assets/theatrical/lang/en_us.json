@@ -9,6 +9,8 @@
   "block.theatrical.led_fresnel": "LED Fresnel",
   "block.theatrical.moving_light": "Moving Light",
   "block.theatrical.pipe": "Rigging Pipe",
+  "block.theatrical.redstone_interface": "Redstone Interface",
+  "block.theatrical.truss": "MT100 Truss",
   "fixture.dmxStart": "DMX Address",
   "fixture.pan": "Pan",
   "fixture.tilt": "Tilt",

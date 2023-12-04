@@ -22,16 +22,10 @@ public class ArtNetInterfaceBlockEntity extends ClientSyncBlockEntity {
     public static <T extends BlockEntity> void tick(Level level, BlockPos pos, BlockState state, T be) {
         ArtNetInterfaceBlockEntity tile = (ArtNetInterfaceBlockEntity) be;
         if(level.isClientSide){
-//            tile.tickTimer++;
-//            if(tile.tickTimer >= 2) {
-//                // dothings
-//
-//            }
             if(tile.isOwnedByCurrentClient()){
                 byte[] data = TheatricalClient.getArtNetManager().getClient(tile.ip).readDmxData(tile.subnet, tile.universe);
                 new SendArtNetData(pos, data).sendToServer();
             }
-//            tile.tickTimer = 0;
         }
     }
 

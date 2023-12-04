@@ -4,6 +4,7 @@ import dev.architectury.registry.registries.DeferredRegister;
 import dev.architectury.registry.registries.RegistrySupplier;
 import dev.imabad.theatrical.TheatricalRegistry;
 import dev.imabad.theatrical.blocks.interfaces.ArtNetInterfaceBlock;
+import dev.imabad.theatrical.blocks.interfaces.RedstoneInterfaceBlock;
 import dev.imabad.theatrical.blocks.light.FresnelBlock;
 import dev.imabad.theatrical.blocks.light.MovingLightBlock;
 import dev.imabad.theatrical.blocks.rigging.TrussBlock;
@@ -23,6 +24,7 @@ public class Blocks {
     public static final RegistrySupplier<Block> ART_NET_INTERFACE = BLOCKS.register("artnet_interface", ArtNetInterfaceBlock::new);
     public static final RegistrySupplier<Block> LED_FRESNEL = BLOCKS.register("led_fresnel", FresnelBlock::new);
     public static final RegistrySupplier<RotatedPillarBlock> TRUSS_BLOCK = BLOCKS.register("truss", TrussBlock::new);
+    public static final RegistrySupplier<Block> REDSTONE_INTERFACE = BLOCKS.register("redstone_interface", RedstoneInterfaceBlock::new);
     public static Boolean neverAllowSpawn(BlockState blockState, BlockGetter blockGetter, BlockPos blockPos, EntityType<?> entity) {
         return false;
     }

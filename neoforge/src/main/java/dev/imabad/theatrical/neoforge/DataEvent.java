@@ -33,6 +33,7 @@ public class DataEvent {
         @Override
         protected void registerStatesAndModels() {
             simpleBlock(Blocks.ART_NET_INTERFACE.get());
+            simpleBlock(Blocks.REDSTONE_INTERFACE.get());
             ModelFile.ExistingModelFile trussModel = models().getExistingFile(new ResourceLocation("theatrical:block/truss"));
             axisBlock(Blocks.TRUSS_BLOCK.get(), trussModel, trussModel);
 //            horizontalBlock(Blocks.PIPE_BLOCK.get(), new ModelFile.UncheckedModelFile(new ResourceLocation("theatrical:block/pipe")));
@@ -49,6 +50,7 @@ public class DataEvent {
         @Override
         protected void registerModels() {
             cubeAll(Blocks.ART_NET_INTERFACE.getId().getPath(), new ResourceLocation(Theatrical.MOD_ID, "block/artnet_interface"));
+            cubeAll(Blocks.REDSTONE_INTERFACE.getId().getPath(), new ResourceLocation(Theatrical.MOD_ID, "block/redstone_interface"));
             withExistingParent(Blocks.PIPE_BLOCK.getId().getPath(), new ResourceLocation(Theatrical.MOD_ID, "block/pipe"));
             withExistingParent(Blocks.TRUSS_BLOCK.getId().getPath(), new ResourceLocation(Theatrical.MOD_ID, "block/truss"));
             withExistingParent(Blocks.MOVING_LIGHT_BLOCK.getId().getPath(), new ResourceLocation(Theatrical.MOD_ID, "block/moving_light/moving_head_whole"));
@@ -68,6 +70,8 @@ public class DataEvent {
             addBlock(Blocks.MOVING_LIGHT_BLOCK, "Moving Light");
             addBlock(Blocks.PIPE_BLOCK, "Rigging Pipe");
             addBlock(Blocks.LED_FRESNEL, "LED Fresnel");
+            addBlock(Blocks.TRUSS_BLOCK, "MT100 Truss");
+            addBlock(Blocks.REDSTONE_INTERFACE, "Redstone Interface");
             add("itemGroup.theatrical", "Theatrical");
             add("artneti.dmxUniverse", "DMX Universe");
             add("artneti.ipAddress", "IP Address");

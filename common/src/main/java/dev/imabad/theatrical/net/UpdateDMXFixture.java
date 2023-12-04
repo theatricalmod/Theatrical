@@ -3,6 +3,7 @@ package dev.imabad.theatrical.net;
 import dev.architectury.networking.NetworkManager;
 import dev.architectury.networking.simple.BaseC2SMessage;
 import dev.architectury.networking.simple.MessageType;
+import dev.imabad.theatrical.blockentities.interfaces.RedstoneInterfaceBlockEntity;
 import dev.imabad.theatrical.blockentities.light.BaseDMXConsumerLightBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
@@ -39,6 +40,8 @@ public class UpdateDMXFixture extends BaseC2SMessage {
         BlockEntity be = context.getPlayer().level().getBlockEntity(pos);
         if(be instanceof BaseDMXConsumerLightBlockEntity dmxConsumerLightBlock){
             dmxConsumerLightBlock.setChannelStartPoint(dmxAddress);
+        } else if(be instanceof RedstoneInterfaceBlockEntity redstoneInterfaceBlockEntity){
+            redstoneInterfaceBlockEntity.setChannelStartPoint(dmxAddress);
         }
     }
 }
