@@ -1,7 +1,10 @@
 package dev.imabad.theatrical;
 
 import dev.architectury.injectables.annotations.ExpectPlatform;
+import dev.imabad.theatrical.client.sound.OpusStreamedAudioStream;
+import dev.imabad.theatrical.client.sound.SpeakerSound;
 import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 
 import java.nio.file.Path;
@@ -23,5 +26,8 @@ public class TheatricalExpectPlatform {
         throw new AssertionError();
     }
 
+
+    @ExpectPlatform
+    public static SpeakerSound newSpeakerSound(ResourceLocation sound, OpusStreamedAudioStream stream, BlockPos pos){ throw new AssertionError();}
 
 }

@@ -7,6 +7,9 @@
     "defaultRequire": 1,
     "maxShiftBy": 5
   },
+  "client": [
+    "client.SoundEngineMixin"
+  ],
   "mixins": [
     "ArgumentTypeInfosAccessor",
     "ClipContextAccessor"
@@ -14,6 +17,7 @@
   "client": [
     "client.ClientMixin",
     "client.LevelRendererMixin",
-    "client.OptionsScreenMixin"
+    "client.OptionsScreenMixin",
+    "LivingEntityMixin"
   ]
 }

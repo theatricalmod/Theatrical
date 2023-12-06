@@ -16,6 +16,11 @@ sourceSets {
     }
 }
 
+repositories {
+    mavenCentral()
+    maven { url "https://jitpack.io" }
+}
+
 dependencies {
     // We depend on fabric loader here to use the fabric @Environment annotations and get the mixin dependencies
     // Do NOT use other classes from fabric loader
@@ -33,6 +38,10 @@ dependencies {
 
     // Shimmer
     modImplementation "com.lowdragmc.shimmer:Shimmer-common:${shimmer_version}"
+
+    //Opus JNI
+    implementation rootProject.files("libs/opus-jni-java-1.0.3.jar")
+    shadowCommon rootProject.files("libs/opus-jni-java-1.0.3.jar")
 }
 
 publishing {

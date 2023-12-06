@@ -11,6 +11,7 @@ import dev.imabad.theatrical.blocks.light.LEDPanelBlock;
 import dev.imabad.theatrical.blocks.light.MovingLightBlock;
 import dev.imabad.theatrical.blocks.rigging.TankTrapBlock;
 import dev.imabad.theatrical.blocks.rigging.TrussBlock;
+import dev.imabad.theatrical.blocks.sound.SpeakerBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.entity.EntityType;
@@ -31,6 +32,7 @@ public class Blocks {
     public static final RegistrySupplier<Block> TANK_TRAP = BLOCKS.register("tank_trap", TankTrapBlock::new);
     public static final RegistrySupplier<Block> LED_PANEL = BLOCKS.register("led_panel", LEDPanelBlock::new);
     public static final RegistrySupplier<Block> BASIC_LIGHTING_DESK = BLOCKS.register("basic_lighting_desk", BasicLightingDeskBlock::new);
+    public static final RegistrySupplier<Block> SPEAKER = BLOCKS.register("speaker", SpeakerBlock::new);
     public static Boolean neverAllowSpawn(BlockState blockState, BlockGetter blockGetter, BlockPos blockPos, EntityType<?> entity) {
         return false;
     }

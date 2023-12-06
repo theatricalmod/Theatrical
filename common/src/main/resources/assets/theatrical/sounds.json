@@ -1,0 +1,10 @@
+{
+  "speaker.opus_stream": {
+    "sounds": [
+      {
+        "name": "theatrical:empty",
+        "stream": true
+      }
+    ]
+  }
+}

@@ -27,6 +27,10 @@ import net.minecraft.commands.synchronization.SingletonArgumentInfo;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -94,4 +98,11 @@ public class Theatrical {
         argTypes.register(new ResourceLocation(Theatrical.MOD_ID, id), () -> serializer);
         ArgumentTypeInfosAccessor.classMap().put(clazz, serializer);
     }
+    public static void handleArmourEquip(Entity entity, ItemStack equippedItem, EquipmentSlot equipmentSlot){
+        if(!(entity instanceof Player player)) return;
+        if(equipmentSlot == EquipmentSlot.CHEST){
+
+        }
+    }
+
 }

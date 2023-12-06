@@ -4,3 +4,5 @@ accessible field net/minecraft/server/network/ServerGamePacketListenerImpl ackBl
 mutable field net/minecraft/world/level/ClipContext collisionContext Lnet/minecraft/world/phys/shapes/CollisionContext;
 accessible method net/minecraft/client/renderer/RenderType translucentState (Lnet/minecraft/client/renderer/RenderStateShard$ShaderStateShard;)Lnet/minecraft/client/renderer/RenderType$CompositeState;
 accessible field net/minecraft/client/gui/components/Checkbox showLabel Z
+accessible method com/mojang/blaze3d/audio/Channel pumpBuffers (I)V
+accessible field net/minecraft/client/sounds/SoundEngine executor Lnet/minecraft/client/sounds/SoundEngineExecutor;

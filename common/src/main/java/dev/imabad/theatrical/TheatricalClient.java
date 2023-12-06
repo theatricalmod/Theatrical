@@ -31,6 +31,10 @@ import dev.imabad.theatrical.net.OpenScreen;
 import dev.imabad.theatrical.net.artnet.ListConsumers;
 import dev.imabad.theatrical.net.artnet.NotifyConsumerChange;
 import dev.imabad.theatrical.net.artnet.RequestNetworks;
+import dev.imabad.theatrical.client.blockentities.FixtureRenderer;
+import dev.imabad.theatrical.client.sound.mic.MicrophoneManager;
+import dev.imabad.theatrical.protocols.artnet.ArtNetManager;
+import net.labymod.opus.OpusCodec;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -55,6 +59,7 @@ public class TheatricalClient {
 
     public static Set<BlockPos> DEBUG_BLOCKS = new HashSet<>();
     private static ArtNetManager artNetManager;
+    private static MicrophoneManager microphoneManager;
     public static void init() {
         BlockEntityRendererRegistry.register(BlockEntities.MOVING_LIGHT.get(), MovingLightRenderer::new);
         BlockEntityRendererRegistry.register(BlockEntities.LED_FRESNEL.get(), FresnelRenderer::new);
@@ -85,7 +90,15 @@ public class TheatricalClient {
             }
         });
 */
+        try {
+            OpusCodec.setupWithTemporaryFolder();
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+        microphoneManager = new MicrophoneManager();
     }
+
+    public static MicrophoneManager getMicrophoneManager() { return microphoneManager;}
 
     public static ArtNetManager getArtNetManager(){
         return artNetManager;

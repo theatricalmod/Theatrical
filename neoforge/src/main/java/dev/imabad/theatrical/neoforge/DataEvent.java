@@ -71,6 +71,7 @@ public class DataEvent {
             withExistingParent(Blocks.BASIC_LIGHTING_DESK.getId().getPath(), new ResourceLocation(Theatrical.MOD_ID, "block/lighting_console"));
             withExistingParent(Items.CONFIGURATION_CARD.getId().getPath(), mcLoc("item/generated"))
                     .texture("layer0", new ResourceLocation(Theatrical.MOD_ID, "item/configuration_card"));
+            basicItem(Items.MICROPHONE_PACK.get());
         }
     }
 
@@ -92,6 +93,7 @@ public class DataEvent {
             addBlock(Blocks.LED_PANEL, "LED Panel");
             addBlock(Blocks.BASIC_LIGHTING_DESK, "Basic Lighting Desk");
             addItem(Items.CONFIGURATION_CARD, "Configuration Card");
+            addItem(Items.MICROPHONE_PACK, "Microphone Pack");
             add("itemGroup.theatrical", "Theatrical");
             add("artneti.dmxUniverse", "DMX Universe");
             add("artneti.ipAddress", "IP Address");
@@ -134,6 +136,9 @@ public class DataEvent {
             add("screen.artnetconfig.subnet", "DMX Subnet");
             add("screen.artnetconfig.networkUniverse", "Network Universe");
             add("screen.artnetconfig.networkEnabled", "Enabled");
+            add("micpack.status", "Status:");
+            add("micpack.on", "On");
+            add("micpack.off", "Off");
         }
     }
 

@@ -51,4 +51,14 @@ public class Items {
             "configuration_card",
             ConfigurationCard::new
     );
+
+    public static final RegistrySupplier<Item> SPEAKER = ITEMS.register(
+            "speaker",
+            () -> new BlockItem(Blocks.SPEAKER.get(), new Item.Properties().arch$tab(Theatrical.TAB))
+    );
+
+    public static final RegistrySupplier<Item> MICROPHONE_PACK = ITEMS.register(
+            "microphone_pack",
+            MicrophonePack::new
+    );
 }

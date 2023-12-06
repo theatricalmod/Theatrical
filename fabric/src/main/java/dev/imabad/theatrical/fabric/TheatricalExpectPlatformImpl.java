@@ -2,11 +2,15 @@ package dev.imabad.theatrical.fabric;
 
 import dev.imabad.theatrical.Theatrical;
 import dev.imabad.theatrical.TheatricalExpectPlatform;
+import dev.imabad.theatrical.client.sound.OpusStreamedAudioStream;
+import dev.imabad.theatrical.client.sound.SpeakerSound;
+import dev.imabad.theatrical.fabric.client.sound.FabricSpeakerSound;
 import net.fabricmc.fabric.api.client.model.BakedModelManagerHelper;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 
 import java.nio.file.Path;
@@ -30,4 +34,9 @@ public class TheatricalExpectPlatformImpl {
         }
         return "Unknown";
     }
+
+    public static SpeakerSound newSpeakerSound(ResourceLocation sound, OpusStreamedAudioStream stream, BlockPos pos){
+        return new FabricSpeakerSound(sound, stream, pos);
+    }
+
 }

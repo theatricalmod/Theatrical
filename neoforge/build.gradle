@@ -6,6 +6,8 @@ plugins {
 
 repositories {
     maven { url "https://maven.neoforged.net/releases/" }
+    mavenCentral()
+    maven { url "https://jitpack.io" }
 }
 
 architectury {
@@ -22,6 +24,7 @@ loom {
     runs {
         client {
             client()
+            vmArgs "-Dlava.native.connector.dir=C:\\Users\\stuar\\Documents\\MCModding\\lava-natives"
         }
         data {
             data()
@@ -62,6 +65,11 @@ dependencies {
     implementation "org.yaml:snakeyaml:${rootProject.snakeyaml_version}"
     forgeRuntimeLibrary "org.yaml:snakeyaml:${rootProject.snakeyaml_version}"
     include "org.yaml:snakeyaml:${rootProject.snakeyaml_version}"
+
+    //OPUS JNI
+    implementation rootProject.files("libs/opus-jni-java-1.0.3.jar")
+    shadowCommon rootProject.files("libs/opus-jni-java-1.0.3.jar")
+    forgeRuntimeLibrary rootProject.files("libs/opus-jni-java-1.0.3.jar")
 }
 
 processResources {

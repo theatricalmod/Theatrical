@@ -2,8 +2,12 @@ package dev.imabad.theatrical.neoforge;
 
 import dev.imabad.theatrical.Theatrical;
 import dev.imabad.theatrical.TheatricalExpectPlatform;
+import dev.imabad.theatrical.client.sound.OpusStreamedAudioStream;
+import dev.imabad.theatrical.client.sound.SpeakerSound;
+import dev.imabad.theatrical.neoforge.client.sound.ForgeSpeakerSound;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.fml.loading.FMLPaths;
 import net.neoforged.fml.loading.LoadingModList;
@@ -29,4 +33,9 @@ public class TheatricalExpectPlatformImpl {
         }
         return "Unknown";
     }
+
+    public static SpeakerSound newSpeakerSound(ResourceLocation sound, OpusStreamedAudioStream stream, BlockPos pos){
+        return new ForgeSpeakerSound(sound, stream, pos);
+    }
+
 }
