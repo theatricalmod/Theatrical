@@ -21,6 +21,9 @@ public class TheatricalConfig {
 
         @TheatricalConfigItem(minValue = "0")
         public int renderDistance = 64;
+
+        @TheatricalConfigItem
+        public boolean doOwnerCheck = true;
     }
 
     public static class ServerConfig extends BaseConfig{

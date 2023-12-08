@@ -63,6 +63,9 @@ public class ArtNetInterfaceBlockEntity extends ClientSyncBlockEntity {
     }
 
     public boolean isOwnedByCurrentClient(){
+        if(!TheatricalConfig.INSTANCE.CLIENT.doOwnerCheck){
+            return true;
+        }
         if(level != null && level.isClientSide){
             return ownerUUID != null && ownerUUID.equals(Minecraft.getInstance().getUser().getProfileId());
         }
