@@ -18,6 +18,7 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Supplier;
 
 public class ConfigHandler {
@@ -90,12 +91,13 @@ public class ConfigHandler {
 
     private <T> void magicLoad(T config, Map<String, Object> inputMap){
         Field[] fields = config.getClass().getFields();
+        Set<String> incomingStrings = inputMap.keySet();
         for (Field f : fields) {
             if(f.isAnnotationPresent(TheatricalConfigItem.class)) {
                 TheatricalConfigItem annotation = f.getAnnotation(TheatricalConfigItem.class);
                 String fieldName = annotation.name().length > 0 ? annotation.name()[0] : f.getName();
                 Class<?> fieldType = annotation.type().length > 0 ? annotation.type()[0] : f.getType();
-                if(!inputMap.containsKey(fieldName) || !fieldType.isInstance(inputMap.get(fieldName))){
+                if(!incomingStrings.contains(fieldName)){
                     break;
                 }
                 Object value = inputMap.get(fieldName);
