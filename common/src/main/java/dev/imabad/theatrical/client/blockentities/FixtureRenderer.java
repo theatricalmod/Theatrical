@@ -19,6 +19,7 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 
@@ -147,5 +148,10 @@ public class FixtureRenderer<T extends BaseLightBlockEntity> implements BlockEnt
     @Override
     public int getViewDistance() {
         return TheatricalConfig.INSTANCE.CLIENT.renderDistance;
+    }
+
+    @Override
+    public boolean shouldRender(T blockEntity, Vec3 cameraPos) {
+        return true;
     }
 }
