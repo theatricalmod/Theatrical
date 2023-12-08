@@ -1,3 +1,3 @@
-# 1.20.2-alpha6
+# 1.20.2-alpha.7
 
-* Add a client side config to disable the local checking of interface ownership.
+* Fix config loading not working properly.
