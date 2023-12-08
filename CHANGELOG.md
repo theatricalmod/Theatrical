@@ -1,4 +1,3 @@
-# 1.20.2-alpha5
+# 1.20.2-alpha6
 
-* Add MT100 Truss back - Texture / model needs not final
-* Add back Redstone interface, takes in ArtNet DMX and converts to redstone signal.
+* Add a client side config to disable the local checking of interface ownership.
