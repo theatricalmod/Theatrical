@@ -47,7 +47,7 @@ public class LEDFresnelFixture extends Fixture {
 
     @Override
     public float getBeamWidth() {
-        return 0.25f;
+        return 0.15f;
     }
 
     @Override

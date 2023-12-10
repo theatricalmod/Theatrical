@@ -5,6 +5,7 @@ import dev.imabad.theatrical.blockentities.BlockEntities;
 import dev.imabad.theatrical.blocks.light.MovingLightBlock;
 import dev.imabad.theatrical.fixtures.Fixtures;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -40,8 +41,8 @@ public class MovingLightBlockEntity extends BaseDMXConsumerLightBlockEntity {
         green = convertByteToInt(ourValues[2]);
         blue = convertByteToInt(ourValues[3]);
         focus = convertByteToInt(ourValues[4]);
-        pan = (int) ((convertByteToInt(ourValues[5]) * 360) / 255f);
-        tilt = (int) ((convertByteToInt(ourValues[6]) * 180) / 255F);
+        pan = (int) ((convertByteToInt(ourValues[5]) * 360) / 255f) - 180;
+        tilt = (int) ((convertByteToInt(ourValues[6]) * 180) / 255F) - 180;
         level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
     }
     public int convertByteToInt(byte val) {
@@ -49,6 +50,6 @@ public class MovingLightBlockEntity extends BaseDMXConsumerLightBlockEntity {
     }
     @Override
     public boolean isUpsideDown() {
-        return getBlockState().getValue(MovingLightBlock.HANGING);
+        return getBlockState().getValue(MovingLightBlock.HANGING) && getBlockState().getValue(MovingLightBlock.HANG_DIRECTION) == Direction.UP;
     }
 }

@@ -7,9 +7,11 @@ import dev.imabad.theatrical.TheatricalExpectPlatform;
 import dev.imabad.theatrical.api.HangType;
 import dev.imabad.theatrical.api.Support;
 import dev.imabad.theatrical.blockentities.light.BaseLightBlockEntity;
+import dev.imabad.theatrical.blockentities.light.MovingLightBlockEntity;
 import dev.imabad.theatrical.blocks.HangableBlock;
 import dev.imabad.theatrical.blocks.light.MovingLightBlock;
 import dev.imabad.theatrical.config.TheatricalConfig;
+import dev.imabad.theatrical.fixtures.Fixtures;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
@@ -60,25 +62,51 @@ public class FixtureRenderer<T extends BaseLightBlockEntity> implements BlockEnt
         if(cachedStaticModel == null){
             cachedStaticModel = TheatricalExpectPlatform.getBakedModel(blockEntity.getFixture().getStaticModel());
         }
-        if (blockEntity.getFixture().getHangType() == HangType.BRACE_BAR && isHanging) {
-            poseStack.translate(0, 0.175, 0);
-        }
-        if (blockEntity.getFixture().getHangType() == HangType.HOOK_BAR && isHanging) {
-            poseStack.translate(0, 0.05, 0);
-        }
+
+//        if (blockEntity.getFixture().getHangType() == HangType.HOOK_BAR && isHanging) {
+//            poseStack.translate(0, 0.05, 0);
+//        }
         poseStack.translate(0.5F, 0, .5F);
+        if(isHanging){
+            Direction hangDirection = blockState.getValue(HangableBlock.HANG_DIRECTION);
+            poseStack.translate(0, 0.5, 0F);
+            if(hangDirection.getAxis() != Direction.Axis.Y){
+                if(hangDirection.getAxis() == Direction.Axis.Z){
+                    if(hangDirection == Direction.SOUTH) {
+                        poseStack.mulPose(Axis.ZP.rotationDegrees(90));
+                        poseStack.mulPose(Axis.XP.rotationDegrees(-90));
+                    } else {
+                        poseStack.mulPose(Axis.ZP.rotationDegrees(90));
+                        poseStack.mulPose(Axis.XP.rotationDegrees(90));
+                    }
+                } else {
+                    if(hangDirection == Direction.EAST) {
+                        poseStack.mulPose(Axis.ZN.rotationDegrees(-90));
+                    } else {
+                        poseStack.mulPose(Axis.ZN.rotationDegrees(90));
+                    }
+                }
+            } else {
+                //TODO: Handle hanging up
+            }
+            poseStack.translate(0, -0.5, 0F);
+        }
+//        poseStack.translate(0, 0.5, 0F);
         if(facing.getAxis() == Direction.Axis.Z) {
-            poseStack.mulPose(Axis.YP.rotationDegrees(facing.getOpposite().toYRot()));
+            poseStack.mulPose(Axis.YP.rotationDegrees(facing.toYRot()));
         } else  {
             poseStack.mulPose(Axis.YP.rotationDegrees(facing.toYRot()));
         }
         poseStack.translate(-0.5F, 0, -.5F);
-        if (blockEntity.getFixture().getHangType() == HangType.BRACE_BAR && isHanging) {
-            if (blockEntity.getLevel().getBlockState(blockEntity.getBlockPos().above()).getBlock() instanceof Support support) {
+        if (isHanging) {
+            if (blockEntity.getLevel().getBlockState(blockEntity.getBlockPos().relative(blockState.getValue(HangableBlock.HANG_DIRECTION))).getBlock() instanceof Support support) {
                 float[] transforms = support.getHookTransforms(blockEntity.getLevel(), blockEntity.getBlockPos(), facing);
                 poseStack.translate(transforms[0], transforms[1], transforms[2]);
             } else {
                 poseStack.translate(0, 0.19, 0);
+            }
+            if (blockEntity.getFixture().getHangType() == HangType.BRACE_BAR) {
+                poseStack.translate(0, -0.08, 0);
             }
         }
         if (isFlipped) {
@@ -86,23 +114,32 @@ public class FixtureRenderer<T extends BaseLightBlockEntity> implements BlockEnt
             poseStack.mulPose(Axis.ZP.rotationDegrees(180));
             poseStack.translate(-0.5F, -0.5, -.5F);
         }
-        if (blockEntity.getFixture().getHangType() == HangType.BRACE_BAR && isHanging) {
-            poseStack.translate(0, 0.19, 0);
-        }
+//        if (blockEntity.getFixture().getHangType() == HangType.BRACE_BAR && isHanging) {
+//            poseStack.translate(0, 0.19, 0);
+//        }
         Minecraft.getInstance().getBlockRenderer().getModelRenderer().renderModel(poseStack.last(), vertexConsumer, blockState, cachedStaticModel, 1, 1, 1, packedLight, packedOverlay);
-        if (blockEntity.getFixture().getHangType() == HangType.BRACE_BAR && isHanging) {
-            poseStack.translate(0, 0.19, 0);
-        }
+//        if (blockEntity.getFixture().getHangType() == HangType.BRACE_BAR && isHanging) {
+//            poseStack.translate(0, 0.19, 0);
+//        }
         float[] pans = blockEntity.getFixture().getPanRotationPosition();
 //        float[] pans = new float[]{0.5F, 0, 0.41F};
         poseStack.translate(pans[0], pans[1], pans[2]);
-        poseStack.mulPose(Axis.YP.rotationDegrees((blockEntity.getPrevPan() + ((blockEntity.getPan()) - blockEntity.getPrevPan()) * partialTicks)));
+        int prevPan = blockEntity.getPrevPan();
+        int pan = blockEntity.getPan();
+        poseStack.mulPose(Axis.YP.rotationDegrees((prevPan + (pan - prevPan) * partialTicks)));
         poseStack.translate(-pans[0], -pans[1], -pans[2]);
         Minecraft.getInstance().getBlockRenderer().getModelRenderer().renderModel(poseStack.last(), vertexConsumer, blockState, cachedPanModel, 1, 1, 1, packedLight, packedOverlay);
         float[] tilts = blockEntity.getFixture().getTiltRotationPosition();
 //        float[] tilts = new float[]{0.5F, 0.3F, 0.39F};
         poseStack.translate(tilts[0], tilts[1], tilts[2]);
-        poseStack.mulPose(Axis.XP.rotationDegrees((blockEntity.getPrevTilt() + ((blockEntity.getTilt()) - blockEntity.getPrevTilt()) * partialTicks)));
+        int prevTilt = blockEntity.getPrevTilt();
+        int tilt = blockEntity.getTilt();
+        if(isFlipped){
+            poseStack.mulPose(Axis.XP.rotationDegrees(-180));
+        } else {
+            poseStack.mulPose(Axis.XP.rotationDegrees(180));
+        }
+        poseStack.mulPose(Axis.XP.rotationDegrees((prevTilt + (tilt - prevTilt) * partialTicks)));
         poseStack.translate(-tilts[0], -tilts[1], -tilts[2]);
         Minecraft.getInstance().getBlockRenderer().getModelRenderer().renderModel(poseStack.last(), vertexConsumer, blockState, cachedTiltModel, 1, 1, 1, packedLight, packedOverlay);
     }

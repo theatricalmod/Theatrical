@@ -27,7 +27,7 @@ public class DMXNetworkData {
     public Collection<DMXConsumer> getConsumersInRange(BlockPos fromPos, int radius){
         Collection<DMXConsumer> consumers = new HashSet<>();
         for(Map.Entry<BlockPos, DMXConsumer> entry : dmxNodes.entrySet()){
-            if(fromPos.distToCenterSqr(entry.getKey().getX(), entry.getKey().getY(), entry.getKey().getZ()) <= radius){
+            if(Math.sqrt(fromPos.distToCenterSqr(entry.getKey().getX(), entry.getKey().getY(), entry.getKey().getZ())) <= radius){
                 consumers.add(entry.getValue());
             }
         }

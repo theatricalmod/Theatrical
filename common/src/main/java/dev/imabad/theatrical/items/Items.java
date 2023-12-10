@@ -35,4 +35,8 @@ public class Items {
             "redstone_interface",
             () -> new BlockItem(Blocks.REDSTONE_INTERFACE.get(), new Item.Properties().arch$tab(Theatrical.TAB))
     );
+    public static final RegistrySupplier<Item> TANK_TRAP = ITEMS.register(
+            "tank_trap",
+            () -> new BlockItem(Blocks.TANK_TRAP.get(), new Item.Properties().arch$tab(Theatrical.TAB))
+    );
 }

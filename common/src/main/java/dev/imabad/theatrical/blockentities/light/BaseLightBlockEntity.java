@@ -3,7 +3,11 @@ package dev.imabad.theatrical.blockentities.light;
 import dev.imabad.theatrical.api.FixtureProvider;
 import dev.imabad.theatrical.blockentities.ClientSyncBlockEntity;
 import dev.imabad.theatrical.blocks.HangableBlock;
+import dev.imabad.theatrical.blocks.light.BaseLightBlock;
+import dev.imabad.theatrical.blocks.light.MovingLightBlock;
 import dev.imabad.theatrical.config.TheatricalConfig;
+import dev.imabad.theatrical.mixin.ClipContextAccessor;
+import net.minecraft.core.AxisCycle;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -127,7 +131,7 @@ public abstract class BaseLightBlockEntity extends ClientSyncBlockEntity impleme
 
     @Override
     public boolean shouldTrace() {
-        return true;
+        return getIntensity() > 0;
     }
 
     @Override
@@ -245,23 +249,56 @@ public abstract class BaseLightBlockEntity extends ClientSyncBlockEntity impleme
         float k = Mth.sin(f);
         return new Vec3((double)(i * j), (double)(-k), (double)(h * j));
     }
-    public double doRayTrace() {
-        BlockState blockState = level.getBlockState(getBlockPos());
-        Direction direction = blockState.getValue(
-                HorizontalDirectionalBlock.FACING);
-        float lookingAngle = direction.toYRot();
-        lookingAngle = (isUpsideDown() ? lookingAngle + getPan() : lookingAngle - getPan());
 
-        float tilt = getTilt();
-        if (!isUpsideDown()) {
-            tilt = -tilt;
+    public static Vec3 rayTraceDir(BaseLightBlockEntity be){
+        BlockState blockState = be.getBlockState();
+        Direction hangDirection = blockState.getValue(BaseLightBlock.HANG_DIRECTION);
+        boolean isHangingNonVertically = (hangDirection != Direction.DOWN && hangDirection != Direction.UP) && blockState.getValue(BaseLightBlock.HANGING);
+        Direction direction = blockState.getValue(BaseLightBlock.FACING);
+        // TODO: Come back and try make this use the same code for both.
+        if(!isHangingNonVertically) {
+            float tilt = be.getTilt();
+            if (be.isUpsideDown()) {
+                tilt = -tilt;
+            }
+            float pan = (direction.toYRot() + be.getPan()) * -1;
+            if (be.isUpsideDown()) {
+                if (direction.getAxis() == Direction.Axis.X) {
+                    pan = (direction.getOpposite().toYRot() + be.getPan());
+                } else {
+                    pan = (direction.toYRot() + be.getPan());
+                }
+            }
+            return BaseLightBlockEntity.calculateViewVector(tilt, pan);
+        } else {
+            // Kindly put together with help from @Hekera & @Mikey
+            Direction opposite = hangDirection.getOpposite();
+            int step = opposite.getAxisDirection().getStep();
+            float offset = 0;
+            float toRad = 3.14159F / 180;
+            float pan = be.getPan() - 180f;
+            float tilt = be.getTilt();
+            pan *= step * toRad;
+            tilt *= -step * toRad;
+            float sinPan = Mth.sin(pan + offset);
+            float cosPan = Mth.cos(pan + offset);
+            float cosTilt = Mth.cos(tilt);
+            float x = sinPan * cosTilt;
+            float y = Mth.sin(tilt);
+            float z = cosPan * cosTilt;
+            AxisCycle cycle = AxisCycle.VALUES[(opposite.getAxis().ordinal() + 2) % AxisCycle.VALUES.length];
+            return new Vec3(cycle.cycle(x, y, z, Direction.Axis.X), cycle.cycle(x, y, z, Direction.Axis.Y), cycle.cycle(x, y, z, Direction.Axis.Z));
         }
+    }
 
-        Vec3 vec32 = calculateViewVector(tilt, lookingAngle);
+    public double doRayTrace() {
+        Vec3 viewVector = BaseLightBlockEntity.rayTraceDir(this);
         double distance = getMaxLightDistance();
-        Vec3 vec3 = new Vec3(getBlockPos().getX() + 0.5, getBlockPos().getY() + 0.5, getBlockPos().getZ() + 0.5);
-        Vec3 vec33 = vec3.add(vec32.x * distance, vec32.y * distance, vec32.z * distance);
-        BlockHitResult result = this.level.clip(new ClipContext(vec3, vec33, ClipContext.Block.VISUAL, net.minecraft.world.level.ClipContext.Fluid.NONE, null));
+        Vec3 vec3 = getBlockPos().getCenter();
+        Vec3 vec33 = vec3.add(viewVector.x * distance, viewVector.y * distance, viewVector.z * distance);
+        ClipContext context = new ClipContext(vec3, vec33, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, null);
+        ((ClipContextAccessor) context).setCollisionContext(new LightCollisionContext(getBlockPos()));
+        BlockHitResult result = this.level.clip(context);
         BlockPos lightPos = result.getBlockPos();
         if (result.getType() != HitResult.Type.MISS && !result.isInside()) {
             distance = result.getLocation().distanceTo(vec3);

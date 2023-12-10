@@ -1,3 +1,4 @@
 accessWidener   v2  named
 accessible field net/minecraft/client/renderer/block/model/BlockModel textureMap Ljava/util/Map;
 accessible field net/minecraft/server/network/ServerGamePacketListenerImpl ackBlockChangesUpTo I
+mutable field net/minecraft/world/level/ClipContext collisionContext Lnet/minecraft/world/phys/shapes/CollisionContext;

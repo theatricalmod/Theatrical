@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "has_pipe=false": {
+      "model": "theatrical:block/tank_trap"
+    },
+    "has_pipe=true": {
+      "model": "theatrical:block/tank_trap_with_pipe"
+    }
+  }
+}

@@ -22,10 +22,13 @@ public abstract class HangableBlock extends HorizontalDirectionalBlock {
     public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
 
     public static final BooleanProperty BROKEN = BooleanProperty.create("broken");
+    public static final DirectionProperty HANG_DIRECTION = DirectionProperty.create("hang_direction");
+    public static final BooleanProperty HANGING = BooleanProperty.create("hanging");
 
     protected HangableBlock(Properties properties) {
         super(properties);
-        this.registerDefaultState(this.getStateDefinition().any().setValue(FACING, Direction.NORTH).setValue(BROKEN, false));
+        this.registerDefaultState(this.getStateDefinition().any().setValue(FACING, Direction.NORTH)
+                .setValue(BROKEN, false).setValue(HANG_DIRECTION, Direction.UP).setValue(HANGING, false));
     }
     @Nullable
     @Override
@@ -35,7 +38,7 @@ public abstract class HangableBlock extends HorizontalDirectionalBlock {
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(FACING).add(BROKEN);
+        builder.add(FACING).add(BROKEN).add(HANG_DIRECTION).add(HANGING);
     }
 
     @Override
@@ -50,8 +53,12 @@ public abstract class HangableBlock extends HorizontalDirectionalBlock {
     }
 
     public boolean isHanging(LevelReader levelReader, BlockPos pos){
-        BlockPos up = pos.above();
-        return !levelReader.isEmptyBlock(up) && levelReader.getBlockState(pos).getBlock() instanceof Support;
+        BlockState blockState = levelReader.getBlockState(pos);
+        if(!blockState.isAir() && blockState.getValue(HANGING)){
+            BlockPos offset = pos.relative(blockState.getValue(HANG_DIRECTION));
+            return !levelReader.isEmptyBlock(offset) && levelReader.getBlockState(offset).getBlock() instanceof Support;
+        }
+        return false;
     }
 
     @Override

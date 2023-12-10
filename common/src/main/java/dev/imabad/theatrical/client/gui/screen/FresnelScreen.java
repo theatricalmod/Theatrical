@@ -37,7 +37,7 @@ public class FresnelScreen extends Screen {
         yCenter = (this.height - this.imageHeight) / 2;
         this.dmxAddress = new EditBox(this.font, xCenter + 62, yCenter + 25, 50, 10, Component.translatable("fixture.dmxStart"));
         this.dmxAddress.setValue(Integer.toString(this.be.getChannelStart()));
-        this.tiltSlider = new BasicSlider(xCenter + 13, yCenter + 45, 150, 20, Component.empty(), be.getTilt(), -180, 180, (newTilt) -> {
+        this.tiltSlider = new BasicSlider(xCenter + 13, yCenter + 45, 150, 20, Component.empty(), be.getTilt(), -90, 90, (newTilt) -> {
             be.setTilt(newTilt.intValue());
         });
         this.panSlider = new BasicSlider(xCenter + 13, yCenter + 75, 150, 20, Component.empty(), be.getPan(),-180, 180, (newPan) -> {

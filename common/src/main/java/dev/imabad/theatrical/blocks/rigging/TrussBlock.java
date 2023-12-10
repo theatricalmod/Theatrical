@@ -92,12 +92,24 @@ public class TrussBlock extends RotatedPillarBlock implements SimpleWaterloggedB
             Item item = player.getItemInHand(hand).getItem();
             if (item instanceof BlockItem blockItem) {
                 if(blockItem.getBlock() instanceof HangableBlock hangableBlock){
-                    BlockPos down = pos.relative(Direction.DOWN);
-                    if(!level.getBlockState(down).isAir()){
+                    BlockPos offset;
+                    if(hit.getDirection().getAxis() == Direction.Axis.Y){
+                        offset = pos.relative(player.getDirection().getOpposite());
+                    } else {
+                        offset = pos.relative(Direction.DOWN);
+                    }
+                    if(!level.getBlockState(offset).isAir()){
                         return InteractionResult.FAIL;
                     }
-                    level.setBlock(down, hangableBlock.defaultBlockState().setValue(HangableBlock.FACING, player.getDirection()), Block.UPDATE_CLIENTS);
-                    if(!player.isCreative()) {
+                    Direction hangDirection = Direction.UP;
+                    if(hit.getDirection().getAxis() == Direction.Axis.Y){
+                        hangDirection = player.getDirection();
+                    }
+                    level.setBlock(offset, hangableBlock.defaultBlockState()
+                            .setValue(HangableBlock.FACING, player.getDirection())
+                            .setValue(HangableBlock.HANGING, true)
+                            .setValue(HangableBlock.HANG_DIRECTION, hangDirection), Block.UPDATE_CLIENTS);
+                    if (!player.isCreative()) {
                         if (player.getItemInHand(hand).getCount() > 1) {
                             player.getItemInHand(hand).setCount(player.getItemInHand(hand).getCount() - 1);
                         } else {

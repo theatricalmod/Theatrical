@@ -1,5 +1,6 @@
 package dev.imabad.theatrical.blocks.light;
 
+import dev.imabad.theatrical.TheatricalClient;
 import dev.imabad.theatrical.blockentities.BlockEntities;
 import dev.imabad.theatrical.blockentities.light.FresnelBlockEntity;
 import dev.imabad.theatrical.blockentities.light.MovingLightBlockEntity;
@@ -37,8 +38,6 @@ import org.jetbrains.annotations.Nullable;
 
 public class FresnelBlock extends BaseLightBlock{
 
-    public static final BooleanProperty HANGING = BooleanProperty.create("hanging");
-
     public FresnelBlock() {
         super(Properties.of()
                 .requiresCorrectToolForDrops()
@@ -58,7 +57,6 @@ public class FresnelBlock extends BaseLightBlock{
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         super.createBlockStateDefinition(builder);
-        builder.add(HANGING);
     }
 
     @Nullable
@@ -95,6 +93,14 @@ public class FresnelBlock extends BaseLightBlock{
     @Environment(EnvType.CLIENT)
     public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
         if(level.isClientSide){
+            if(player.isCrouching()){
+                if(TheatricalClient.DEBUG_BLOCKS.contains(pos)){
+                    TheatricalClient.DEBUG_BLOCKS.remove(pos);
+                } else {
+                    TheatricalClient.DEBUG_BLOCKS.add(pos);
+                }
+                return InteractionResult.SUCCESS;
+            }
             FresnelBlockEntity be = (FresnelBlockEntity)level.getBlockEntity(pos);
             Minecraft.getInstance().setScreen(new FresnelScreen(be));
         }

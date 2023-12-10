@@ -2,6 +2,7 @@ package dev.imabad.theatrical.neoforge;
 
 import dev.imabad.theatrical.Theatrical;
 import dev.imabad.theatrical.blocks.Blocks;
+import dev.imabad.theatrical.blocks.rigging.TankTrapBlock;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
@@ -9,6 +10,7 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.client.model.generators.BlockStateProvider;
+import net.neoforged.neoforge.client.model.generators.ConfiguredModel;
 import net.neoforged.neoforge.client.model.generators.ItemModelProvider;
 import net.neoforged.neoforge.client.model.generators.ModelFile;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
@@ -36,6 +38,13 @@ public class DataEvent {
             simpleBlock(Blocks.REDSTONE_INTERFACE.get());
             ModelFile.ExistingModelFile trussModel = models().getExistingFile(new ResourceLocation("theatrical:block/truss"));
             axisBlock(Blocks.TRUSS_BLOCK.get(), trussModel, trussModel);
+            getVariantBuilder(Blocks.TANK_TRAP.get()).forAllStates(blockState -> {
+                ModelFile file = models().getExistingFile(new ResourceLocation("theatrical:block/tank_trap"));
+                if(blockState.getValue(TankTrapBlock.HAS_PIPE)){
+                    file = models().getExistingFile(new ResourceLocation("theatrical:block/tank_trap_with_pipe"));
+                }
+                return ConfiguredModel.builder().modelFile(file).build();
+            });
 //            horizontalBlock(Blocks.PIPE_BLOCK.get(), new ModelFile.UncheckedModelFile(new ResourceLocation("theatrical:block/pipe")));
         }
 
@@ -51,10 +60,11 @@ public class DataEvent {
         protected void registerModels() {
             cubeAll(Blocks.ART_NET_INTERFACE.getId().getPath(), new ResourceLocation(Theatrical.MOD_ID, "block/artnet_interface"));
             cubeAll(Blocks.REDSTONE_INTERFACE.getId().getPath(), new ResourceLocation(Theatrical.MOD_ID, "block/redstone_interface"));
-            withExistingParent(Blocks.PIPE_BLOCK.getId().getPath(), new ResourceLocation(Theatrical.MOD_ID, "block/pipe"));
+            withExistingParent(Blocks.PIPE_BLOCK.getId().getPath(), new ResourceLocation(Theatrical.MOD_ID, "block/vertical_pipe"));
             withExistingParent(Blocks.TRUSS_BLOCK.getId().getPath(), new ResourceLocation(Theatrical.MOD_ID, "block/truss"));
             withExistingParent(Blocks.MOVING_LIGHT_BLOCK.getId().getPath(), new ResourceLocation(Theatrical.MOD_ID, "block/moving_light/moving_head_whole"));
             withExistingParent(Blocks.LED_FRESNEL.getId().getPath(), new ResourceLocation(Theatrical.MOD_ID, "block/fresnel/fresnel_whole"));
+            withExistingParent(Blocks.TANK_TRAP.getId().getPath(), new ResourceLocation(Theatrical.MOD_ID, "block/tank_trap"));
         }
     }
 
@@ -72,6 +82,7 @@ public class DataEvent {
             addBlock(Blocks.LED_FRESNEL, "LED Fresnel");
             addBlock(Blocks.TRUSS_BLOCK, "MT100 Truss");
             addBlock(Blocks.REDSTONE_INTERFACE, "Redstone Interface");
+            addBlock(Blocks.TANK_TRAP, "Tank Trap");
             add("itemGroup.theatrical", "Theatrical");
             add("artneti.dmxUniverse", "DMX Universe");
             add("artneti.ipAddress", "IP Address");
