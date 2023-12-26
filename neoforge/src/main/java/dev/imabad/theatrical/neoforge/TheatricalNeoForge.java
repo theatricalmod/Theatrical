@@ -5,6 +5,7 @@ import dev.imabad.theatrical.Theatrical;
 import dev.imabad.theatrical.TheatricalClient;
 import dev.imabad.theatrical.api.Fixture;
 import dev.imabad.theatrical.fixtures.Fixtures;
+import net.minecraft.core.registries.Registries;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -14,6 +15,7 @@ import net.neoforged.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.neoforged.neoforge.client.event.ModelEvent;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.registries.NeoForgeRegistries;
 
 @Mod(Theatrical.MOD_ID)
 public class TheatricalNeoForge {
@@ -29,9 +31,13 @@ public class TheatricalNeoForge {
             TheatricalClient.init();
             FMLJavaModLoadingContext.get().getModEventBus().addListener((ModelEvent.RegisterAdditional additionalEvent) -> {
                 for(Fixture fixture : Fixtures.FIXTURES){
-                    additionalEvent.register(fixture.getPanModel());
                     additionalEvent.register(fixture.getStaticModel());
-                    additionalEvent.register(fixture.getTiltModel());
+                    if(fixture.hasPanModel()) {
+                        additionalEvent.register(fixture.getPanModel());
+                    }
+                    if(fixture.hasTiltModel()) {
+                        additionalEvent.register(fixture.getTiltModel());
+                    }
                 }
             });
             if(Platform.isDevelopmentEnvironment()) {

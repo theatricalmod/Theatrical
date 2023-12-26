@@ -65,6 +65,7 @@ public class DataEvent {
             withExistingParent(Blocks.MOVING_LIGHT_BLOCK.getId().getPath(), new ResourceLocation(Theatrical.MOD_ID, "block/moving_light/moving_head_whole"));
             withExistingParent(Blocks.LED_FRESNEL.getId().getPath(), new ResourceLocation(Theatrical.MOD_ID, "block/fresnel/fresnel_whole"));
             withExistingParent(Blocks.TANK_TRAP.getId().getPath(), new ResourceLocation(Theatrical.MOD_ID, "block/tank_trap"));
+            withExistingParent(Blocks.LED_PANEL.getId().getPath(), new ResourceLocation(Theatrical.MOD_ID, "block/led_panel"));
         }
     }
 
@@ -83,6 +84,7 @@ public class DataEvent {
             addBlock(Blocks.TRUSS_BLOCK, "MT100 Truss");
             addBlock(Blocks.REDSTONE_INTERFACE, "Redstone Interface");
             addBlock(Blocks.TANK_TRAP, "Tank Trap");
+            addBlock(Blocks.LED_PANEL, "LED Panel");
             add("itemGroup.theatrical", "Theatrical");
             add("artneti.dmxUniverse", "DMX Universe");
             add("artneti.ipAddress", "IP Address");

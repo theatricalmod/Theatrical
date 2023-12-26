@@ -1,6 +1,7 @@
 package dev.imabad.theatrical.blockentities.light;
 
 import dev.imabad.theatrical.api.FixtureProvider;
+import dev.imabad.theatrical.api.Support;
 import dev.imabad.theatrical.blockentities.ClientSyncBlockEntity;
 import dev.imabad.theatrical.blocks.HangableBlock;
 import dev.imabad.theatrical.blocks.light.BaseLightBlock;
@@ -25,6 +26,8 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+
+import java.util.Optional;
 
 public abstract class BaseLightBlockEntity extends ClientSyncBlockEntity implements FixtureProvider {
     AABB INFINITE_EXTENT_AABB = new AABB(Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
@@ -233,6 +236,29 @@ public abstract class BaseLightBlockEntity extends ClientSyncBlockEntity impleme
         return (getPrevRed() << 16) | (getPrevGreen() << 8) | getPrevBlue();
     }
 
+    public Optional<BlockState> getSupportingStructure(){
+        if(getLevel() != null){
+            BlockState blockState = getLevel().getBlockState(getBlockPos()
+                    .relative(getBlockState().getValue(HangableBlock.HANG_DIRECTION)));
+            if(blockState.getBlock() instanceof Support) {
+                return Optional.of(blockState);
+            }
+        }
+        return Optional.empty();
+    }
+
+    public int getBasePan(){
+        if(isHangingNonVertically(getBlockState())){
+            Direction facing = getBlockState().getValue(BaseLightBlock.FACING);
+            return switch (facing) {
+                case NORTH, SOUTH -> 90;
+                case WEST -> 180;
+                default -> 0;
+            };
+        }
+        return 0;
+    }
+
     public int calculatePartialColour(float partialTicks){
         int r = (int) (getPrevRed() + ((getRed()) - getPrevRed()) * partialTicks);
         int g = (int) (getPrevGreen() + ((getGreen()) - getPrevGreen()) * partialTicks);
@@ -250,18 +276,29 @@ public abstract class BaseLightBlockEntity extends ClientSyncBlockEntity impleme
         return new Vec3((double)(i * j), (double)(-k), (double)(h * j));
     }
 
+    public static boolean isHangingNonVertically(BlockState blockState){
+        return isHangingNonVertically(blockState.getValue(BaseLightBlock.HANG_DIRECTION),
+                blockState.getValue(BaseLightBlock.HANGING));
+    }
+    public static boolean isHangingNonVertically(Direction hangDirection, boolean isHanging){
+        return (hangDirection != Direction.DOWN && hangDirection != Direction.UP) && isHanging;
+    }
+
     public static Vec3 rayTraceDir(BaseLightBlockEntity be){
         BlockState blockState = be.getBlockState();
         Direction hangDirection = blockState.getValue(BaseLightBlock.HANG_DIRECTION);
-        boolean isHangingNonVertically = (hangDirection != Direction.DOWN && hangDirection != Direction.UP) && blockState.getValue(BaseLightBlock.HANGING);
         Direction direction = blockState.getValue(BaseLightBlock.FACING);
+        boolean isHangingNonVertically = isHangingNonVertically(hangDirection, blockState.getValue(BaseLightBlock.HANGING));
         // TODO: Come back and try make this use the same code for both.
         if(!isHangingNonVertically) {
             float tilt = be.getTilt();
-            if (be.isUpsideDown()) {
+            if (be.isUpsideDown() || be instanceof FresnelBlockEntity) {
                 tilt = -tilt;
             }
-            float pan = (direction.toYRot() + be.getPan()) * -1;
+            float pan = (direction.toYRot() - be.getPan());
+            if(be instanceof FresnelBlockEntity){
+                pan *= -1;
+            }
             if (be.isUpsideDown()) {
                 if (direction.getAxis() == Direction.Axis.X) {
                     pan = (direction.getOpposite().toYRot() + be.getPan());
@@ -276,7 +313,7 @@ public abstract class BaseLightBlockEntity extends ClientSyncBlockEntity impleme
             int step = opposite.getAxisDirection().getStep();
             float offset = 0;
             float toRad = 3.14159F / 180;
-            float pan = be.getPan() - 180f;
+            float pan = be.getBasePan() + be.getPan();
             float tilt = be.getTilt();
             pan *= step * toRad;
             tilt *= -step * toRad;

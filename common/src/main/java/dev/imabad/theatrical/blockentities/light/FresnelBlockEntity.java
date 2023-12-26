@@ -12,13 +12,10 @@ import net.minecraft.world.level.block.state.BlockState;
 import java.util.Arrays;
 
 public class FresnelBlockEntity extends BaseDMXConsumerLightBlockEntity {
-    public FresnelBlockEntity(BlockEntityType<?> blockEntityType, BlockPos blockPos, BlockState blockState) {
-        super(blockEntityType, blockPos, blockState);
-        setChannelCount(4);
-    }
 
     public FresnelBlockEntity(BlockPos pos, BlockState state) {
-        this(BlockEntities.LED_FRESNEL.get(), pos, state);
+        super(BlockEntities.LED_FRESNEL.get(), pos, state);
+        setChannelCount(4);
     }
     @Override
     public Fixture getFixture() {

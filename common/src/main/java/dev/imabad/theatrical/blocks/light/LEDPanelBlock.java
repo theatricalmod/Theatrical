@@ -2,8 +2,10 @@ package dev.imabad.theatrical.blocks.light;
 
 import dev.imabad.theatrical.TheatricalClient;
 import dev.imabad.theatrical.blockentities.BlockEntities;
-import dev.imabad.theatrical.blockentities.light.MovingLightBlockEntity;
+import dev.imabad.theatrical.blockentities.light.FresnelBlockEntity;
+import dev.imabad.theatrical.blockentities.light.LEDPanelBlockEntity;
 import dev.imabad.theatrical.blocks.Blocks;
+import dev.imabad.theatrical.client.gui.screen.FresnelScreen;
 import dev.imabad.theatrical.client.gui.screen.GenericDMXConfigurationScreen;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -13,11 +15,9 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
@@ -35,23 +35,23 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
-public class MovingLightBlock extends BaseLightBlock{
+public class LEDPanelBlock extends BaseLightBlock {
 
-
-    public MovingLightBlock() {
+    public LEDPanelBlock() {
         super(Properties.of()
-            .requiresCorrectToolForDrops()
-            .strength(3, 3)
-            .noOcclusion()
-            .isValidSpawn(Blocks::neverAllowSpawn)
-            .mapColor(MapColor.METAL)
-            .sound(SoundType.METAL)
-            .pushReaction(PushReaction.DESTROY));
+                .requiresCorrectToolForDrops()
+                .strength(3, 3)
+                .noOcclusion()
+                .isValidSpawn(Blocks::neverAllowSpawn)
+                .mapColor(MapColor.METAL)
+                .sound(SoundType.METAL)
+                .pushReaction(PushReaction.DESTROY));
     }
+
     @Nullable
     @Override
-    public BlockEntity newBlockEntity(BlockPos blockPos, BlockState blockState) {
-        return new MovingLightBlockEntity(blockPos, blockState);
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+        return new LEDPanelBlockEntity(pos, state);
     }
 
     @Override
@@ -77,17 +77,13 @@ public class MovingLightBlock extends BaseLightBlock{
 
     @Override
     public Direction getLightFacing(Direction hangDirection, Player placingPlayer) {
-        if(hangDirection == Direction.UP){
-            return placingPlayer.getDirection();
-        }
-        Direction playerFacing = placingPlayer.getDirection();
-        return playerFacing.getOpposite();
+        return placingPlayer.getDirection().getOpposite();
     }
 
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> blockEntityType) {
-        return level.isClientSide ? null : blockEntityType == BlockEntities.MOVING_LIGHT.get() ? MovingLightBlockEntity::tick : null;
+        return level.isClientSide ? null : blockEntityType == BlockEntities.LED_PANEL.get() ? LEDPanelBlockEntity::tick : null;
     }
 
     @Override
@@ -96,6 +92,14 @@ public class MovingLightBlock extends BaseLightBlock{
             return Shapes.empty();
         }
         return super.getVisualShape(state, level, pos, context);
+    }
+
+    @Override
+    public VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+        if(state.getValue(HANGING)){
+            return Shapes.empty();
+        }
+        return super.getCollisionShape(state, level, pos, context);
     }
 
     @Override
@@ -110,17 +114,9 @@ public class MovingLightBlock extends BaseLightBlock{
                 }
                 return InteractionResult.SUCCESS;
             }
-            MovingLightBlockEntity be = (MovingLightBlockEntity)level.getBlockEntity(pos);
-            Minecraft.getInstance().setScreen(new GenericDMXConfigurationScreen<>(be, pos, "block.theatrical.moving_light"));
+            LEDPanelBlockEntity be = (LEDPanelBlockEntity)level.getBlockEntity(pos);
+            Minecraft.getInstance().setScreen(new GenericDMXConfigurationScreen<>(be, pos, "block.theatrical.led_panel"));
         }
         return InteractionResult.SUCCESS;
-    }
-
-    @Override
-    public void destroy(LevelAccessor level, BlockPos pos, BlockState state) {
-        if(level.isClientSide()) {
-            TheatricalClient.DEBUG_BLOCKS.remove(pos);
-        }
-        super.destroy(level, pos, state);
     }
 }

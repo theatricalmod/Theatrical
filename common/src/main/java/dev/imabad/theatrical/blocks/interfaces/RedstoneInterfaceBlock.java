@@ -1,10 +1,8 @@
 package dev.imabad.theatrical.blocks.interfaces;
 
-import dev.imabad.theatrical.blockentities.interfaces.ArtNetInterfaceBlockEntity;
 import dev.imabad.theatrical.blockentities.interfaces.RedstoneInterfaceBlockEntity;
 import dev.imabad.theatrical.blocks.Blocks;
-import dev.imabad.theatrical.client.gui.screen.ArtNetInterfaceScreen;
-import dev.imabad.theatrical.client.gui.screen.RedstoneInterfaceScreen;
+import dev.imabad.theatrical.client.gui.screen.GenericDMXConfigurationScreen;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
@@ -12,17 +10,13 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntityTicker;
-import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.phys.BlockHitResult;
@@ -50,7 +44,7 @@ public class RedstoneInterfaceBlock  extends Block implements EntityBlock {
     public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
         if(level.isClientSide){
             RedstoneInterfaceBlockEntity be = (RedstoneInterfaceBlockEntity)level.getBlockEntity(pos);
-            Minecraft.getInstance().setScreen(new RedstoneInterfaceScreen(be));
+            Minecraft.getInstance().setScreen(new GenericDMXConfigurationScreen<>(be, pos, "block.theatrical.redstone_interface"));
         }
         return InteractionResult.SUCCESS;
     }

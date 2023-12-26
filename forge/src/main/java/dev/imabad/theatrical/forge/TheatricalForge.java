@@ -26,9 +26,13 @@ public class TheatricalForge {
         TheatricalClient.init();
         FMLJavaModLoadingContext.get().getModEventBus().addListener((ModelEvent.RegisterAdditional additionalEvent) -> {
             for(Fixture fixture : Fixtures.FIXTURES){
-                additionalEvent.register(fixture.getPanModel());
                 additionalEvent.register(fixture.getStaticModel());
-                additionalEvent.register(fixture.getTiltModel());
+                if(fixture.hasPanModel()) {
+                    additionalEvent.register(fixture.getPanModel());
+                }
+                if(fixture.hasTiltModel()) {
+                    additionalEvent.register(fixture.getTiltModel());
+                }
             }
         });
         if(Platform.isDevelopmentEnvironment()) {

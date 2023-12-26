@@ -16,6 +16,10 @@ public class Fixtures {
 
 	public static final RegistrySupplier<Fixture> LED_FRESNEL =
 			FIXTURES.register(new ResourceLocation(Theatrical.MOD_ID, "fresnel"), LEDFresnelFixture::new);
+
+
+	public static final RegistrySupplier<Fixture> LED_PANEL =
+			FIXTURES.register(new ResourceLocation(Theatrical.MOD_ID, "led_panel"), LEDPanelFixture::new);
 	public static void init() {
 		// NOOP
 	}

@@ -15,9 +15,13 @@ public class TheatricalClientFabric implements ClientModInitializer {
         TheatricalClient.init();
         ModelLoadingRegistry.INSTANCE.registerModelProvider((manager, out) -> {
             for(Fixture fixture : Fixtures.FIXTURES){
-                out.accept(fixture.getPanModel());
                 out.accept(fixture.getStaticModel());
-                out.accept(fixture.getTiltModel());
+                if(fixture.hasPanModel()) {
+                    out.accept(fixture.getPanModel());
+                }
+                if(fixture.hasTiltModel()) {
+                    out.accept(fixture.getTiltModel());
+                }
             }
         });
         if(Platform.isDevelopmentEnvironment()) {

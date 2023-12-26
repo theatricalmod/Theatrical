@@ -39,4 +39,8 @@ public class Items {
             "tank_trap",
             () -> new BlockItem(Blocks.TANK_TRAP.get(), new Item.Properties().arch$tab(Theatrical.TAB))
     );
+    public static final RegistrySupplier<Item> LED_PANEL = ITEMS.register(
+            "led_panel",
+            () -> new BlockItem(Blocks.LED_PANEL.get(), new Item.Properties().arch$tab(Theatrical.TAB))
+    );
 }

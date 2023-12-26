@@ -6,28 +6,25 @@ import com.mojang.math.Axis;
 import dev.architectury.registry.client.rendering.BlockEntityRendererRegistry;
 import dev.imabad.theatrical.blockentities.BlockEntities;
 import dev.imabad.theatrical.blockentities.light.BaseLightBlockEntity;
-import dev.imabad.theatrical.blockentities.light.MovingLightBlockEntity;
 import dev.imabad.theatrical.blocks.light.MovingLightBlock;
-import dev.imabad.theatrical.client.blockentities.FixtureRenderer;
+import dev.imabad.theatrical.client.blockentities.FresnelRenderer;
+import dev.imabad.theatrical.client.blockentities.LEDPanelRenderer;
+import dev.imabad.theatrical.client.blockentities.MovingLightRenderer;
+import dev.imabad.theatrical.fixtures.Fixtures;
 import dev.imabad.theatrical.protocols.artnet.ArtNetManager;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.core.AxisCycle;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.util.Mth;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix3f;
 import org.joml.Matrix4f;
-import org.joml.Quaternionf;
-import org.joml.Vector4f;
 
 import java.awt.*;
 import java.nio.ByteBuffer;
@@ -40,8 +37,9 @@ public class TheatricalClient {
     public static Set<BlockPos> DEBUG_BLOCKS = new HashSet<>();
     private static ArtNetManager artNetManager;
     public static void init() {
-        BlockEntityRendererRegistry.register(BlockEntities.MOVING_LIGHT.get(), FixtureRenderer::new);
-        BlockEntityRendererRegistry.register(BlockEntities.LED_FRESNEL.get(), FixtureRenderer::new);
+        BlockEntityRendererRegistry.register(BlockEntities.MOVING_LIGHT.get(), MovingLightRenderer::new);
+        BlockEntityRendererRegistry.register(BlockEntities.LED_FRESNEL.get(), FresnelRenderer::new);
+        BlockEntityRendererRegistry.register(BlockEntities.LED_PANEL.get(), LEDPanelRenderer::new);
 //        BlockEntityRendererRegistry.register(BlockEntities.CABLE.get(), CableRenderer::new);
         artNetManager = new ArtNetManager();
     }

@@ -3,10 +3,8 @@ package dev.imabad.theatrical.blocks.light;
 import dev.imabad.theatrical.TheatricalClient;
 import dev.imabad.theatrical.blockentities.BlockEntities;
 import dev.imabad.theatrical.blockentities.light.FresnelBlockEntity;
-import dev.imabad.theatrical.blockentities.light.MovingLightBlockEntity;
 import dev.imabad.theatrical.blocks.Blocks;
 import dev.imabad.theatrical.client.gui.screen.FresnelScreen;
-import dev.imabad.theatrical.client.gui.screen.MovingLightScreen;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
@@ -15,9 +13,11 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
@@ -26,7 +26,6 @@ import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
-import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.phys.BlockHitResult;
@@ -75,6 +74,27 @@ public class FresnelBlock extends BaseLightBlock{
         return !levelReader.getBlockState(blockPos.below()).isAir();
     }
 
+    @Override
+    public Direction getLightFacing(Direction hangDirection, Player placingPlayer) {
+        if(hangDirection == Direction.UP){
+            return placingPlayer.getDirection();
+        }
+        Direction playerFacing = placingPlayer.getDirection();
+        if(playerFacing.getAxis() == Direction.Axis.X){
+            if(playerFacing == Direction.WEST){
+                return Direction.SOUTH;
+            } else {
+                return Direction.NORTH;
+            }
+        } else {
+            if(playerFacing == Direction.SOUTH){
+                return Direction.WEST;
+            } else {
+                return Direction.EAST;
+            }
+        }
+    }
+
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> blockEntityType) {
@@ -105,5 +125,13 @@ public class FresnelBlock extends BaseLightBlock{
             Minecraft.getInstance().setScreen(new FresnelScreen(be));
         }
         return InteractionResult.SUCCESS;
+    }
+
+    @Override
+    public void destroy(LevelAccessor level, BlockPos pos, BlockState state) {
+        if(level.isClientSide()) {
+            TheatricalClient.DEBUG_BLOCKS.remove(pos);
+        }
+        super.destroy(level, pos, state);
     }
 }

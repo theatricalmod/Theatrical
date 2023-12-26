@@ -1,28 +1,37 @@
 package dev.imabad.theatrical.client.gui.screen;
 
 import dev.imabad.theatrical.Theatrical;
+import dev.imabad.theatrical.api.dmx.DMXConsumer;
 import dev.imabad.theatrical.blockentities.light.MovingLightBlockEntity;
 import dev.imabad.theatrical.net.UpdateDMXFixture;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 
-public class MovingLightScreen extends Screen {
+public class GenericDMXConfigurationScreen<T extends DMXConsumer> extends Screen {
     private final ResourceLocation GUI = new ResourceLocation(Theatrical.MOD_ID, "textures/gui/blank.png");
 
-    private int imageWidth, imageHeight, xCenter, yCenter;
+    private final int imageWidth;
+    private final int imageHeight;
+    private int xCenter;
+    private int yCenter;
     private EditBox dmxAddress;
-    private MovingLightBlockEntity be;
+    private final T be;
+    private final BlockPos blockPos;
+    private final String titleTranslationKey;
 
-    public MovingLightScreen(MovingLightBlockEntity be) {
-        super(Component.translatable("screen.movinglight"));
+    public GenericDMXConfigurationScreen(T be, BlockPos pos, String titleTranslationKey) {
+        super(Component.translatable(titleTranslationKey));
         this.imageWidth = 176;
         this.imageHeight = 126;
         this.be = be;
+        this.blockPos = pos;
+        this.titleTranslationKey = titleTranslationKey;
     }
 
     @Override
@@ -34,10 +43,10 @@ public class MovingLightScreen extends Screen {
         this.dmxAddress.setValue(Integer.toString(this.be.getChannelStart()));
         this.addWidget(this.dmxAddress);
         this.addRenderableWidget(
-            new Button.Builder(Component.translatable("artneti.save"), button -> this.update())
-                .pos(xCenter + 40, yCenter + 90)
-                .size(100, 20)
-                .build()
+                new Button.Builder(Component.translatable("artneti.save"), button -> this.update())
+                        .pos(xCenter + 40, yCenter + 90)
+                        .size(100, 20)
+                        .build()
         );
     }
 
@@ -47,7 +56,7 @@ public class MovingLightScreen extends Screen {
             if (dmx > 512 || dmx < 0) {
                 return;
             }
-            new UpdateDMXFixture(be.getBlockPos(), dmx).sendToServer();
+            new UpdateDMXFixture(blockPos, dmx).sendToServer();
         } catch(NumberFormatException ignored) {
             //We need a nicer way to show that this is invalid?
         }
@@ -72,7 +81,7 @@ public class MovingLightScreen extends Screen {
     }
 
     private void renderLabels(GuiGraphics guiGraphics) {
-        renderLabel(guiGraphics, "block.theatrical.moving_light", 5,5);
+        renderLabel(guiGraphics, titleTranslationKey, 5,5);
         renderLabel(guiGraphics, "fixture.dmxStart", 0,15);
     }
 
@@ -81,8 +90,4 @@ public class MovingLightScreen extends Screen {
         guiGraphics.drawString(font, translatable, xCenter + (this.imageWidth / 2) - (this.font.width(translatable.getString()) / 2), yCenter + offSetY, 0x404040, false);
     }
 
-    @Override
-    public void tick() {
-//        this.dmxAddress.tick();
-    }
 }

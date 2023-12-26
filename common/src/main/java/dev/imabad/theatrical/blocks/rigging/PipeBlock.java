@@ -1,5 +1,7 @@
 package dev.imabad.theatrical.blocks.rigging;
 
+import dev.imabad.theatrical.api.FixtureProvider;
+import dev.imabad.theatrical.api.HangType;
 import dev.imabad.theatrical.api.Support;
 import dev.imabad.theatrical.blocks.Blocks;
 import dev.imabad.theatrical.blocks.HangableBlock;
@@ -64,7 +66,15 @@ public class PipeBlock extends DirectionalBlock implements Support {
         if(levelReader.getBlockState(pos).getValue(BaseLightBlock.HANG_DIRECTION) == Direction.UP){
             return new float[]{0, .5f, 0};
         }
-        return new float[]{0, -0.35F, 0};
+        if(levelReader.getBlockEntity(pos) instanceof FixtureProvider fixtureProvider){
+            if(fixtureProvider.getFixture().getHangType() == HangType.BRACE_BAR){
+                return new float[]{0, -0.35F, 0};
+            } else {
+                return new float[]{0, 0.5F, 0};
+            }
+        }
+
+        return new float[]{0, 0F, 0};
     }
 
     @Override
@@ -131,8 +141,9 @@ public class PipeBlock extends DirectionalBlock implements Support {
                     if(state.getValue(FACING).getAxis() == Direction.Axis.Y){
                         hangDirection = player.getDirection();
                     }
+                    Direction facingDirection = hangableBlock.getLightFacing(hangDirection, player);
                     level.setBlock(offset, hangableBlock.defaultBlockState()
-                            .setValue(HangableBlock.FACING, player.getDirection())
+                            .setValue(HangableBlock.FACING, facingDirection)
                             .setValue(HangableBlock.HANGING, true)
                             .setValue(HangableBlock.HANG_DIRECTION, hangDirection), Block.UPDATE_CLIENTS);
                     if (!player.isCreative()) {

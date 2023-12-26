@@ -3,9 +3,16 @@ package dev.imabad.theatrical.fixtures;
 import dev.imabad.theatrical.Theatrical;
 import dev.imabad.theatrical.api.Fixture;
 import dev.imabad.theatrical.api.HangType;
+import dev.imabad.theatrical.blocks.light.BaseLightBlock;
+import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class MovingLightFixture extends Fixture {
+
+    private static final ResourceLocation TILT_MODEL = new ResourceLocation(Theatrical.MOD_ID, "block/moving_light/moving_head_tilt");
+    private static final ResourceLocation PAN_MODEL = new ResourceLocation(Theatrical.MOD_ID, "block/moving_light/moving_head_pan");
+    private static final ResourceLocation STATIC_MODEL = new ResourceLocation(Theatrical.MOD_ID, "block/moving_light/moving_head_static");
 
     private final float[] tiltRotation = new float[]{0.5F, .5F, .5F};
     private final float[] panRotation = new float[]{0.5F, .5F, .5F};
@@ -14,17 +21,17 @@ public class MovingLightFixture extends Fixture {
 
     @Override
     public ResourceLocation getTiltModel() {
-        return new ResourceLocation(Theatrical.MOD_ID, "block/moving_light/moving_head_tilt");
+        return TILT_MODEL;
     }
 
     @Override
     public ResourceLocation getPanModel() {
-        return new ResourceLocation(Theatrical.MOD_ID, "block/moving_light/moving_head_pan");
+        return PAN_MODEL;
     }
 
     @Override
     public ResourceLocation getStaticModel() {
-        return new ResourceLocation(Theatrical.MOD_ID, "block/moving_light/moving_head_static");
+        return STATIC_MODEL;
     }
 
     @Override
@@ -60,5 +67,13 @@ public class MovingLightFixture extends Fixture {
     @Override
     public HangType getHangType() {
         return HangType.BRACE_BAR;
+    }
+
+    @Override
+    public float[] getTransforms(BlockState fixtureBlockState, BlockState supportBlockState) {
+        if(fixtureBlockState.getValue(BaseLightBlock.HANG_DIRECTION) == Direction.UP){
+            return new float[]{0, .5f, 0};
+        }
+        return new float[]{0, -0.35F, 0};
     }
 }

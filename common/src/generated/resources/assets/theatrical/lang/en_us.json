@@ -7,6 +7,7 @@
   "artneti.save": "Save",
   "block.theatrical.artnet_interface": "ArtNet Interface",
   "block.theatrical.led_fresnel": "LED Fresnel",
+  "block.theatrical.led_panel": "LED Panel",
   "block.theatrical.moving_light": "Moving Light",
   "block.theatrical.pipe": "Rigging Pipe",
   "block.theatrical.redstone_interface": "Redstone Interface",

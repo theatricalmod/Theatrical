@@ -2,35 +2,30 @@ package dev.imabad.theatrical.blockentities.light;
 
 import dev.imabad.theatrical.api.Fixture;
 import dev.imabad.theatrical.blockentities.BlockEntities;
-import dev.imabad.theatrical.blocks.light.MovingLightBlock;
 import dev.imabad.theatrical.fixtures.Fixtures;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.Arrays;
 
-public class MovingLightBlockEntity extends BaseDMXConsumerLightBlockEntity {
-    public MovingLightBlockEntity(BlockEntityType<?> blockEntityType, BlockPos blockPos, BlockState blockState) {
-        super(blockEntityType, blockPos, blockState);
-        setChannelCount(7);
+public class LEDPanelBlockEntity extends BaseDMXConsumerLightBlockEntity{
+    public LEDPanelBlockEntity(BlockPos blockPos, BlockState blockState) {
+        super(BlockEntities.LED_PANEL.get(), blockPos, blockState);
+        setChannelCount(4);
     }
 
-    public MovingLightBlockEntity(BlockPos pos, BlockState state) {
-        this(BlockEntities.MOVING_LIGHT.get(), pos, state);
-    }
     @Override
     public Fixture getFixture() {
-        return Fixtures.MOVING_LIGHT.get();
+        return Fixtures.LED_PANEL.get();
     }
 
     @Override
     public void consume(byte[] dmxValues) {
         byte[] ourValues = Arrays.copyOfRange(dmxValues, this.getChannelStart(),
                 this.getChannelStart() + this.getChannelCount());
-        if(ourValues.length < 7){
+        if(ourValues.length < 4){
             return;
         }
         if(this.storePrev()){
@@ -40,21 +35,14 @@ public class MovingLightBlockEntity extends BaseDMXConsumerLightBlockEntity {
         red = convertByteToInt(ourValues[1]);
         green = convertByteToInt(ourValues[2]);
         blue = convertByteToInt(ourValues[3]);
-        focus = convertByteToInt(ourValues[4]);
-        pan = (int) ((convertByteToInt(ourValues[5]) * 360) / 255f) - 180;
-        tilt = (int) ((convertByteToInt(ourValues[6]) * 180) / 255F) - 180;
         level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
     }
     public int convertByteToInt(byte val) {
         return Byte.toUnsignedInt(val);
     }
-    @Override
-    public boolean isUpsideDown() {
-        return getBlockState().getValue(MovingLightBlock.HANGING) && getBlockState().getValue(MovingLightBlock.HANG_DIRECTION) == Direction.UP;
-    }
 
     @Override
-    public int getBasePan() {
-        return 0;
+    public float getMaxLightDistance() {
+        return 1;
     }
 }

@@ -5,6 +5,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
@@ -64,7 +65,9 @@ public abstract class HangableBlock extends HorizontalDirectionalBlock {
     @Override
     public void tick(BlockState blockState, ServerLevel serverLevel, BlockPos blockPos, RandomSource randomSource) {
         if(!blockState.getValue(BROKEN) && !canSurvive(blockState, serverLevel, blockPos)){
-            // Make light fall.
+            //TODO: Make light fall.
         }
     }
+
+    public abstract Direction getLightFacing(Direction hangDirection, Player placingPlayer);
 }
