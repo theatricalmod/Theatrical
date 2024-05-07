@@ -129,7 +129,7 @@ public abstract class BaseLightBlockEntity extends ClientSyncBlockEntity impleme
 
     @Override
     public float getMaxLightDistance() {
-        return 25;
+        return TheatricalConfig.INSTANCE.COMMON.defaultMaxLightDist;
     }
 
     @Override
