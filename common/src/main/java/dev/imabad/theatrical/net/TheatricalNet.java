@@ -11,5 +11,6 @@ public interface TheatricalNet {
     MessageType UPDATE_ARTNET_INTERFACE = MAIN.registerC2S("update_artnet_interface", UpdateArtNetInterface::new);
     MessageType UPDATE_DMX_FIXTURE = MAIN.registerC2S("update_dmx_fixture", UpdateDMXFixture::new);
     MessageType UPDATE_FIXTURE_POS = MAIN.registerC2S("update_fixture_pos", UpdateFixturePosition::new);
+    MessageType UPDATE_CONSOLE_FADER = MAIN.registerC2S("update_conosle_fader", UpdateConsoleFader::new);
     static void init(){}
 }

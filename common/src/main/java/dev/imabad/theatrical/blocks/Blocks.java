@@ -3,6 +3,7 @@ package dev.imabad.theatrical.blocks;
 import dev.architectury.registry.registries.DeferredRegister;
 import dev.architectury.registry.registries.RegistrySupplier;
 import dev.imabad.theatrical.TheatricalRegistry;
+import dev.imabad.theatrical.blocks.control.BasicLightingDeskBlock;
 import dev.imabad.theatrical.blocks.interfaces.ArtNetInterfaceBlock;
 import dev.imabad.theatrical.blocks.interfaces.RedstoneInterfaceBlock;
 import dev.imabad.theatrical.blocks.light.FresnelBlock;
@@ -29,6 +30,7 @@ public class Blocks {
     public static final RegistrySupplier<Block> REDSTONE_INTERFACE = BLOCKS.register("redstone_interface", RedstoneInterfaceBlock::new);
     public static final RegistrySupplier<Block> TANK_TRAP = BLOCKS.register("tank_trap", TankTrapBlock::new);
     public static final RegistrySupplier<Block> LED_PANEL = BLOCKS.register("led_panel", LEDPanelBlock::new);
+    public static final RegistrySupplier<Block> BASIC_LIGHTING_DESK = BLOCKS.register("basic_lighting_desk", BasicLightingDeskBlock::new);
     public static Boolean neverAllowSpawn(BlockState blockState, BlockGetter blockGetter, BlockPos blockPos, EntityType<?> entity) {
         return false;
     }
