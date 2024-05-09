@@ -67,7 +67,7 @@ public class TheatricalClient {
 
     public static void renderWorldLast(PoseStack poseStack, Matrix4f projectionMatrix, Camera camera, float tickDelta){
         Minecraft mc = Minecraft.getInstance();
-        if(mc.getDebugOverlay().showDebugScreen()){
+        if(mc.options.renderDebug){
             Vec3 cameraPos = camera.getPosition();
             //#region translateToCamera
             poseStack.pushPose();

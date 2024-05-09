@@ -61,9 +61,10 @@ public class GenericDMXConfigurationScreen<T extends DMXConsumer> extends Screen
             //We need a nicer way to show that this is invalid?
         }
     }
+
     @Override
-    public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        super.renderBackground(guiGraphics, mouseX, mouseY, partialTick);
+    public void renderBackground(GuiGraphics guiGraphics) {
+        super.renderBackground(guiGraphics);
         this.renderWindow(guiGraphics);
     }
 
