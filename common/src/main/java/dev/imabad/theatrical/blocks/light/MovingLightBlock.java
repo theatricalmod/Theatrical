@@ -87,7 +87,7 @@ public class MovingLightBlock extends BaseLightBlock{
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> blockEntityType) {
-        return level.isClientSide ? null : blockEntityType == BlockEntities.MOVING_LIGHT.get() ? MovingLightBlockEntity::tick : null;
+        return blockEntityType == BlockEntities.MOVING_LIGHT.get() ? MovingLightBlockEntity::tick : null;
     }
 
     @Override

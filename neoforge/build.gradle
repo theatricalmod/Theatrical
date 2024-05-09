@@ -22,7 +22,6 @@ loom {
     runs {
         client {
             client()
-            vmArgs "-XX:+AllowEnhancedClassRedefinition"
         }
         data {
             data()

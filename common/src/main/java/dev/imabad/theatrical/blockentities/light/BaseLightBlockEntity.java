@@ -7,12 +7,19 @@ import dev.imabad.theatrical.blocks.HangableBlock;
 import dev.imabad.theatrical.blocks.light.BaseLightBlock;
 import dev.imabad.theatrical.blocks.light.MovingLightBlock;
 import dev.imabad.theatrical.config.TheatricalConfig;
+import dev.imabad.theatrical.lighting.LambDynamicLight;
+import dev.imabad.theatrical.lighting.LambDynamicLightUtil;
+import dev.imabad.theatrical.lighting.LightManager;
 import dev.imabad.theatrical.mixin.ClipContextAccessor;
+import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.core.AxisCycle;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Mth;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -29,13 +36,15 @@ import net.minecraft.world.phys.Vec3;
 
 import java.util.Optional;
 
-public abstract class BaseLightBlockEntity extends ClientSyncBlockEntity implements FixtureProvider {
+public abstract class BaseLightBlockEntity extends ClientSyncBlockEntity implements FixtureProvider, LambDynamicLight {
     AABB INFINITE_EXTENT_AABB = new AABB(Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
     private double distance = 0;
     protected int pan, tilt, focus, intensity, red, green, blue = 0;
     protected int prevTilt, prevPan, prevFocus, prevIntensity, prevRed, prevGreen, prevBlue = 0;
     private long tickTimer = 0;
-    private BlockPos emissionBlock;
+    private BlockPos emissionBlock, prevEmissionBlock;
+    private int prevLuminance;
+    private LongOpenHashSet trackedLitChunkPos = new LongOpenHashSet();
 
     public BaseLightBlockEntity(BlockEntityType<?> blockEntityType, BlockPos blockPos, BlockState blockState) {
         super(blockEntityType, blockPos, blockState);
@@ -149,7 +158,7 @@ public abstract class BaseLightBlockEntity extends ClientSyncBlockEntity impleme
 
     public static <T extends BlockEntity> void tick(Level level, BlockPos pos, BlockState state, T be) {
         BaseLightBlockEntity tile = (BaseLightBlockEntity) be;
-        if(!level.isClientSide){
+//        if(!level.isClientSide){
             tile.tickTimer++;
             if(tile.tickTimer >= 5){
 //                if(tile.storePrev()){
@@ -160,20 +169,17 @@ public abstract class BaseLightBlockEntity extends ClientSyncBlockEntity impleme
             }
             if(tile.shouldTrace()){
                 tile.distance = tile.doRayTrace();
-                if(tile.emissionBlock != null && tile.emitsLight()){
-                    float newVal = tile.intensity / 255f;
-                    int lightVal = (int) (newVal * 15f);
-                    BlockState lightBlockState = level.getBlockState(tile.emissionBlock);
-                    if(lightBlockState.isAir() || !(lightBlockState.getBlock() instanceof LightBlock)){
-                        level.setBlock(tile.emissionBlock, Blocks.LIGHT.defaultBlockState().setValue(LightBlock.LEVEL, lightVal), Block.UPDATE_ALL);
-                    } else {
-                        if(lightBlockState.getValue(LightBlock.LEVEL) != lightVal){
-                            level.setBlock(tile.emissionBlock, lightBlockState.setValue(LightBlock.LEVEL, lightVal), Block.UPDATE_ALL);
-                        }
-                    }
+            }
+            if (level.isClientSide() && LightManager.shouldUpdateDynamicLight()) {
+                if (tile.isRemoved()) {
+                    tile.setDynamicLightEnabled(false);
+                } else {
+                    tile.dynamicLightTick();
+                    LightManager.updateTracking(tile);
                 }
             }
-        }
+//        } else {
+//        }
     }
 
     public int getPan() {
@@ -343,23 +349,7 @@ public abstract class BaseLightBlockEntity extends ClientSyncBlockEntity impleme
                 lightPos = result.getBlockPos().relative(result.getDirection(), 1);
             }
         }
-        if (lightPos.equals(getBlockPos())) {
-            return distance;
-        }
-        if (!level.getBlockState(lightPos).isAir() && !(level
-                .getBlockState(lightPos).getBlock() instanceof LightBlock)) {
-            lightPos = lightPos.relative(result.getDirection(), 1);
-        }
         distance = new Vec3(lightPos.getX(), lightPos.getY(), lightPos.getZ()).distanceTo(new Vec3(getBlockPos().getX(), getBlockPos().getY(), getBlockPos().getZ()));
-        if (lightPos.equals(emissionBlock)) {
-            return distance;
-        }
-        if (emissionBlock != null && level.getBlockState(emissionBlock).getBlock() instanceof LightBlock) {
-            level.setBlock(emissionBlock, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
-        }
-        if ((!(level.getBlockState(lightPos).isAir()) && !(level.getBlockState(lightPos).getBlock() instanceof LightBlock))) {
-            return distance;
-        }
         emissionBlock = lightPos;
         return distance;
     }
@@ -367,10 +357,7 @@ public abstract class BaseLightBlockEntity extends ClientSyncBlockEntity impleme
     @Override
     public void setRemoved() {
         if(emissionBlock != null){
-            if(!level.getBlockState(emissionBlock).isAir() && level.getBlockState(emissionBlock).getBlock() instanceof LightBlock){
-                level.setBlock(emissionBlock, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
-                emissionBlock = null;
-            }
+            emissionBlock = null;
         }
         super.setRemoved();
     }
@@ -383,5 +370,99 @@ public abstract class BaseLightBlockEntity extends ClientSyncBlockEntity impleme
     public void setPan(int pan){
         this.prevPan = this.pan;
         this.pan = pan;
+    }
+
+    @Override
+    public double getDynamicLightX() {
+        return emissionBlock.getX();
+    }
+
+    @Override
+    public double getDynamicLightY() {
+        return emissionBlock.getY();
+    }
+
+    @Override
+    public double getDynamicLightZ() {
+        return emissionBlock.getZ();
+    }
+
+    @Override
+    public Level getDynamicLightWorld() {
+        return this.getLevel();
+    }
+
+    @Override
+    public void resetDynamicLight() {
+
+    }
+    @Override
+    public int getLuminance() {
+        float newVal = intensity / 255f;
+        return (int) (newVal * 15f);
+    }
+
+    @Override
+    public void dynamicLightTick() {
+
+    }
+
+    @Override
+    public boolean shouldUpdateDynamicLight() {
+        return LightManager.shouldUpdateDynamicLight() && emitsLight() && emissionBlock != null;
+    }
+
+    @Override
+    public boolean lambdynlights$updateDynamicLight(LevelRenderer renderer) {
+        if (!this.shouldUpdateDynamicLight())
+            return false;
+        int luminance = this.getLuminance();
+
+        if(!emissionBlock.equals(prevEmissionBlock) || luminance != prevLuminance){
+            this.prevEmissionBlock = emissionBlock;
+            this.prevLuminance = luminance;
+            var newPos = new LongOpenHashSet();
+
+            if (luminance > 0) {
+                var entityChunkPos = new ChunkPos(emissionBlock);
+                var chunkPos = new BlockPos.MutableBlockPos(entityChunkPos.x, LambDynamicLightUtil.getSectionCoord(emissionBlock.getY()), entityChunkPos.z);
+
+                LightManager.scheduleChunkRebuild(renderer, chunkPos);
+                LightManager.updateTrackedChunks(chunkPos, this.trackedLitChunkPos, newPos);
+
+                var directionX = (emissionBlock.getX() & 15) >= 8 ? Direction.EAST : Direction.WEST;
+                var directionY = (emissionBlock.getY() & 15) >= 8 ? Direction.UP : Direction.DOWN;
+                var directionZ = (emissionBlock.getZ() & 15) >= 8 ? Direction.SOUTH : Direction.NORTH;
+
+                for (int i = 0; i < 7; i++) {
+                    if (i % 4 == 0) {
+                        chunkPos.move(directionX); // X
+                    } else if (i % 4 == 1) {
+                        chunkPos.move(directionZ); // XZ
+                    } else if (i % 4 == 2) {
+                        chunkPos.move(directionX.getOpposite()); // Z
+                    } else {
+                        chunkPos.move(directionZ.getOpposite()); // origin
+                        chunkPos.move(directionY); // Y
+                    }
+                    LightManager.scheduleChunkRebuild(renderer, chunkPos);
+                    LightManager.updateTrackedChunks(chunkPos, this.trackedLitChunkPos, newPos);
+                }
+            }
+            // Schedules the rebuild of removed chunks.
+            this.lambdynlights$scheduleTrackedChunksRebuild(renderer);
+            // Update tracked lit chunks.
+            this.trackedLitChunkPos = newPos;
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public void lambdynlights$scheduleTrackedChunksRebuild(LevelRenderer renderer) {
+        if (Minecraft.getInstance().level == this.level)
+            for (long pos : this.trackedLitChunkPos) {
+                LightManager.scheduleChunkRebuild(renderer, pos);
+            }
     }
 }

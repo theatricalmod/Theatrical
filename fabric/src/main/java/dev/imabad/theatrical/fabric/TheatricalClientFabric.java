@@ -25,8 +25,13 @@ public class TheatricalClientFabric implements ClientModInitializer {
             }
         });
         if(Platform.isDevelopmentEnvironment()) {
+            WorldRenderEvents.START.register(this::renderWorldStartFabric);
             WorldRenderEvents.AFTER_TRANSLUCENT.register(this::renderWorldLastFabric);
         }
+    }
+
+    private void renderWorldStartFabric(WorldRenderContext context) {
+        TheatricalClient.renderWorldLastAfterTripwire(context.worldRenderer());
     }
 
     private void renderWorldLastFabric(WorldRenderContext context){

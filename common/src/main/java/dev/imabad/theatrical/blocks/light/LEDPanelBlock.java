@@ -83,7 +83,7 @@ public class LEDPanelBlock extends BaseLightBlock {
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> blockEntityType) {
-        return level.isClientSide ? null : blockEntityType == BlockEntities.LED_PANEL.get() ? LEDPanelBlockEntity::tick : null;
+        return blockEntityType == BlockEntities.LED_PANEL.get() ? LEDPanelBlockEntity::tick : null;
     }
 
     @Override

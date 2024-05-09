@@ -8,5 +8,9 @@
   },
   "mixins": [
     "ClipContextAccessor"
+  ],
+  "client": [
+    "client.ClientMixin",
+    "client.LevelRendererMixin"
   ]
 }

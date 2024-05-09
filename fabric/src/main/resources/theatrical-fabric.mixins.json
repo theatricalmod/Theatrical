@@ -9,5 +9,8 @@
   },
   "mixins": [
     "ClipContextMixin"
+  ],
+  "client": [
+    "AoCalculatorMixin"
   ]
 }

@@ -11,6 +11,7 @@ import dev.imabad.theatrical.client.blockentities.FresnelRenderer;
 import dev.imabad.theatrical.client.blockentities.LEDPanelRenderer;
 import dev.imabad.theatrical.client.blockentities.MovingLightRenderer;
 import dev.imabad.theatrical.fixtures.Fixtures;
+import dev.imabad.theatrical.lighting.LightManager;
 import dev.imabad.theatrical.protocols.artnet.ArtNetManager;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
@@ -58,6 +59,10 @@ public class TheatricalClient {
         consumer.vertex(matrix4f, (float) origin.x, (float) origin.y, (float) origin.z).color(255, 255, 255, 255).normal(matrix3f, 0.0f, 0.0f, 0.0f).endVertex();
         consumer.vertex(matrix4f, (float) destination.x, (float) destination.y, (float) destination.z).color(255, 255, 255, 255).normal(matrix3f, 0.0f, 0.0f, 0.0f).endVertex();
         return new float[]{be.getTilt(), be.getPan()};
+    }
+
+    public static void renderWorldLastAfterTripwire(LevelRenderer levelRenderer){
+        LightManager.updateAll(levelRenderer);
     }
 
     public static void renderWorldLast(PoseStack poseStack, Matrix4f projectionMatrix, Camera camera, float tickDelta){
