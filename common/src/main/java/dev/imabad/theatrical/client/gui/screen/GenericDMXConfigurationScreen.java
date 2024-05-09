@@ -70,6 +70,7 @@ public class GenericDMXConfigurationScreen<T extends DMXConsumer> extends Screen
 
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        this.renderBackground(guiGraphics);
         super.render(guiGraphics, mouseX, mouseY, partialTick);
         this.dmxAddress.render(guiGraphics, mouseX, mouseY, partialTick);
         this.renderLabels(guiGraphics);
