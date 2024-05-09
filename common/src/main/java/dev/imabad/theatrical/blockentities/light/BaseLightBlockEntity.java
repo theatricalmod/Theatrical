@@ -302,6 +302,9 @@ public abstract class BaseLightBlockEntity extends ClientSyncBlockEntity impleme
                 tilt = -tilt;
             }
             float pan = (direction.toYRot() - be.getPan());
+            if(direction.getAxis() == Direction.WEST.getAxis()){
+                pan -= 180;
+            }
             if(be instanceof FresnelBlockEntity){
                 pan *= -1;
             }
@@ -357,6 +360,7 @@ public abstract class BaseLightBlockEntity extends ClientSyncBlockEntity impleme
     @Override
     public void setRemoved() {
         if(emissionBlock != null){
+            this.setDynamicLightEnabled(false);
             emissionBlock = null;
         }
         super.setRemoved();
