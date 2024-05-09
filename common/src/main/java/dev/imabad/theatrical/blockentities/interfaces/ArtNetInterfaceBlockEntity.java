@@ -1,7 +1,5 @@
 package dev.imabad.theatrical.blockentities.interfaces;
 
-import com.mojang.util.UUIDTypeAdapter;
-import com.mojang.util.UndashedUuid;
 import dev.imabad.theatrical.TheatricalClient;
 import dev.imabad.theatrical.blockentities.BlockEntities;
 import dev.imabad.theatrical.blockentities.ClientSyncBlockEntity;
