@@ -55,6 +55,9 @@ public abstract class HangableBlock extends HorizontalDirectionalBlock {
 
     public boolean isHanging(LevelReader levelReader, BlockPos pos){
         BlockState blockState = levelReader.getBlockState(pos);
+        if(!(blockState.getBlock() instanceof HangableBlock)){
+            return false;
+        }
         if(!blockState.isAir() && blockState.getValue(HANGING)){
             BlockPos offset = pos.relative(blockState.getValue(HANG_DIRECTION));
             return !levelReader.isEmptyBlock(offset) && levelReader.getBlockState(offset).getBlock() instanceof Support;
