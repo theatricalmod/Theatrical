@@ -1,11 +1,9 @@
 package dev.imabad.theatrical.blockentities.interfaces;
 
-import dev.imabad.theatrical.TheatricalClient;
 import dev.imabad.theatrical.blockentities.BlockEntities;
 import dev.imabad.theatrical.blockentities.ClientSyncBlockEntity;
 import dev.imabad.theatrical.config.TheatricalConfig;
 import dev.imabad.theatrical.dmx.DMXNetworkData;
-import dev.imabad.theatrical.net.SendArtNetData;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -19,12 +17,16 @@ import java.util.UUID;
 public class ArtNetInterfaceBlockEntity extends ClientSyncBlockEntity {
     public static <T extends BlockEntity> void tick(Level level, BlockPos pos, BlockState state, T be) {
         ArtNetInterfaceBlockEntity tile = (ArtNetInterfaceBlockEntity) be;
-        if(level.isClientSide){
-            if(tile.isOwnedByCurrentClient()){
-                byte[] data = TheatricalClient.getArtNetManager().getClient(tile.ip).readDmxData(tile.subnet, tile.universe);
-                new SendArtNetData(pos, data).sendToServer();
-            }
-        }
+//        if(level.isClientSide){
+//            if(tile.isOwnedByCurrentClient()){
+//                TheatricalArtNetClient client = TheatricalClient.getArtNetManager().getClient(tile.ip);
+//                if(!client.isSubscribedTo(tile.universe)){
+//                    client.subscribeToUniverse(tile.universe);
+//                }
+//                byte[] data = client.readDmxData(tile.subnet, tile.universe);
+//                new SendArtNetData(pos, data).sendToServer();
+//            }
+//        }
     }
 
     private int subnet, universe, tickTimer = 0;
@@ -40,7 +42,9 @@ public class ArtNetInterfaceBlockEntity extends ClientSyncBlockEntity {
         compoundTag.putString("ip", ip);
         compoundTag.putInt("subnet", subnet);
         compoundTag.putInt("universe", universe);
-        compoundTag.putUUID("ownerUUID", ownerUUID);
+        if(ownerUUID != null) {
+            compoundTag.putUUID("ownerUUID", ownerUUID);
+        }
     }
 
     @Override
@@ -48,14 +52,16 @@ public class ArtNetInterfaceBlockEntity extends ClientSyncBlockEntity {
         this.ip = compoundTag.getString("ip");
         this.subnet = compoundTag.getInt("subnet");
         this.universe = compoundTag.getInt("universe");
-        this.ownerUUID = compoundTag.getUUID("ownerUUID");
+        if(compoundTag.contains("ownerUUID")) {
+            this.ownerUUID = compoundTag.getUUID("ownerUUID");
+        }
     }
 
     public void update(byte[] data) {
         if(level != null && level.getServer() != null) {
             var dmxData = DMXNetworkData.getInstance();
             if(dmxData != null) {
-                dmxData.getConsumersInRange(getBlockPos(), TheatricalConfig.INSTANCE.COMMON.wirelessDMXRadius).forEach(dmxConsumer -> dmxConsumer.consume(data));
+                dmxData.getConsumersInRange(universe, getBlockPos(), TheatricalConfig.INSTANCE.COMMON.wirelessDMXRadius).forEach(dmxConsumer -> dmxConsumer.consume(data));
             }
         }
     }
@@ -71,16 +77,16 @@ public class ArtNetInterfaceBlockEntity extends ClientSyncBlockEntity {
     }
 
     public boolean hasReceivedPacket(){
-        if(level != null && level.isClientSide){
-            return TheatricalClient.getArtNetManager().getClient(this.ip).hasReceivedPacket();
-        }
+//        if(level != null && level.isClientSide){
+//            return TheatricalClient.getArtNetManager().getClient(this.ip).hasReceivedPacket();
+//        }
         return false;
     }
 
     public long getLastReceivedPacket(){
-        if(level != null && level.isClientSide){
-            return TheatricalClient.getArtNetManager().getClient(this.ip).getLastPacketMS();
-        }
+//        if(level != null && level.isClientSide){
+//            return TheatricalClient.getArtNetManager().getClient(this.ip).getLastPacketMS();
+//        }
         return 0;
     }
 

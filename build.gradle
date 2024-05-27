@@ -44,7 +44,12 @@ allprojects {
             name = 'ParchmentMC'
             url = 'https://maven.parchmentmc.org'
         }
+        maven {
+            name = 'Rushmead'
+            url = 'https://mvn.imabad.dev/repository/maven-releases/'
+        }
         mavenCentral()
+        mavenLocal()
         // Add repositories to retrieve artifacts from in here.
         // You should only use this when depending on other mods because
         // Loom adds the essential maven repositories to download Minecraft and libraries from automatically.

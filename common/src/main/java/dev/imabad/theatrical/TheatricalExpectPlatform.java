@@ -19,5 +19,9 @@ public class TheatricalExpectPlatform {
     public static BakedModel getBakedModel(ResourceLocation modelLocation){
         throw new AssertionError();
     }
+    @ExpectPlatform
+    public static String getModVersion() {
+        throw new AssertionError();
+    }
 
 }

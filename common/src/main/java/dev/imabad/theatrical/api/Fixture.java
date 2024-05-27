@@ -1,9 +1,12 @@
 package dev.imabad.theatrical.api;
 
+import dev.imabad.theatrical.api.dmx.DMXPersonality;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.state.BlockState;
+
+import java.util.List;
 
 public abstract class Fixture {
     public abstract ResourceLocation getTiltModel();
@@ -36,4 +39,5 @@ public abstract class Fixture {
         return true;
     }
     public abstract float[] getTransforms(BlockState fixtureBlockState, BlockState supportBlockState);
+    public abstract List<DMXPersonality> getDMXPersonalities();
 }

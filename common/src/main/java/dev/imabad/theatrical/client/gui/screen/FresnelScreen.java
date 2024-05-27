@@ -19,7 +19,7 @@ public class FresnelScreen extends Screen {
     private final ResourceLocation GUI = new ResourceLocation(Theatrical.MOD_ID, "textures/gui/blank.png");
 
     private int imageWidth, imageHeight, xCenter, yCenter;
-    private EditBox dmxAddress;
+    private EditBox dmxAddress, dmxUniverse;
     private BasicSlider tiltSlider, panSlider;
     private FresnelBlockEntity be;
 
@@ -35,8 +35,10 @@ public class FresnelScreen extends Screen {
         super.init();
         xCenter = (this.width - this.imageWidth) / 2;
         yCenter = (this.height - this.imageHeight) / 2;
-        this.dmxAddress = new EditBox(this.font, xCenter + 62, yCenter + 25, 50, 10, Component.translatable("fixture.dmxStart"));
+        this.dmxAddress = new EditBox(this.font, xCenter + (((imageWidth / 2) / 2) - 25), yCenter + 25, 50, 10, Component.translatable("fixture.dmxStart"));
         this.dmxAddress.setValue(Integer.toString(this.be.getChannelStart()));
+        this.dmxUniverse = new EditBox(this.font, xCenter + (imageWidth - (((imageWidth / 2) / 2) + 25)), yCenter + 25, 50, 10, Component.translatable("artneti.dmxUniverse"));
+        this.dmxUniverse.setValue(Integer.toString(this.be.getUniverse()));
         this.tiltSlider = new BasicSlider(xCenter + 13, yCenter + 45, 150, 20, Component.empty(), be.getTilt(), -90, 90, (newTilt) -> {
             be.setTilt(newTilt.intValue());
         });
@@ -44,6 +46,7 @@ public class FresnelScreen extends Screen {
             be.setPan(newPan.intValue());
         });
         this.addRenderableWidget(this.dmxAddress);
+        this.addRenderableWidget(this.dmxUniverse);
         this.addRenderableWidget(tiltSlider);
         this.addRenderableWidget(panSlider);
         this.addRenderableWidget(
@@ -60,7 +63,11 @@ public class FresnelScreen extends Screen {
             if (dmx > 512 || dmx < 0) {
                 return;
             }
-            new UpdateDMXFixture(be.getBlockPos(), dmx).sendToServer();
+            int universe = Integer.parseInt(this.dmxUniverse.getValue());
+            if (universe > 16 || universe < 0) {
+                return;
+            }
+            new UpdateDMXFixture(be.getBlockPos(), dmx, universe).sendToServer();
             new UpdateFixturePosition(be.getBlockPos(), be.getTilt(), be.getPan()).sendToServer();
         } catch (NumberFormatException ignored) {
             //We need a nicer way to show that this is invalid?
@@ -87,14 +94,15 @@ public class FresnelScreen extends Screen {
 
     private void renderLabels(GuiGraphics guiGraphics) {
         renderLabel(guiGraphics, "block.theatrical.led_fresnel", 5, 5);
-        renderLabel(guiGraphics, "fixture.dmxStart", 0, 15);
+        renderLabel(guiGraphics, "fixture.dmxStart", -44, 15);
+        renderLabel(guiGraphics, "artneti.dmxUniverse", 44, 15);
         renderLabel(guiGraphics, "fixture.tilt", 0, 36);
         renderLabel(guiGraphics, "fixture.pan", 0, 66);
     }
 
     private void renderLabel(GuiGraphics guiGraphics, String translationKey, int offSetX, int offSetY) {
         MutableComponent translatable = Component.translatable(translationKey);
-        guiGraphics.drawString(font, translatable, xCenter + (this.imageWidth / 2) - (this.font.width(translatable.getString()) / 2), yCenter + offSetY, 0x404040, false);
+        guiGraphics.drawString(font, translatable, xCenter + (this.imageWidth / 2) - (this.font.width(translatable.getString()) / 2) + offSetX, yCenter + offSetY, 0x404040, false);
     }
 
     @Override

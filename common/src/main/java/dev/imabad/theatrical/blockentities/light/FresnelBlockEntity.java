@@ -5,6 +5,7 @@ import dev.imabad.theatrical.blockentities.BlockEntities;
 import dev.imabad.theatrical.blocks.light.MovingLightBlock;
 import dev.imabad.theatrical.fixtures.Fixtures;
 import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -43,6 +44,27 @@ public class FresnelBlockEntity extends BaseDMXConsumerLightBlockEntity {
         blue = convertByteToInt(ourValues[3]);
         level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
     }
+
+    @Override
+    public int getDeviceTypeId() {
+        return 0x02;
+    }
+
+    @Override
+    public String getModelName() {
+        return "LED Fresnel";
+    }
+
+    @Override
+    public ResourceLocation getFixtureId() {
+        return Fixtures.LED_FRESNEL.getId();
+    }
+
+    @Override
+    public int getActivePersonality() {
+        return 0;
+    }
+
     public int convertByteToInt(byte val) {
         return Byte.toUnsignedInt(val);
     }

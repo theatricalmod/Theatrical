@@ -3,6 +3,7 @@ package dev.imabad.theatrical;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
+import dev.architectury.event.events.client.ClientPlayerEvent;
 import dev.architectury.registry.client.rendering.BlockEntityRendererRegistry;
 import dev.imabad.theatrical.blockentities.BlockEntities;
 import dev.imabad.theatrical.blockentities.light.BaseLightBlockEntity;
@@ -10,8 +11,12 @@ import dev.imabad.theatrical.blocks.light.MovingLightBlock;
 import dev.imabad.theatrical.client.blockentities.FresnelRenderer;
 import dev.imabad.theatrical.client.blockentities.LEDPanelRenderer;
 import dev.imabad.theatrical.client.blockentities.MovingLightRenderer;
-import dev.imabad.theatrical.fixtures.Fixtures;
+import dev.imabad.theatrical.config.TheatricalConfig;
+import dev.imabad.theatrical.dmx.DMXDevice;
+import dev.imabad.theatrical.dmx.TheatricalArtNetClient;
 import dev.imabad.theatrical.lighting.LightManager;
+import dev.imabad.theatrical.net.artnet.ListConsumers;
+import dev.imabad.theatrical.net.artnet.NotifyConsumerChange;
 import dev.imabad.theatrical.protocols.artnet.ArtNetManager;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
@@ -43,6 +48,14 @@ public class TheatricalClient {
         BlockEntityRendererRegistry.register(BlockEntities.LED_PANEL.get(), LEDPanelRenderer::new);
 //        BlockEntityRendererRegistry.register(BlockEntities.CABLE.get(), CableRenderer::new);
         artNetManager = new ArtNetManager();
+        ClientPlayerEvent.CLIENT_PLAYER_JOIN.register((event) -> {
+            if(TheatricalConfig.INSTANCE.CLIENT.artnetEnabled){
+                artNetManager.getClient();
+            }
+        });
+        ClientPlayerEvent.CLIENT_PLAYER_QUIT.register((event) -> {
+            onWorldClose();
+        });
     }
 
     public static ArtNetManager getArtNetManager(){
@@ -59,6 +72,10 @@ public class TheatricalClient {
         consumer.vertex(matrix4f, (float) origin.x, (float) origin.y, (float) origin.z).color(255, 255, 255, 255).normal(matrix3f, 0.0f, 0.0f, 0.0f).endVertex();
         consumer.vertex(matrix4f, (float) destination.x, (float) destination.y, (float) destination.z).color(255, 255, 255, 255).normal(matrix3f, 0.0f, 0.0f, 0.0f).endVertex();
         return new float[]{be.getTilt(), be.getPan()};
+    }
+
+    public static void onWorldClose(){
+        artNetManager.shutdownAll();
     }
 
     public static void renderWorldLastAfterTripwire(LevelRenderer levelRenderer){
@@ -127,5 +144,32 @@ public class TheatricalClient {
         long hi = uuid.getMostSignificantBits();
         long lo = uuid.getLeastSignificantBits();
         return ByteBuffer.allocate(16).putLong(hi).putLong(lo).array();
+    }
+
+    public static void handleConsumerChange(NotifyConsumerChange notifyConsumerChange){
+        if(TheatricalConfig.INSTANCE.CLIENT.artnetEnabled){
+            TheatricalArtNetClient artNetClient = getArtNetManager().getClient();
+            if(artNetClient.isSubscribedTo(notifyConsumerChange.getUniverse())){
+                DMXDevice dmxDevice = notifyConsumerChange.getDmxDevice();
+                if(notifyConsumerChange.getChangeType() == NotifyConsumerChange.ChangeType.ADD){
+                    artNetClient.addDevice(notifyConsumerChange.getUniverse(), dmxDevice.getDeviceId(), dmxDevice);
+                } else if(notifyConsumerChange.getChangeType() == NotifyConsumerChange.ChangeType.UPDATE) {
+                    artNetClient.updateDevice(notifyConsumerChange.getUniverse(), dmxDevice.getDeviceId(), dmxDevice);
+                } else {
+                    artNetClient.removeDevice(notifyConsumerChange.getUniverse(), dmxDevice.getDeviceId());
+                }
+            }
+        }
+    }
+
+    public static void handleListConsumers(ListConsumers listConsumers){
+        if(TheatricalConfig.INSTANCE.CLIENT.artnetEnabled) {
+            TheatricalArtNetClient artNetClient = getArtNetManager().getClient();
+            if (artNetClient.isSubscribedTo(listConsumers.getUniverse())) {
+                for (DMXDevice dmxDevice : listConsumers.getDmxDevices()) {
+                    artNetClient.addDevice(listConsumers.getUniverse(), dmxDevice.getDeviceId(), dmxDevice);
+                }
+            }
+        }
     }
 }

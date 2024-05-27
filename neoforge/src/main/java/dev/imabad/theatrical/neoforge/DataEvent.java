@@ -96,6 +96,8 @@ public class DataEvent {
             add("fixture.pan", "Pan");
             add("fixture.tilt", "Tilt");
             add("screen.movinglight", "Moving Light");
+            add("button.artnetconfig", "ArtNet Config");
+            add("screen.artnetconfig.enabled", "ArtNet Enabled: %s");
         }
     }
 

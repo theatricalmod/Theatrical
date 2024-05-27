@@ -3,12 +3,27 @@ package dev.imabad.theatrical.fixtures;
 import dev.imabad.theatrical.Theatrical;
 import dev.imabad.theatrical.api.Fixture;
 import dev.imabad.theatrical.api.HangType;
+import dev.imabad.theatrical.api.dmx.DMXPersonality;
 import dev.imabad.theatrical.blocks.light.BaseLightBlock;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.state.BlockState;
 
+import java.util.Collections;
+import java.util.List;
+
 public class MovingLightFixture extends Fixture {
+
+    private static final List<DMXPersonality> PERSONALITIES = Collections.singletonList(
+            new DMXPersonality(7, "7-Channel Mode")
+                    .addSlot(SharedSlots.INTENSITY)
+                    .addSlot(SharedSlots.RED)
+                    .addSlot(SharedSlots.GREEN)
+                    .addSlot(SharedSlots.BLUE)
+                    .addSlot(SharedSlots.FOCUS)
+                    .addSlot(SharedSlots.PAN)
+                    .addSlot(SharedSlots.TILT)
+    );
 
     private static final ResourceLocation TILT_MODEL = new ResourceLocation(Theatrical.MOD_ID, "block/moving_light/moving_head_tilt");
     private static final ResourceLocation PAN_MODEL = new ResourceLocation(Theatrical.MOD_ID, "block/moving_light/moving_head_pan");
@@ -75,5 +90,10 @@ public class MovingLightFixture extends Fixture {
             return new float[]{0, .5f, 0};
         }
         return new float[]{0, -0.35F, 0};
+    }
+
+    @Override
+    public List<DMXPersonality> getDMXPersonalities() {
+        return PERSONALITIES;
     }
 }

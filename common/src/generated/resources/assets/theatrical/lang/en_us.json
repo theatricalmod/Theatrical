@@ -13,9 +13,11 @@
   "block.theatrical.redstone_interface": "Redstone Interface",
   "block.theatrical.tank_trap": "Tank Trap",
   "block.theatrical.truss": "MT100 Truss",
+  "button.artnetconfig": "ArtNet Config",
   "fixture.dmxStart": "DMX Address",
   "fixture.pan": "Pan",
   "fixture.tilt": "Tilt",
   "itemGroup.theatrical": "Theatrical",
+  "screen.artnetconfig.enabled": "ArtNet Enabled: %s",
   "screen.movinglight": "Moving Light"
 }

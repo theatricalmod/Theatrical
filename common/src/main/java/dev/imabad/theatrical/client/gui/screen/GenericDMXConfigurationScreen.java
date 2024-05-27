@@ -20,7 +20,7 @@ public class GenericDMXConfigurationScreen<T extends DMXConsumer> extends Screen
     private final int imageHeight;
     private int xCenter;
     private int yCenter;
-    private EditBox dmxAddress;
+    private EditBox dmxAddress, dmxUniverse;
     private final T be;
     private final BlockPos blockPos;
     private final String titleTranslationKey;
@@ -41,7 +41,11 @@ public class GenericDMXConfigurationScreen<T extends DMXConsumer> extends Screen
         yCenter = (this.height - this.imageHeight) / 2;
         this.dmxAddress = new EditBox(this.font, xCenter + 62, yCenter + 25, 50, 10, Component.translatable("fixture.dmxStart"));
         this.dmxAddress.setValue(Integer.toString(this.be.getChannelStart()));
-        this.addWidget(this.dmxAddress);
+        this.addRenderableWidget(this.dmxAddress);
+
+        this.dmxUniverse = new EditBox(this.font, xCenter + 62, yCenter + 50, 50, 10, Component.translatable("artneti.dmxUniverse"));
+        this.dmxUniverse.setValue(Integer.toString(this.be.getUniverse()));
+        this.addRenderableWidget(this.dmxUniverse);
         this.addRenderableWidget(
                 new Button.Builder(Component.translatable("artneti.save"), button -> this.update())
                         .pos(xCenter + 40, yCenter + 90)
@@ -56,7 +60,12 @@ public class GenericDMXConfigurationScreen<T extends DMXConsumer> extends Screen
             if (dmx > 512 || dmx < 0) {
                 return;
             }
-            new UpdateDMXFixture(blockPos, dmx).sendToServer();
+
+            int universe = Integer.parseInt(this.dmxUniverse.getValue());
+            if (universe > 16 || universe < 0) {
+                return;
+            }
+            new UpdateDMXFixture(blockPos, dmx, universe).sendToServer();
         } catch(NumberFormatException ignored) {
             //We need a nicer way to show that this is invalid?
         }
@@ -70,7 +79,6 @@ public class GenericDMXConfigurationScreen<T extends DMXConsumer> extends Screen
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         super.render(guiGraphics, mouseX, mouseY, partialTick);
-        this.dmxAddress.render(guiGraphics, mouseX, mouseY, partialTick);
         this.renderLabels(guiGraphics);
     }
 
@@ -83,6 +91,7 @@ public class GenericDMXConfigurationScreen<T extends DMXConsumer> extends Screen
     private void renderLabels(GuiGraphics guiGraphics) {
         renderLabel(guiGraphics, titleTranslationKey, 5,5);
         renderLabel(guiGraphics, "fixture.dmxStart", 0,15);
+        renderLabel(guiGraphics, "artneti.dmxUniverse", 0,40);
     }
 
     private void renderLabel(GuiGraphics guiGraphics, String translationKey, int offSetX, int offSetY){
