@@ -1,0 +1,20 @@
+{
+  "artneti.dmxUniverse": "DMX Universum",
+  "artneti.ipAddress": "IP Addresse",
+  "artneti.lastReceived": "Zuletzt erfasste Daten vor %d Sekunden",
+  "artneti.notAuthorized": "Du bist Dafür nicht Authorisiert!",
+  "artneti.notConnected": "Keine Daten Bekommen.",
+  "artneti.save": "Speichern",
+  "block.theatrical.artnet_interface": "ArtNet Eingang",
+  "block.theatrical.led_fresnel": "LED Fresnel",
+  "block.theatrical.moving_light": "Moving Light",
+  "block.theatrical.pipe": "Rigging Röhre",
+  "block.theatrical.redstone_interface": "Redstone Eingang",
+  "block.theatrical.tank_trap": "Panzer Falle",
+  "block.theatrical.truss": "MT100 Truss",
+  "fixture.dmxStart": "DMX Addresse",
+  "fixture.pan": "Pan",
+  "fixture.tilt": "Tilt",
+  "itemGroup.theatrical": "Theatrical",
+  "screen.movinglight": "Moving Light"
+}
