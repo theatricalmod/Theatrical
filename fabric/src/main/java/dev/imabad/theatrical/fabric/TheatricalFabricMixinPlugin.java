@@ -21,7 +21,7 @@ public class TheatricalFabricMixinPlugin implements IMixinConfigPlugin {
 
     @Override
     public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
-        if(mixinClassName.contains("ClipContextMixin") && FabricLoader.getInstance().isModLoaded("porting_lib")){
+        if(mixinClassName.contains("ClipContextMixin") && (FabricLoader.getInstance().isModLoaded("porting_lib") || FabricLoader.getInstance().isModLoaded("porting_lib_base"))){
             //Porting lib already has this mixin and thus we don't need it!
             return false;
         }

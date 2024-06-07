@@ -47,6 +47,7 @@ public abstract class BaseDMXConsumerLightBlockEntity extends BaseLightBlockEnti
 
     public void setChannelStartPoint(int channelStartPoint) {
         this.channelStartPoint = channelStartPoint;
+        this.setChanged();
         level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
     }
 

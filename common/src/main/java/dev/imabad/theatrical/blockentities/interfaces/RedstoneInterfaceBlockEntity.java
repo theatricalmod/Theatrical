@@ -67,6 +67,7 @@ public class RedstoneInterfaceBlockEntity extends ClientSyncBlockEntity implemen
 
     public void setChannelStartPoint(int channelStartPoint) {
         this.channelStartPoint = channelStartPoint;
+        this.setChanged();
         level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
     }
 
