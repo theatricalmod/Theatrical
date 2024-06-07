@@ -1,3 +1,4 @@
-# 1.20.1-alpha.10
+# 1.20.1-alpha.11
 
-* Fix not updating lights properly in forge
+* Fix crash when using create on fabric
+* Fix a bug where sometimes dmx addresses wouldn't save
