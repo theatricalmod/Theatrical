@@ -50,7 +50,10 @@ public class DMXNetworkData {
                 .sendTo(knownSenders);
     }
     public Collection<DMXConsumer> getConsumers(int universe){
-        return universeToNodeMap.get(universe).values();
+        if(universeToNodeMap.get(universe) != null) {
+            return universeToNodeMap.get(universe).values();
+        }
+        return null;
     }
 
     public BlockPos getConsumerPos(int universe, RDMDeviceId deviceId){
