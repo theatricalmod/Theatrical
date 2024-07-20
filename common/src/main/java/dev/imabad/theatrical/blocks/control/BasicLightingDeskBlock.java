@@ -25,6 +25,7 @@ import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.phys.BlockHitResult;
@@ -33,8 +34,8 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
-public class BasicLightingDeskBlock extends DirectionalBlock implements EntityBlock {
-    public static final DirectionProperty FACING = DirectionalBlock.FACING;
+public class BasicLightingDeskBlock extends Block implements EntityBlock {
+    public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
     private static final VoxelShape SHAPE = Shapes.create(0, 0, 0, 16 / 16D, 3 / 16D, 16 / 16D);
 
     public BasicLightingDeskBlock() {
@@ -63,13 +64,13 @@ public class BasicLightingDeskBlock extends DirectionalBlock implements EntityBl
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-        return null;
+        return new BasicLightingDeskBlockEntity(pos, state);
     }
 
-    @Override
-    public RenderShape getRenderShape(BlockState blockState) {
-        return RenderShape.ENTITYBLOCK_ANIMATED;
-    }
+//    @Override
+//    public RenderShape getRenderShape(BlockState blockState) {
+//        return RenderShape.ENTITYBLOCK_ANIMATED;
+//    }
 
     @Override
     public float getShadeBrightness(BlockState blockState, BlockGetter blockGetter, BlockPos blockPos) {

@@ -4,46 +4,48 @@ import dev.architectury.networking.NetworkManager;
 import dev.architectury.networking.simple.BaseC2SMessage;
 import dev.architectury.networking.simple.MessageType;
 import dev.imabad.theatrical.blockentities.control.BasicLightingDeskBlockEntity;
-import dev.imabad.theatrical.blockentities.interfaces.ArtNetInterfaceBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
-public class UpdateConsoleFader extends BaseC2SMessage {
+public class ControlGo extends BaseC2SMessage {
 
     private final BlockPos blockPos;
-    private final int fader;
-    private final int value;
+    private final int fadeInTicks, fadeOutTicks;
 
-    public UpdateConsoleFader(BlockPos blockPos, int fader, int value) {
+    public ControlGo(BlockPos blockPos, int fadeInTicks, int fadeOutTicks) {
         this.blockPos = blockPos;
-        this.fader = fader;
-        this.value = value;
+        this.fadeInTicks = fadeInTicks;
+        this.fadeOutTicks = fadeOutTicks;
     }
 
-    UpdateConsoleFader(FriendlyByteBuf buf) {
+    ControlGo(FriendlyByteBuf buf){
         this.blockPos = buf.readBlockPos();
-        this.fader = buf.readInt();
-        this.value = buf.readInt();
+        this.fadeInTicks = buf.readInt();
+        this.fadeOutTicks = buf.readInt();
     }
 
     @Override
     public MessageType getType() {
-        return TheatricalNet.UPDATE_CONSOLE_FADER;
+        return TheatricalNet.CONTROL_GO;
     }
 
     @Override
     public void write(FriendlyByteBuf buf) {
         buf.writeBlockPos(blockPos);
-        buf.writeInt(fader);
-        buf.writeInt(value);
+        buf.writeInt(fadeInTicks);
+        buf.writeInt(fadeOutTicks);
     }
 
     @Override
     public void handle(NetworkManager.PacketContext context) {
         BlockEntity be = context.getPlayer().level().getBlockEntity(blockPos);
         if(be instanceof BasicLightingDeskBlockEntity lightingDeskBlock){
-            lightingDeskBlock.setFader(fader, value);
+            if(!lightingDeskBlock.isRunMode()){
+                lightingDeskBlock.setFadeInTicks(fadeInTicks);
+                lightingDeskBlock.setFadeOutTicks(fadeOutTicks);
+            }
+            lightingDeskBlock.clickButton();
         }
     }
 }

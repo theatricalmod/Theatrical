@@ -1,10 +1,13 @@
 package dev.imabad.theatrical.client.gui.screen;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import dev.imabad.theatrical.Theatrical;
 import dev.imabad.theatrical.blockentities.control.BasicLightingDeskBlockEntity;
 import dev.imabad.theatrical.client.gui.widgets.FaderWidget;
-import dev.imabad.theatrical.net.TheatricalNet;
-import dev.imabad.theatrical.net.UpdateConsoleFader;
+import dev.imabad.theatrical.net.ControlGo;
+import dev.imabad.theatrical.net.ControlModeToggle;
+import dev.imabad.theatrical.net.ControlMoveStep;
+import dev.imabad.theatrical.net.ControlUpdateFader;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
@@ -46,15 +49,22 @@ public class BasicLightingDeskScreen extends Screen {
     }
 
     private void renderLabels(GuiGraphics guiGraphics) {
-        renderLabel(guiGraphics, "block.theatrical.led_fresnel", 5, 5);
-        renderLabel(guiGraphics, "fixture.dmxStart", 0, 15);
-        renderLabel(guiGraphics, "fixture.tilt", 0, 36);
-        renderLabel(guiGraphics, "fixture.pan", 0, 66);
+        renderLabel(guiGraphics, "ui.control.step", 20, 57, be.getCurrentStep());
+        renderLabel(guiGraphics, be.isRunMode() ? "ui.control.modes.run" : "ui.control.modes.program", 41, 90);
+        renderLabel(guiGraphics, "ui.control.cues", 100, 5);
+        for(int key : be.getStoredSteps().keySet()){
+            renderLabel(guiGraphics, "ui.control.cue", 101, 15 + (10 * key), key);
+        }
+        renderLabel(guiGraphics, "ui.control.fadeIn", 35, 10);
+        renderLabel(guiGraphics, "ui.control.fadeOut", 35, 33);
     }
 
-    private void renderLabel(GuiGraphics guiGraphics, String translationKey, int offSetX, int offSetY) {
-        MutableComponent translatable = Component.translatable(translationKey);
-        guiGraphics.drawString(font, translatable, xCenter + (this.imageWidth / 2) - (this.font.width(translatable.getString()) / 2), yCenter + offSetY, 0x404040, false);
+    private void renderLabel(GuiGraphics guiGraphics, String translationKey, int offSetX, int offSetY, Object... replacements) {
+        guiGraphics.pose().pushPose();
+//        guiGraphics.pose().scale(0.8f, 0.8f, 0.8f);
+        MutableComponent translatable = Component.translatable(translationKey, replacements);
+        guiGraphics.drawString(font, translatable, (xCenter + (this.imageWidth / 2) - (this.font.width(translatable.getString()) / 2)) + offSetX, yCenter + offSetY, 0x404040, false);
+        guiGraphics.pose().popPose();
     }
 
     @Override
@@ -73,11 +83,11 @@ public class BasicLightingDeskScreen extends Screen {
         }
         this.addRenderableWidget(new FaderWidget(xCenter + 184, yCenter + 7, -1, Byte.toUnsignedInt(be.getGrandMaster())));
         this.addRenderableWidget(new Button.Builder(Component.literal("<-"), button -> this.moveStep(false))
-                .pos(xCenter + 130, yCenter + 20)
+                .pos(xCenter + 155, yCenter + 67)
                 .size(15, 20)
                 .build());
         this.addRenderableWidget(new Button.Builder(Component.literal("->"), button -> this.moveStep(true))
-                .pos(xCenter + 145, yCenter + 20)
+                .pos(xCenter + 170, yCenter + 67)
                 .size(15, 20)
                 .build());
         this.addRenderableWidget(new Button.Builder(Component.literal("Go"), button -> this.go())
@@ -88,8 +98,8 @@ public class BasicLightingDeskScreen extends Screen {
                 .pos(xCenter + 155, yCenter + 100)
                 .size(30, 20)
                 .build());
-        this.fadeInTime = new EditBox(this.font, xCenter + 170, yCenter + 60, 20, 10, Component.literal("0"));
-        this.fadeOutTime = new EditBox(this.font, xCenter + 170, yCenter + 75, 20, 10, Component.literal("0"));
+        this.fadeInTime = new EditBox(this.font, xCenter + 147, yCenter + 20, 20, 10, Component.literal("0"));
+        this.fadeOutTime = new EditBox(this.font, xCenter + 147, yCenter + 43, 20, 10, Component.literal("0"));
         this.fadeInTime.setValue(Integer.toString(be.getFadeInTicks()));
         this.fadeOutTime.setValue(Integer.toString(be.getFadeOutTicks()));
         this.addRenderableWidget(fadeInTime);
@@ -97,27 +107,32 @@ public class BasicLightingDeskScreen extends Screen {
     }
 
     private void moveStep(boolean forward){
-
+        new ControlMoveStep(be.getBlockPos(), forward).sendToServer();
     }
 
     private void go(){
-
+        new ControlGo(be.getBlockPos(), Integer.parseInt(fadeInTime.getValue()), Integer.parseInt(fadeOutTime.getValue())).sendToServer();
     }
 
     private void mode(){
-
+        new ControlModeToggle(be.getBlockPos()).sendToServer();
     }
 
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
         this.children().forEach(widget -> {
             if(widget instanceof FaderWidget fader) {
-                if (widget.isMouseOver(mouseX, mouseY) && ((FaderWidget) widget).isDragging()) {
-                    int newVal = fader.calculateNewValue(mouseY);
-                    new UpdateConsoleFader(be.getBlockPos(), fader.getChannel(), newVal).sendToServer();
+                if (fader.isMouseOver(mouseX, mouseY) && fader.isDragging()) {
+                    int newVal = fader.updateValue(mouseY);
+                    new ControlUpdateFader(be.getBlockPos(), fader.getChannel(), newVal).sendToServer();
                 }
             }
         });
         return super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
+    }
+
+    @Override
+    public boolean isPauseScreen() {
+        return false;
     }
 }

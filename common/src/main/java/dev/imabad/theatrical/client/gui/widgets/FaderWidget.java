@@ -61,4 +61,9 @@ public class FaderWidget extends AbstractWidget {
     public int calculateNewValue(double mouseY){
         return (int) (((this.height - (mouseY - this.getY())) / this.height) * 255f);
     }
+
+    public int updateValue(double mouseY){
+        this.value = calculateNewValue(mouseY);
+        return value;
+    }
 }

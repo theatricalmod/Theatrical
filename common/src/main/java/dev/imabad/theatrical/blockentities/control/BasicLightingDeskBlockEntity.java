@@ -209,6 +209,7 @@ public class BasicLightingDeskBlockEntity extends ClientSyncBlockEntity {
 
     public void toggleMode(){
         this.isRunMode = !this.isRunMode;
+        setChanged();
     }
 
     public void clickButton(){
@@ -296,7 +297,7 @@ public class BasicLightingDeskBlockEntity extends ClientSyncBlockEntity {
         }
         activeCue = storedCue;
         this.currentStep = getNextStep();
-//        markDirty();
+        setChanged();
     }
 
     private Integer getFirst(){
@@ -325,6 +326,7 @@ public class BasicLightingDeskBlockEntity extends ClientSyncBlockEntity {
         StoredCue storedCue = new StoredCue(Arrays.copyOf(faders, faders.length), this.fadeInTicks, this.fadeOutTicks);
         storedSteps.put(this.currentStep, storedCue);
         this.currentStep++;
+        setChanged();
     }
 
     public int getFadeInTicks() {
