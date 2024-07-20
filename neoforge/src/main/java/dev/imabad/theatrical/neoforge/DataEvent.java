@@ -38,6 +38,7 @@ public class DataEvent {
             simpleBlock(Blocks.REDSTONE_INTERFACE.get());
             ModelFile.ExistingModelFile trussModel = models().getExistingFile(new ResourceLocation("theatrical:block/truss"));
             axisBlock(Blocks.TRUSS_BLOCK.get(), trussModel, trussModel);
+            horizontalBlock(Blocks.BASIC_LIGHTING_DESK.get(), models().getExistingFile(new ResourceLocation("theatrical:block/lighting_console")));
             getVariantBuilder(Blocks.TANK_TRAP.get()).forAllStates(blockState -> {
                 ModelFile file = models().getExistingFile(new ResourceLocation("theatrical:block/tank_trap"));
                 if(blockState.getValue(TankTrapBlock.HAS_PIPE)){
@@ -66,6 +67,7 @@ public class DataEvent {
             withExistingParent(Blocks.LED_FRESNEL.getId().getPath(), new ResourceLocation(Theatrical.MOD_ID, "block/fresnel/fresnel_whole"));
             withExistingParent(Blocks.TANK_TRAP.getId().getPath(), new ResourceLocation(Theatrical.MOD_ID, "block/tank_trap"));
             withExistingParent(Blocks.LED_PANEL.getId().getPath(), new ResourceLocation(Theatrical.MOD_ID, "block/led_panel"));
+            withExistingParent(Blocks.BASIC_LIGHTING_DESK.getId().getPath(), new ResourceLocation(Theatrical.MOD_ID, "block/lighting_console"));
         }
     }
 
@@ -85,6 +87,7 @@ public class DataEvent {
             addBlock(Blocks.REDSTONE_INTERFACE, "Redstone Interface");
             addBlock(Blocks.TANK_TRAP, "Tank Trap");
             addBlock(Blocks.LED_PANEL, "LED Panel");
+            addBlock(Blocks.BASIC_LIGHTING_DESK, "Basic Lighting Desk");
             add("itemGroup.theatrical", "Theatrical");
             add("artneti.dmxUniverse", "DMX Universe");
             add("artneti.ipAddress", "IP Address");
@@ -98,6 +101,13 @@ public class DataEvent {
             add("screen.movinglight", "Moving Light");
             add("button.artnetconfig", "ArtNet Config");
             add("screen.artnetconfig.enabled", "ArtNet Enabled: %s");
+            add("ui.control.step", "Step - %s");
+            add("ui.control.modes.run", "Run Mode");
+            add("ui.control.modes.program", "Program Mode");
+            add("ui.control.cues", "Cues");
+            add("ui.control.cue", "Cue - %s");
+            add("ui.control.fadeIn", "Fade in");
+            add("ui.control.fadeOut", "Fade out");
         }
     }
 

@@ -14,9 +14,14 @@ public interface TheatricalNet {
     MessageType UPDATE_FIXTURE_POS = MAIN.registerC2S("update_fixture_pos", UpdateFixturePosition::new);
     MessageType RDM_UPDATE_FIXTURE = MAIN.registerC2S("rdm_update_fixture", RDMUpdateConsumer::new);
     MessageType REQUEST_CONSUMERS = MAIN.registerC2S("request_consumers", RequestConsumers::new);
+    MessageType UPDATE_CONSOLE_FADER = MAIN.registerC2S("update_console_fader", ControlUpdateFader::new);
+    MessageType CONTROL_MOVE_STEP = MAIN.registerC2S("control_move_step", ControlMoveStep::new);
+    MessageType CONTROL_MODE_TOGGLE = MAIN.registerC2S("control_mode_toggle", ControlModeToggle::new);
+    MessageType CONTROL_GO = MAIN.registerC2S("control_go", ControlGo::new);
 
     // S2C
     MessageType NOTIFY_CONSUMER_CHANGE = MAIN.registerS2C("notify_consumer_change", NotifyConsumerChange::new);
     MessageType LIST_CONSUMERS = MAIN.registerS2C("list_consumers", ListConsumers::new);
+
     static void init(){}
 }
