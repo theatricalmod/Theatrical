@@ -42,9 +42,9 @@ public class UpdateArtNetInterface extends BaseC2SMessage {
     public void handle(NetworkManager.PacketContext context) {
         BlockEntity be = context.getPlayer().level().getBlockEntity(pos);
         if(be instanceof ArtNetInterfaceBlockEntity artNetInterfaceBlockEntity){
-            if(artNetInterfaceBlockEntity.getOwnerUUID().equals(context.getPlayer().getUUID())){
-                artNetInterfaceBlockEntity.updateConfig(ipAddress, dmxUniverse);
-            }
+//            if(artNetInterfaceBlockEntity.getOwnerUUID().equals(context.getPlayer().getUUID())){
+//                artNetInterfaceBlockEntity.updateConfig(ipAddress, dmxUniverse);
+//            }
         }
     }
 }

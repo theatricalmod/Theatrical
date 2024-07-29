@@ -168,4 +168,14 @@ public class DMXNetwork {
     public boolean isMember(UUID playerUUID){
         return members.stream().anyMatch(x -> x.playerId().equals(playerUUID));
     }
+
+    public boolean canSendDMX(UUID uuid) {
+        Optional<DMXNetworkMember> first = members.stream()
+                .filter(dmxNetworkMember -> dmxNetworkMember.playerId() == uuid).findFirst();
+        if(first.isEmpty()){
+            return false;
+        }
+        DMXNetworkMember dmxNetworkMember = first.get();
+        return dmxNetworkMember.role() == DMXNetworkMemberRole.SEND || dmxNetworkMember.role() == DMXNetworkMemberRole.ADMIN;
+    }
 }

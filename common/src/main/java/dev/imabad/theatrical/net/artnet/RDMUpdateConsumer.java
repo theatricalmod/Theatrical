@@ -7,27 +7,32 @@ import dev.architectury.networking.simple.MessageType;
 import dev.imabad.theatrical.Theatrical;
 import dev.imabad.theatrical.blockentities.interfaces.RedstoneInterfaceBlockEntity;
 import dev.imabad.theatrical.blockentities.light.BaseDMXConsumerLightBlockEntity;
-import dev.imabad.theatrical.dmx.DMXDevice;
+import dev.imabad.theatrical.dmx.DMXNetwork;
 import dev.imabad.theatrical.dmx.DMXNetworkData;
 import dev.imabad.theatrical.net.TheatricalNet;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
+import java.util.UUID;
+
 public class RDMUpdateConsumer extends BaseC2SMessage {
 
-    private int universe, newAddress;;
-    private RDMDeviceId dmxDevice;
+    private final UUID networkId;
+    private final int universe;
+    private final int newAddress;
+    private final RDMDeviceId dmxDevice;
 
-    public RDMUpdateConsumer(int universe, RDMDeviceId dmxDevice, int newAddress){
+    public RDMUpdateConsumer(UUID networkId, int universe, RDMDeviceId dmxDevice, int newAddress){
+        this.networkId = networkId;
         this.universe = universe;
         this.dmxDevice = dmxDevice;
         this.newAddress = newAddress;
     }
 
     public RDMUpdateConsumer(FriendlyByteBuf buf){
+        networkId = buf.readUUID();
         universe = buf.readInt();
         dmxDevice = new RDMDeviceId(buf.readByteArray(6));
         newAddress = buf.readInt();
@@ -40,6 +45,7 @@ public class RDMUpdateConsumer extends BaseC2SMessage {
 
     @Override
     public void write(FriendlyByteBuf buf) {
+        buf.writeUUID(networkId);
         buf.writeInt(universe);
         buf.writeByteArray(dmxDevice.toBytes());
         buf.writeInt(newAddress);
@@ -50,7 +56,11 @@ public class RDMUpdateConsumer extends BaseC2SMessage {
         Level level = context.getPlayer().level();
         if(level.getServer() != null ) {
             if (context.getPlayer().hasPermissions(level.getServer().getOperatorUserPermissionLevel())) {
-                BlockPos consumerPos = DMXNetworkData.getInstance().getConsumerPos(universe, dmxDevice);
+                DMXNetwork network = DMXNetworkData.getInstance(level).getNetwork(networkId);
+                if(network == null){
+                    return;
+                }
+                BlockPos consumerPos = network.getConsumerPos(universe, dmxDevice);
                 if(consumerPos != null){
                     BlockEntity be = context.getPlayer().level().getBlockEntity(consumerPos);
                     if(be instanceof BaseDMXConsumerLightBlockEntity dmxConsumerLightBlock){

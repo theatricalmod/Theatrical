@@ -9,6 +9,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
+import java.util.UUID;
+
 public class UpdateDMXFixture extends BaseC2SMessage {
 
     private BlockPos pos;

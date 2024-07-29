@@ -2,19 +2,23 @@ package dev.imabad.theatrical.client.gui.screen;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import dev.imabad.theatrical.Theatrical;
+import dev.imabad.theatrical.TheatricalClient;
 import dev.imabad.theatrical.blockentities.control.BasicLightingDeskBlockEntity;
 import dev.imabad.theatrical.client.gui.widgets.FaderWidget;
-import dev.imabad.theatrical.net.ControlGo;
-import dev.imabad.theatrical.net.ControlModeToggle;
-import dev.imabad.theatrical.net.ControlMoveStep;
-import dev.imabad.theatrical.net.ControlUpdateFader;
+import dev.imabad.theatrical.net.*;
+import dev.imabad.theatrical.util.UUIDUtil;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.CycleButton;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
+
+import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class BasicLightingDeskScreen extends Screen {
 
@@ -23,11 +27,13 @@ public class BasicLightingDeskScreen extends Screen {
     private int imageWidth, imageHeight, xCenter, yCenter;
     private BasicLightingDeskBlockEntity be;
     private EditBox fadeInTime, fadeOutTime;
+    private UUID networkId;
     public BasicLightingDeskScreen(BasicLightingDeskBlockEntity blockEntity) {
         super(Component.translatable("screen.basicLightingDesk"));
         this.imageWidth = 244;
         this.imageHeight = 126;
         this.be = blockEntity;
+        this.networkId = be.getNetworkId();
     }
 
     @Override
@@ -104,6 +110,21 @@ public class BasicLightingDeskScreen extends Screen {
         this.fadeOutTime.setValue(Integer.toString(be.getFadeOutTicks()));
         this.addRenderableWidget(fadeInTime);
         this.addRenderableWidget(fadeOutTime);
+        this.addRenderableWidget(new CycleButton.Builder<UUID>((networkId) ->
+        {
+            if (TheatricalClient.getArtNetManager().getKnownNetworks().containsKey(networkId)) {
+                return Component.literal(TheatricalClient.getArtNetManager().getKnownNetworks().get(networkId));
+            }
+            return Component.literal("Unknown");
+        }
+        ).withValues(CycleButton.ValueListSupplier.create(Stream.concat(Stream.of(UUIDUtil.NULL),
+                        TheatricalClient.getArtNetManager().getKnownNetworks().keySet().stream()).collect(Collectors.toList())))
+                .displayOnlyValue().withInitialValue(networkId)
+                .create(xCenter, yCenter, 150, 20,
+                        Component.translatable("screen.artnetconfig.network"), (obj, val) -> {
+                            this.networkId = val;
+                            new UpdateNetworkId(be.getBlockPos(), networkId).sendToServer();
+                        }));
     }
 
     private void moveStep(boolean forward){

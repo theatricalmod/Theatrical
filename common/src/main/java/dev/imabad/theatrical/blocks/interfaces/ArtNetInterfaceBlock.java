@@ -62,7 +62,7 @@ public class ArtNetInterfaceBlock extends Block implements EntityBlock {
         if(!level.isClientSide){
             BlockEntity be = level.getBlockEntity(pos);
             if(be instanceof ArtNetInterfaceBlockEntity interfaceBlock && placer != null){
-                interfaceBlock.setOwnerUUID(placer.getUUID());
+//                interfaceBlock.setOwnerUUID(placer.getUUID());
             }
         }
         super.setPlacedBy(level, pos, state, placer, stack);

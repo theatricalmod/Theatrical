@@ -5,7 +5,6 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import dev.architectury.event.events.client.ClientPlayerEvent;
 import dev.architectury.registry.client.rendering.BlockEntityRendererRegistry;
-import dev.architectury.registry.client.rendering.RenderTypeRegistry;
 import dev.imabad.theatrical.blockentities.BlockEntities;
 import dev.imabad.theatrical.blockentities.light.BaseLightBlockEntity;
 import dev.imabad.theatrical.blocks.light.MovingLightBlock;
@@ -15,11 +14,12 @@ import dev.imabad.theatrical.client.blockentities.LEDPanelRenderer;
 import dev.imabad.theatrical.client.blockentities.MovingLightRenderer;
 import dev.imabad.theatrical.config.TheatricalConfig;
 import dev.imabad.theatrical.dmx.DMXDevice;
-import dev.imabad.theatrical.dmx.TheatricalArtNetClient;
+import dev.imabad.theatrical.client.dmx.TheatricalArtNetClient;
 import dev.imabad.theatrical.lighting.LightManager;
 import dev.imabad.theatrical.net.artnet.ListConsumers;
 import dev.imabad.theatrical.net.artnet.NotifyConsumerChange;
-import dev.imabad.theatrical.protocols.artnet.ArtNetManager;
+import dev.imabad.theatrical.client.dmx.ArtNetManager;
+import dev.imabad.theatrical.net.artnet.RequestNetworks;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -52,6 +52,7 @@ public class TheatricalClient {
 //        BlockEntityRendererRegistry.register(BlockEntities.CABLE.get(), CableRenderer::new);
         artNetManager = new ArtNetManager();
         ClientPlayerEvent.CLIENT_PLAYER_JOIN.register((event) -> {
+            new RequestNetworks().sendToServer();
             if(TheatricalConfig.INSTANCE.CLIENT.artnetEnabled){
                 artNetManager.getClient();
             }

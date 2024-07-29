@@ -1,5 +1,6 @@
 package dev.imabad.theatrical.blockentities.control;
 
+import dev.imabad.theatrical.api.dmx.BelongsToNetwork;
 import dev.imabad.theatrical.blockentities.BlockEntities;
 import dev.imabad.theatrical.blockentities.ClientSyncBlockEntity;
 import dev.imabad.theatrical.blocks.control.BasicLightingDeskBlock;
@@ -13,12 +14,9 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Optional;
+import java.util.*;
 
-public class BasicLightingDeskBlockEntity extends ClientSyncBlockEntity {
+public class BasicLightingDeskBlockEntity extends ClientSyncBlockEntity implements BelongsToNetwork {
     public static class StoredCue {
         private byte[] faders;
         private int fadeInTicks;
@@ -75,8 +73,10 @@ public class BasicLightingDeskBlockEntity extends ClientSyncBlockEntity {
     private int fadeOutTicksRemaining = 0;
     private byte[] perTickOut, perTickIn;
     private boolean isFadingOut = false;
-
     private byte grandMaster = -1;
+
+    private UUID networkId;
+    private int universe = 0;
 
     public BasicLightingDeskBlockEntity(BlockPos blockPos, BlockState blockState) {
         super(BlockEntities.BASIC_LIGHTING_DESK.get(), blockPos, blockState);
@@ -119,9 +119,9 @@ public class BasicLightingDeskBlockEntity extends ClientSyncBlockEntity {
 
     public void update(byte[] data) {
         if(level != null && level.getServer() != null) {
-            var dmxData = DMXNetworkData.getInstance();
+            var dmxData = DMXNetworkData.getInstance(level).getNetwork(networkId);
             if(dmxData != null) {
-                dmxData.getConsumersInRange(getBlockPos(), TheatricalConfig.INSTANCE.COMMON.wirelessDMXRadius).forEach(dmxConsumer -> dmxConsumer.consume(data));
+                dmxData.getConsumers(universe).forEach(consumer -> consumer.consume(data));
             }
         }
     }
@@ -151,6 +151,10 @@ public class BasicLightingDeskBlockEntity extends ClientSyncBlockEntity {
         compoundTag.putBoolean("isRunMode", isRunMode);
         compoundTag.putInt("fadeInTicks", fadeInTicks);
         compoundTag.putInt("fadeOutTicks", fadeOutTicks);
+        if(networkId != null){
+            compoundTag.putUUID("network", networkId);
+        }
+        compoundTag.putInt("universe", universe);
     }
 
     @Override
@@ -180,6 +184,12 @@ public class BasicLightingDeskBlockEntity extends ClientSyncBlockEntity {
         }
         if(compoundTag.contains("fadeOutTicks")){
             fadeOutTicks = compoundTag.getInt("fadeOutTicks");
+        }
+        if(compoundTag.contains("network")){
+            networkId = compoundTag.getUUID("network");
+        }
+        if(compoundTag.contains("universe")){
+            universe = compoundTag.getInt("universe");
         }
     }
 
@@ -345,4 +355,17 @@ public class BasicLightingDeskBlockEntity extends ClientSyncBlockEntity {
         this.fadeOutTicks = fadeOutTicks;
     }
 
+    public UUID getNetworkId() {
+        return networkId;
+    }
+
+    @Override
+    public void setNetworkId(UUID newNetworkId) {
+        if(newNetworkId == this.networkId){
+            return;
+        }
+        this.networkId = newNetworkId;
+        setChanged();
+        level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
+    }
 }
