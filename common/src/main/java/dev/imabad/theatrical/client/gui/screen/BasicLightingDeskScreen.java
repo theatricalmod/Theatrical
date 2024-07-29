@@ -120,7 +120,7 @@ public class BasicLightingDeskScreen extends Screen {
         ).withValues(CycleButton.ValueListSupplier.create(Stream.concat(Stream.of(UUIDUtil.NULL),
                         TheatricalClient.getArtNetManager().getKnownNetworks().keySet().stream()).collect(Collectors.toList())))
                 .displayOnlyValue().withInitialValue(networkId)
-                .create(xCenter, yCenter, 150, 20,
+                .create(xCenter + 45, yCenter + 130, 150, 20,
                         Component.translatable("screen.artnetconfig.network"), (obj, val) -> {
                             this.networkId = val;
                             new UpdateNetworkId(be.getBlockPos(), networkId).sendToServer();

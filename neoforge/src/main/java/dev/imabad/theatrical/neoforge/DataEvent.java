@@ -108,6 +108,18 @@ public class DataEvent {
             add("ui.control.cue", "Cue - %s");
             add("ui.control.fadeIn", "Fade in");
             add("ui.control.fadeOut", "Fade out");
+            add("commands.network.notfound", "Network not found.");
+            add("commands.networks", "There are %s network(s): %s.");
+            add("commands.network.members", "There are %s network member(s): %s.");
+            add("commands.network.members.add.success", "Added %s to the network.");
+            add("commands.network.members.add.failed", "Player already member of network.");
+            add("commands.network.members.remove.success", "Removed %s from the network.");
+            add("commands.network", "%s (%s) has %s member(s)");
+            add("commands.network.invalid", "Unknown network mode: %s");
+            add("commands.network.role.invalid", "Unknown member role: %s");
+            add("commands.network.created", "Network created");
+            add("commands.network.deleted", "Network deleted");
+            add("commands.network.updated", "Network updated");
         }
     }
 

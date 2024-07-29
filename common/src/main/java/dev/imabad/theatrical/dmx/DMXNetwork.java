@@ -5,19 +5,21 @@ import dev.imabad.theatrical.api.dmx.DMXConsumer;
 import dev.imabad.theatrical.net.artnet.NotifyConsumerChange;
 import io.netty.util.collection.IntObjectHashMap;
 import io.netty.util.collection.IntObjectMap;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
 public class DMXNetwork {
     private final UUID id;
-    private final String name;
-    private final DMXNetworkMode mode;
+    private String name;
+    private DMXNetworkMode mode;
     private final Set<DMXNetworkMember> members;
     private final IntObjectMap<Map<BlockPos, DMXConsumer>> universeToNodeMap = new IntObjectHashMap<>();
     private final Set<ServerPlayer> knownSenders = new HashSet<>();
@@ -51,6 +53,7 @@ public class DMXNetwork {
         CompoundTag tag = new CompoundTag();
         tag.putUUID("id", id);
         tag.putString("mode", mode.toString());
+        tag.putString("name", name);
         ListTag membersList = new ListTag();
         for (DMXNetworkMember member : members) {
             CompoundTag memberTag = new CompoundTag();
@@ -163,6 +166,12 @@ public class DMXNetwork {
 
     public void addMember(UUID playerUUID, DMXNetworkMemberRole role){
         members.add(new DMXNetworkMember(playerUUID, role));
+        DMXNetworkData.getInstance().setDirty();
+    }
+    public void removeMember(UUID playerUUID){
+        DMXNetworkMember dmxNetworkMember = getDmxNetworkMember(playerUUID);
+        members.remove(dmxNetworkMember);
+        DMXNetworkData.getInstance().setDirty();
     }
 
     public boolean isMember(UUID playerUUID){
@@ -170,12 +179,39 @@ public class DMXNetwork {
     }
 
     public boolean canSendDMX(UUID uuid) {
+        DMXNetworkMember dmxNetworkMember = getDmxNetworkMember(uuid);
+        if (dmxNetworkMember == null) return false;
+        return dmxNetworkMember.role() == DMXNetworkMemberRole.SEND || dmxNetworkMember.role() == DMXNetworkMemberRole.ADMIN;
+    }
+
+    public boolean isAdmin(UUID uuid){
+        DMXNetworkMember dmxNetworkMember = getDmxNetworkMember(uuid);
+        if (dmxNetworkMember == null) return false;
+        return dmxNetworkMember.role() == DMXNetworkMemberRole.ADMIN;
+    }
+
+    public void setMemberRole(UUID playerId, DMXNetworkMemberRole role){
+        DMXNetworkMember dmxNetworkMember = getDmxNetworkMember(playerId);
+        if(dmxNetworkMember != null) {
+            dmxNetworkMember.setRole(role);
+            DMXNetworkData.getInstance().setDirty();
+        }
+    }
+
+    @Nullable
+    private DMXNetworkMember getDmxNetworkMember(UUID uuid) {
         Optional<DMXNetworkMember> first = members.stream()
                 .filter(dmxNetworkMember -> dmxNetworkMember.playerId() == uuid).findFirst();
-        if(first.isEmpty()){
-            return false;
-        }
-        DMXNetworkMember dmxNetworkMember = first.get();
-        return dmxNetworkMember.role() == DMXNetworkMemberRole.SEND || dmxNetworkMember.role() == DMXNetworkMemberRole.ADMIN;
+        return first.orElse(null);
+    }
+
+    public void setName(String name) {
+        this.name = name;
+        DMXNetworkData.getInstance().setDirty();
+    }
+
+    public void setMode(DMXNetworkMode mode) {
+        this.mode = mode;
+        DMXNetworkData.getInstance().setDirty();
     }
 }

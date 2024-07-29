@@ -1,17 +1,10 @@
 package dev.imabad.theatrical.dmx;
 
-import ch.bildspur.artnet.rdm.RDMDeviceId;
-import dev.imabad.theatrical.api.dmx.DMXConsumer;
-import dev.imabad.theatrical.net.artnet.NotifyConsumerChange;
+import dev.architectury.utils.GameInstance;
 import dev.imabad.theatrical.net.artnet.NotifyNetworks;
-import io.netty.util.collection.IntObjectHashMap;
-import io.netty.util.collection.IntObjectMap;
-import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -32,6 +25,11 @@ public class DMXNetworkData extends SavedData {
             DMXNetworkData::read,
             null
     );
+
+    public static void unloadLevel(){
+        INSTANCE = null;
+    }
+
     public static DMXNetworkData getInstance(Level level){
         if(INSTANCE == null){
             INSTANCE = level.getServer()
@@ -39,6 +37,14 @@ public class DMXNetworkData extends SavedData {
         }
         return INSTANCE;
     }
+
+    public static DMXNetworkData getInstance(){
+        if(INSTANCE == null){
+            INSTANCE = GameInstance.getServer().overworld().getDataStorage().computeIfAbsent(factory, KEY);
+        }
+        return INSTANCE;
+    }
+
 
     @Nullable
     public DMXNetwork getNetwork(UUID networkId){
@@ -50,7 +56,20 @@ public class DMXNetworkData extends SavedData {
         network.addMember(player.getUUID(), DMXNetworkMemberRole.ADMIN);
         networks.put(network.id(), network);
         notifyNetworks(player);
+        setDirty();
         return network;
+    }
+    public DMXNetwork createNetwork(String name, DMXNetworkMode mode){
+        DMXNetwork network = new DMXNetwork(name);
+        network.setMode(mode);
+        networks.put(network.id(), network);
+        setDirty();
+        return network;
+    }
+
+    public void deleteNetwork(DMXNetwork dmxNetwork){
+        networks.remove(dmxNetwork.id());
+        setDirty();
     }
 
     public void notifyNetworks(Player player){

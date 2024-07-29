@@ -119,7 +119,7 @@ public class BasicLightingDeskBlockEntity extends ClientSyncBlockEntity implemen
 
     public void update(byte[] data) {
         if(level != null && level.getServer() != null) {
-            var dmxData = DMXNetworkData.getInstance(level).getNetwork(networkId);
+            var dmxData = DMXNetworkData.getInstance(level.getServer().overworld()).getNetwork(networkId);
             if(dmxData != null) {
                 dmxData.getConsumers(universe).forEach(consumer -> consumer.consume(data));
             }
@@ -195,6 +195,7 @@ public class BasicLightingDeskBlockEntity extends ClientSyncBlockEntity implemen
 
     public void setFaders(byte[] faders){
         this.faders = Arrays.copyOf(faders, faders.length);
+        setChanged();
     }
 
     public void setFader(int fader, int value){
@@ -203,6 +204,7 @@ public class BasicLightingDeskBlockEntity extends ClientSyncBlockEntity implemen
         } else {
             this.grandMaster = (byte) value;
         }
+        setChanged();
     }
 
     public int getCurrentStep() {

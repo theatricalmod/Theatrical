@@ -46,7 +46,7 @@ public class SendArtNetData extends BaseC2SMessage {
     public void handle(NetworkManager.PacketContext context) {
         Level level = context.getPlayer().level();
         if(level.getServer() != null) {
-            DMXNetwork network = DMXNetworkData.getInstance(level).getNetwork(networkId);
+            DMXNetwork network = DMXNetworkData.getInstance(level.getServer().overworld()).getNetwork(networkId);
             UUID uuid = context.getPlayer().getUUID();
             if(network != null) {
                 if (network.isMember(uuid) && network.canSendDMX(uuid)) {

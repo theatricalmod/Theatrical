@@ -37,7 +37,7 @@ public class RequestNetworks extends BaseC2SMessage {
     public void handle(NetworkManager.PacketContext context) {
         Level level = context.getPlayer().level();
         if(level.getServer() != null ) {
-            List<DMXNetwork> networksForPlayer = DMXNetworkData.getInstance(level)
+            List<DMXNetwork> networksForPlayer = DMXNetworkData.getInstance(level.getServer().overworld())
                     .getNetworksForPlayer(context.getPlayer().getUUID());
             Map<UUID, String> collect = networksForPlayer.stream().collect(Collectors.toMap(DMXNetwork::id, DMXNetwork::name));
             new NotifyNetworks(collect).sendTo((ServerPlayer) context.getPlayer());

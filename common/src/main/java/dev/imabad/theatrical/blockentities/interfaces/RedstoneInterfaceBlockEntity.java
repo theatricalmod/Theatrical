@@ -162,14 +162,14 @@ public class RedstoneInterfaceBlockEntity extends ClientSyncBlockEntity implemen
     }
 
     private void updateConsumer(){
-        var dmxData = DMXNetworkData.getInstance(level).getNetwork(networkId);
+        var dmxData = DMXNetworkData.getInstance(level.getServer().overworld()).getNetwork(networkId);
         if (dmxData != null) {
             dmxData.updateConsumer(this);
         }
     }
 
     private void addConsumer(){
-        var dmxData = DMXNetworkData.getInstance(level).getNetwork(networkId);
+        var dmxData = DMXNetworkData.getInstance(level.getServer().overworld()).getNetwork(networkId);
         if (dmxData != null) {
             if(deviceId == null){
                 generateDeviceId();
@@ -179,7 +179,7 @@ public class RedstoneInterfaceBlockEntity extends ClientSyncBlockEntity implemen
     }
 
     private void removeConsumer(){
-        var dmxData = DMXNetworkData.getInstance(level).getNetwork(networkId);
+        var dmxData = DMXNetworkData.getInstance(level.getServer().overworld()).getNetwork(networkId);
         if (dmxData != null) {
             dmxData.removeConsumer(this, getBlockPos());
         }

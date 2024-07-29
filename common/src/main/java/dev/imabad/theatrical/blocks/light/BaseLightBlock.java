@@ -62,7 +62,7 @@ public abstract class BaseLightBlock extends HangableBlock implements EntityBloc
         if(!level.isClientSide){
             BlockEntity be = level.getBlockEntity(pos);
             if(be instanceof BaseDMXConsumerLightBlockEntity consumerLightBlockEntity && placer instanceof ServerPlayer player){
-                consumerLightBlockEntity.setNetworkId(DMXNetworkData.getInstance(level).getDefaultNetworkForPlayer(player).id());
+                consumerLightBlockEntity.setNetworkId(DMXNetworkData.getInstance(level.getServer().overworld()).getDefaultNetworkForPlayer(player).id());
             }
         }
     }

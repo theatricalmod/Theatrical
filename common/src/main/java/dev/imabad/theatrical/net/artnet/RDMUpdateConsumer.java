@@ -56,7 +56,7 @@ public class RDMUpdateConsumer extends BaseC2SMessage {
         Level level = context.getPlayer().level();
         if(level.getServer() != null ) {
             if (context.getPlayer().hasPermissions(level.getServer().getOperatorUserPermissionLevel())) {
-                DMXNetwork network = DMXNetworkData.getInstance(level).getNetwork(networkId);
+                DMXNetwork network = DMXNetworkData.getInstance(level.getServer().overworld()).getNetwork(networkId);
                 if(network == null){
                     return;
                 }
