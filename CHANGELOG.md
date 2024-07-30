@@ -1,5 +1,6 @@
-# 1.20.1-alpha.13
+# 1.20.1-alpha.14
 
-* Fix beams not rendering correctly
-* Prevent crashing when getting the consumers for a network
-* Change color of text in the ArtNet configuration screen
+* Make the artnet configuration page look better
+* Fix some bugs relating to incorrect artnet
+* Fix some crashes
+* Fix saving artnet config network
