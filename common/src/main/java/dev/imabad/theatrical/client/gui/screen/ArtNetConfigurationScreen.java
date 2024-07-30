@@ -7,6 +7,7 @@ import dev.imabad.theatrical.client.gui.widgets.LabeledEditBox;
 import dev.imabad.theatrical.config.ConfigHandler;
 import dev.imabad.theatrical.config.TheatricalConfig;
 import dev.imabad.theatrical.net.UpdateArtNetInterface;
+import dev.imabad.theatrical.util.UUIDUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.OptionInstance;
 import net.minecraft.client.gui.GuiGraphics;
@@ -19,9 +20,9 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class ArtNetConfigurationScreen extends Screen {
 
@@ -30,6 +31,7 @@ public class ArtNetConfigurationScreen extends Screen {
     private int[] universe;
     private String ipAddress;
     private boolean enabled;
+    private UUID networkId;
     private Screen lastScreen;
     private LinearLayout layout;
 
@@ -42,6 +44,7 @@ public class ArtNetConfigurationScreen extends Screen {
         universe[3] = TheatricalConfig.INSTANCE.CLIENT.universe4;
         this.ipAddress = TheatricalConfig.INSTANCE.CLIENT.artNetIP;
         this.enabled = TheatricalConfig.INSTANCE.CLIENT.artnetEnabled;
+        this.networkId = TheatricalClient.getArtNetManager().getNetworkId();
         this.lastScreen = lastScreen;
     }
 
@@ -73,6 +76,20 @@ public class ArtNetConfigurationScreen extends Screen {
         ).withValues(List.of(true, false)).displayOnlyValue().withInitialValue(enabled).create(xCenter, yCenter, 150, 20, Component.translatable("screen.artnetconfig.enabled"), (obj, val) -> {
             this.enabled = val;
         }));
+        layout.addChild(new CycleButton.Builder<UUID>((networkId) ->
+        {
+            if (TheatricalClient.getArtNetManager().getKnownNetworks().containsKey(networkId)) {
+                return Component.literal(TheatricalClient.getArtNetManager().getKnownNetworks().get(networkId));
+            }
+            return Component.literal("Unknown");
+        }
+        ).withValues(CycleButton.ValueListSupplier.create(Stream.concat(Stream.of(UUIDUtil.NULL),
+                        TheatricalClient.getArtNetManager().getKnownNetworks().keySet().stream()).collect(Collectors.toList())))
+                .displayOnlyValue().withInitialValue(networkId)
+                .create(xCenter, yCenter, 150, 20,
+                        Component.translatable("screen.artnetconfig.enabled"), (obj, val) -> {
+                            this.networkId = val;
+                        }));
 //        layout.addChild(new Button.Builder(
 //                ,
 //                button -> {
@@ -150,6 +167,9 @@ public class ArtNetConfigurationScreen extends Screen {
             }
             TheatricalConfig.INSTANCE.CLIENT.artNetIP = ipAddressBox.getValue();
             TheatricalConfig.INSTANCE.CLIENT.artnetEnabled = enabled;
+            if(networkId != TheatricalClient.getArtNetManager().getNetworkId()) {
+                TheatricalClient.getArtNetManager().setNetworkId(networkId);
+            }
             ConfigHandler.INSTANCE.saveConfig(ConfigHandler.ConfigSide.CLIENT);
             boolean isInGame = Minecraft.getInstance().level != null;
             if(isInGame) {

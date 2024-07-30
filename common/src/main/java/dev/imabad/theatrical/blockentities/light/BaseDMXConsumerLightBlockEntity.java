@@ -3,8 +3,10 @@ package dev.imabad.theatrical.blockentities.light;
 import ch.bildspur.artnet.rdm.RDMDeviceId;
 import dev.imabad.theatrical.Constants;
 import dev.imabad.theatrical.api.dmx.DMXConsumer;
+import dev.imabad.theatrical.dmx.DMXNetwork;
 import dev.imabad.theatrical.dmx.DMXNetworkData;
 import dev.imabad.theatrical.util.RndUtils;
+import dev.imabad.theatrical.util.UUIDUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.Level;
@@ -14,11 +16,13 @@ import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.Arrays;
 import java.util.Random;
+import java.util.UUID;
 
 public abstract class BaseDMXConsumerLightBlockEntity extends BaseLightBlockEntity implements DMXConsumer {
 
     private int channelCount, channelStartPoint, dmxUniverse;
     private RDMDeviceId deviceId;
+    private UUID networkId = UUIDUtil.NULL;
 
     public BaseDMXConsumerLightBlockEntity(BlockEntityType<?> blockEntityType, BlockPos blockPos, BlockState blockState) {
         super(blockEntityType, blockPos, blockState);
@@ -30,7 +34,10 @@ public abstract class BaseDMXConsumerLightBlockEntity extends BaseLightBlockEnti
         compoundTag.putInt("channelCount", channelCount);
         compoundTag.putInt("channelStartPoint", channelStartPoint);
         compoundTag.putInt("dmxUniverse", dmxUniverse);
-        compoundTag.putByteArray("deviceId", deviceId.toBytes());
+        if(deviceId != null) {
+            compoundTag.putByteArray("deviceId", deviceId.toBytes());
+        }
+        compoundTag.putUUID("network", networkId);
     }
 
     @Override
@@ -44,6 +51,9 @@ public abstract class BaseDMXConsumerLightBlockEntity extends BaseLightBlockEnti
         if(compoundTag.contains("deviceId")){
             deviceId = new RDMDeviceId(compoundTag.getByteArray("deviceId"));
         }
+        if(compoundTag.contains("network")){
+            networkId = compoundTag.getUUID("network");
+        }
     }
 
     private void generateDeviceId(){
@@ -54,6 +64,7 @@ public abstract class BaseDMXConsumerLightBlockEntity extends BaseLightBlockEnti
             new Random().nextBytes(bytes);
         }
         deviceId = new RDMDeviceId(Constants.MANUFACTURER_ID, bytes);
+        setChanged();
         level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
     }
 
@@ -77,6 +88,10 @@ public abstract class BaseDMXConsumerLightBlockEntity extends BaseLightBlockEnti
         return deviceId;
     }
 
+    public UUID getNetworkId() {
+        return networkId;
+    }
+
     public void setUniverse(int dmxUniverse) {
         if(this.dmxUniverse == dmxUniverse){
             return;
@@ -84,6 +99,7 @@ public abstract class BaseDMXConsumerLightBlockEntity extends BaseLightBlockEnti
         removeConsumer();
         this.dmxUniverse = dmxUniverse;
         addConsumer();
+        setChanged();
         level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
     }
 
@@ -97,22 +113,23 @@ public abstract class BaseDMXConsumerLightBlockEntity extends BaseLightBlockEnti
         }
         this.channelStartPoint = channelStartPoint;
         updateConsumer();
+        setChanged();
         level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
     }
     private void updateConsumer(){
-        var dmxData = DMXNetworkData.getInstance();
+        var dmxData = DMXNetworkData.getInstance(level.getServer().overworld()).getNetwork(networkId);
         if (dmxData != null) {
             dmxData.updateConsumer(this);
         }
     }
     private void removeConsumer(){
-        var dmxData = DMXNetworkData.getInstance();
+        var dmxData = DMXNetworkData.getInstance(level.getServer().overworld()).getNetwork(networkId);
         if (dmxData != null) {
             dmxData.removeConsumer(this, getBlockPos());
         }
     }
     private void addConsumer(){
-        var dmxData = DMXNetworkData.getInstance();
+        var dmxData = DMXNetworkData.getInstance(level.getServer().overworld()).getNetwork(networkId);
         if (dmxData != null) {
             if(deviceId == null){
                 generateDeviceId();
@@ -135,5 +152,16 @@ public abstract class BaseDMXConsumerLightBlockEntity extends BaseLightBlockEnti
             removeConsumer();
         }
         super.setRemoved();
+    }
+
+    public void setNetworkId(UUID networkId) {
+        if(networkId == this.networkId){
+            return;
+        }
+        removeConsumer();
+        this.networkId = networkId;
+        addConsumer();
+        setChanged();
+        level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
     }
 }

@@ -43,6 +43,7 @@ public class FresnelBlockEntity extends BaseDMXConsumerLightBlockEntity {
         green = convertByteToInt(ourValues[2]);
         blue = convertByteToInt(ourValues[3]);
         level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
+        setChanged();
     }
 
     @Override

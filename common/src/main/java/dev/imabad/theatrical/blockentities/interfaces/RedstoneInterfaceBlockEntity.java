@@ -19,12 +19,14 @@ import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.Arrays;
 import java.util.Random;
+import java.util.UUID;
 
 public class RedstoneInterfaceBlockEntity extends ClientSyncBlockEntity implements DMXConsumer {
 
     private int channelStartPoint, dmxUniverse = 0;
     private int redstoneOutput = 0;
     private RDMDeviceId deviceId;
+    private UUID networkId;
 
     public RedstoneInterfaceBlockEntity(BlockPos blockPos, BlockState blockState) {
         super(BlockEntities.REDSTONE_INTERFACE.get(), blockPos, blockState);
@@ -36,6 +38,9 @@ public class RedstoneInterfaceBlockEntity extends ClientSyncBlockEntity implemen
         compoundTag.putInt("channelStartPoint", channelStartPoint);
         compoundTag.putInt("dmxUniverse", dmxUniverse);
         compoundTag.putByteArray("deviceId", deviceId.toBytes());
+        if(networkId != null){
+            compoundTag.putUUID("network", networkId);
+        }
     }
 
     @Override
@@ -46,6 +51,9 @@ public class RedstoneInterfaceBlockEntity extends ClientSyncBlockEntity implemen
         }
         if(compoundTag.contains("deviceId")){
             deviceId = new RDMDeviceId(compoundTag.getByteArray("deviceId"));
+        }
+        if(compoundTag.contains("network")){
+            networkId = compoundTag.getUUID("network");
         }
     }
 
@@ -93,6 +101,22 @@ public class RedstoneInterfaceBlockEntity extends ClientSyncBlockEntity implemen
         return 0;
     }
 
+    @Override
+    public UUID getNetworkId() {
+        return networkId;
+    }
+
+    public void setNetworkId(UUID networkId) {
+        if(networkId == this.networkId){
+            return;
+        }
+        removeConsumer();
+        this.networkId = networkId;
+        addConsumer();
+        setChanged();
+        level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
+    }
+
     private void generateDeviceId(){
         byte[] bytes = new byte[4];
         if(level != null) {
@@ -138,14 +162,14 @@ public class RedstoneInterfaceBlockEntity extends ClientSyncBlockEntity implemen
     }
 
     private void updateConsumer(){
-        var dmxData = DMXNetworkData.getInstance();
+        var dmxData = DMXNetworkData.getInstance(level.getServer().overworld()).getNetwork(networkId);
         if (dmxData != null) {
             dmxData.updateConsumer(this);
         }
     }
 
     private void addConsumer(){
-        var dmxData = DMXNetworkData.getInstance();
+        var dmxData = DMXNetworkData.getInstance(level.getServer().overworld()).getNetwork(networkId);
         if (dmxData != null) {
             if(deviceId == null){
                 generateDeviceId();
@@ -155,7 +179,7 @@ public class RedstoneInterfaceBlockEntity extends ClientSyncBlockEntity implemen
     }
 
     private void removeConsumer(){
-        var dmxData = DMXNetworkData.getInstance();
+        var dmxData = DMXNetworkData.getInstance(level.getServer().overworld()).getNetwork(networkId);
         if (dmxData != null) {
             dmxData.removeConsumer(this, getBlockPos());
         }

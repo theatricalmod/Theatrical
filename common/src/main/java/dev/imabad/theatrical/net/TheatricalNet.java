@@ -18,10 +18,14 @@ public interface TheatricalNet {
     MessageType CONTROL_MOVE_STEP = MAIN.registerC2S("control_move_step", ControlMoveStep::new);
     MessageType CONTROL_MODE_TOGGLE = MAIN.registerC2S("control_mode_toggle", ControlModeToggle::new);
     MessageType CONTROL_GO = MAIN.registerC2S("control_go", ControlGo::new);
+    MessageType REQUEST_NETWORKS = MAIN.registerC2S("request_networks", RequestNetworks::new);
+    MessageType UPDATE_NETWORK_ID = MAIN.registerC2S("update_network_id", UpdateNetworkId::new);
+    MessageType CONFIGURE_CONFIGURATION_CARD = MAIN.registerC2S("configure_configuration_card", ConfigureConfigurationCard::new);
 
     // S2C
     MessageType NOTIFY_CONSUMER_CHANGE = MAIN.registerS2C("notify_consumer_change", NotifyConsumerChange::new);
     MessageType LIST_CONSUMERS = MAIN.registerS2C("list_consumers", ListConsumers::new);
+    MessageType NOTIFY_NETWORKS = MAIN.registerS2C("notify_networks", NotifyNetworks::new);
 
     static void init(){}
 }

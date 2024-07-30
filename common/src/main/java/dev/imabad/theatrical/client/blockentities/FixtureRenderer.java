@@ -5,7 +5,10 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import dev.imabad.theatrical.blockentities.light.BaseLightBlockEntity;
 import dev.imabad.theatrical.blocks.HangableBlock;
 import dev.imabad.theatrical.blocks.light.MovingLightBlock;
+import dev.imabad.theatrical.client.LazyRenderers;
+import dev.imabad.theatrical.client.TheatricalRenderTypes;
 import dev.imabad.theatrical.config.TheatricalConfig;
+import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
@@ -35,16 +38,33 @@ public abstract class FixtureRenderer<T extends BaseLightBlockEntity> implements
         renderModel(blockEntity, poseStack, vertexConsumer, facing, partialTick, isFlipped, blockState, isHanging, packedLight, packedOverlay);
         beforeRenderBeam(blockEntity, poseStack, vertexConsumer, multiBufferSource, facing, partialTick, isFlipped, blockState, isHanging, packedLight, packedOverlay);
         if(shouldRenderBeam(blockEntity)){
-            VertexConsumer beamConsumer = multiBufferSource.getBuffer(RenderType.lightning());
-            poseStack.translate(blockEntity.getFixture().getBeamStartPosition()[0], blockEntity.getFixture().getBeamStartPosition()[1], blockEntity.getFixture().getBeamStartPosition()[2]);
-            float intensity = (blockEntity.getPrevIntensity() + ((blockEntity.getIntensity()) - blockEntity.getPrevIntensity()) * partialTick);
-            int color = blockEntity.calculatePartialColour(partialTick);
-            renderLightBeam(beamConsumer, poseStack, blockEntity, partialTick, (float) ((intensity * beamOpacity) / 255f), blockEntity.getFixture().getBeamWidth(), (float) blockEntity.getDistance(), color);
+            LazyRenderers.addLazyRender(new LazyRenderers.LazyRenderer() {
+                @Override
+                public void render(MultiBufferSource.BufferSource bufferSource, PoseStack poseStack, Camera camera, float partialTick) {
+                    poseStack.pushPose();
+                    Vec3 offset = Vec3.atLowerCornerOf(blockEntity.getBlockPos()).subtract(camera.getPosition());
+                    poseStack.translate(offset.x, offset.y, offset.z);
+                    preparePoseStack(blockEntity, poseStack, facing, partialTick, isFlipped, blockState, isHanging);
+                    VertexConsumer beamConsumer = bufferSource.getBuffer(TheatricalRenderTypes.BEAM);
+                    poseStack.translate(blockEntity.getFixture().getBeamStartPosition()[0], blockEntity.getFixture().getBeamStartPosition()[1], blockEntity.getFixture().getBeamStartPosition()[2]);
+                    float intensity = (blockEntity.getPrevIntensity() + ((blockEntity.getIntensity()) - blockEntity.getPrevIntensity()) * partialTick);
+                    int color = blockEntity.calculatePartialColour(partialTick);
+                    renderLightBeam(beamConsumer, poseStack, blockEntity, partialTick, (float) ((intensity * beamOpacity) / 255f), blockEntity.getFixture().getBeamWidth(), (float) blockEntity.getDistance(), color);
+                    poseStack.popPose();
+                }
+
+                @Override
+                public Vec3 getPos(float partialTick) {
+                    return blockEntity.getBlockPos().getCenter();
+                }
+            });
         }
         poseStack.popPose();
     }
 
     public abstract void renderModel(T blockEntity, PoseStack poseStack, VertexConsumer vertexConsumer, Direction facing, float partialTicks, boolean isFlipped, BlockState blockState, boolean isHanging, int packedLight, int packedOverlay);
+
+    public abstract void preparePoseStack(T blockEntity, PoseStack poseStack, Direction facing, float partialTicks, boolean isFlipped, BlockState blockState, boolean isHanging);
 
     public void beforeRenderBeam(T blockEntity, PoseStack poseStack, VertexConsumer vertexConsumer,
                                  MultiBufferSource multiBufferSource, Direction facing, float partialTicks,
@@ -89,7 +109,7 @@ public abstract class FixtureRenderer<T extends BaseLightBlockEntity> implements
     }
 
     protected void addVertex(VertexConsumer builder, Matrix4f matrix4f, Matrix3f matrix3f, int r, int g, int b, int a, float x, float y, float z) {
-        builder.vertex(matrix4f, x, y, z).color(r, g, b, a).overlayCoords(OverlayTexture.NO_OVERLAY).normal(matrix3f, 0.0F, 1.0F, 0.0F).endVertex();
+        builder.vertex(matrix4f, x, y, z).color(r, g, b, a).endVertex();
     }
 
     @Override

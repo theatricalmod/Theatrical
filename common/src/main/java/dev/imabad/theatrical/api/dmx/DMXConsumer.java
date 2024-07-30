@@ -3,7 +3,9 @@ package dev.imabad.theatrical.api.dmx;
 import ch.bildspur.artnet.rdm.RDMDeviceId;
 import net.minecraft.resources.ResourceLocation;
 
-public interface DMXConsumer {
+import java.util.UUID;
+
+public interface DMXConsumer extends BelongsToNetwork {
 
     int getChannelCount();
 
@@ -23,4 +25,5 @@ public interface DMXConsumer {
 
     int getActivePersonality();
 
+    UUID getNetworkId();
 }

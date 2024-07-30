@@ -3,6 +3,7 @@ package dev.imabad.theatrical.neoforge;
 import dev.imabad.theatrical.Theatrical;
 import dev.imabad.theatrical.blocks.Blocks;
 import dev.imabad.theatrical.blocks.rigging.TankTrapBlock;
+import dev.imabad.theatrical.items.Items;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
@@ -68,6 +69,8 @@ public class DataEvent {
             withExistingParent(Blocks.TANK_TRAP.getId().getPath(), new ResourceLocation(Theatrical.MOD_ID, "block/tank_trap"));
             withExistingParent(Blocks.LED_PANEL.getId().getPath(), new ResourceLocation(Theatrical.MOD_ID, "block/led_panel"));
             withExistingParent(Blocks.BASIC_LIGHTING_DESK.getId().getPath(), new ResourceLocation(Theatrical.MOD_ID, "block/lighting_console"));
+            withExistingParent(Items.CONFIGURATION_CARD.getId().getPath(), mcLoc("item/generated"))
+                    .texture("layer0", new ResourceLocation(Theatrical.MOD_ID, "item/configuration_card"));
         }
     }
 
@@ -88,6 +91,7 @@ public class DataEvent {
             addBlock(Blocks.TANK_TRAP, "Tank Trap");
             addBlock(Blocks.LED_PANEL, "LED Panel");
             addBlock(Blocks.BASIC_LIGHTING_DESK, "Basic Lighting Desk");
+            addItem(Items.CONFIGURATION_CARD, "Configuration Card");
             add("itemGroup.theatrical", "Theatrical");
             add("artneti.dmxUniverse", "DMX Universe");
             add("artneti.ipAddress", "IP Address");
@@ -108,6 +112,22 @@ public class DataEvent {
             add("ui.control.cue", "Cue - %s");
             add("ui.control.fadeIn", "Fade in");
             add("ui.control.fadeOut", "Fade out");
+            add("commands.network.notfound", "Network not found.");
+            add("commands.networks", "There are %s network(s): %s.");
+            add("commands.network.members", "There are %s network member(s): %s.");
+            add("commands.network.members.add.success", "Added %s to the network.");
+            add("commands.network.members.add.failed", "Player already member of network.");
+            add("commands.network.members.remove.success", "Removed %s from the network.");
+            add("commands.network", "%s (%s) has %s member(s)");
+            add("commands.network.invalid", "Unknown network mode: %s");
+            add("commands.network.role.invalid", "Unknown member role: %s");
+            add("commands.network.created", "Network created");
+            add("commands.network.deleted", "Network deleted");
+            add("commands.network.updated", "Network updated");
+            add("screen.configurationcard.autoincrement", "Address Auto Increment");
+            add("screen.configurationcard", "Configuration Card");
+            add("screen.artnetconfig.network", "Network");
+            add("item.configurationcard.success", "Configured device to %s network, universe %s and address %s - next address is %s.");
         }
     }
 
