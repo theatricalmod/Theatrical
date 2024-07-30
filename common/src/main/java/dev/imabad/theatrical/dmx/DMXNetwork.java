@@ -131,6 +131,7 @@ public class DMXNetwork {
                         0, "", new ResourceLocation("")))
                 .sendTo(knownSenders);
     }
+    @Nullable
     public Collection<DMXConsumer> getConsumers(int universe){
         if(universeToNodeMap.get(universe) != null) {
             return universeToNodeMap.get(universe).values();

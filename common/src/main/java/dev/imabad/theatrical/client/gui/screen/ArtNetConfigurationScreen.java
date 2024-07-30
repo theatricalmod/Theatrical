@@ -55,19 +55,19 @@ public class ArtNetConfigurationScreen extends Screen {
         layout.defaultCellSetting().alignHorizontallyCenter().padding(10);
         xCenter = (this.width / 2);
         yCenter = (this.height / 2);
-        this.ipAddressBox = new LabeledEditBox(this.font, xCenter, yCenter, 100, 20, Component.translatable("artneti.ipAddress"));
+        this.ipAddressBox = new LabeledEditBox(this.font, xCenter, yCenter, 100, 20, Component.translatable("artneti.ipAddress")).color(0xffffff);
         this.ipAddressBox.setValue(ipAddress);
         layout.addChild(this.ipAddressBox);
-        this.universeBox1 = new LabeledEditBox(this.font, xCenter, yCenter, 100, 20, Component.translatable("artneti.dmxUniverse").append(" 1"));
+        this.universeBox1 = new LabeledEditBox(this.font, xCenter, yCenter, 100, 20, Component.translatable("artneti.dmxUniverse").append(" 1")).color(0xffffff);
         this.universeBox1.setValue(Integer.toString(universe[0]));
         layout.addChild(this.universeBox1);
-        this.universeBox2 = new LabeledEditBox(this.font, xCenter, yCenter , 100, 20, (Component)Component.translatable("artneti.dmxUniverse").append(" 2"));
+        this.universeBox2 = new LabeledEditBox(this.font, xCenter, yCenter , 100, 20, (Component)Component.translatable("artneti.dmxUniverse").append(" 2")).color(0xffffff);
         this.universeBox2.setValue(Integer.toString(universe[1]));
         layout.addChild(this.universeBox2);
-        this.universeBox3 = new LabeledEditBox(this.font, xCenter, yCenter , 100, 20, (Component)Component.translatable("artneti.dmxUniverse").append(" 3"));
+        this.universeBox3 = new LabeledEditBox(this.font, xCenter, yCenter , 100, 20, (Component)Component.translatable("artneti.dmxUniverse").append(" 3")).color(0xffffff);
         this.universeBox3.setValue(Integer.toString(universe[2]));
         layout.addChild(this.universeBox3);
-        this.universeBox4 = new LabeledEditBox(this.font, xCenter, yCenter, 100, 20, (Component)Component.translatable("artneti.dmxUniverse").append(" 4"));
+        this.universeBox4 = new LabeledEditBox(this.font, xCenter, yCenter, 100, 20, (Component)Component.translatable("artneti.dmxUniverse").append(" 4")).color(0xffffff);
         this.universeBox4.setValue(Integer.toString(universe[3]));
         layout.addChild(this.universeBox4);
 //        new OptionInstance.Enum<>(List.of(true, false), Codec.BOOL).createButton()

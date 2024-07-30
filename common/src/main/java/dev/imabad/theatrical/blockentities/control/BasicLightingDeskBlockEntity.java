@@ -1,6 +1,7 @@
 package dev.imabad.theatrical.blockentities.control;
 
 import dev.imabad.theatrical.api.dmx.BelongsToNetwork;
+import dev.imabad.theatrical.api.dmx.DMXConsumer;
 import dev.imabad.theatrical.blockentities.BlockEntities;
 import dev.imabad.theatrical.blockentities.ClientSyncBlockEntity;
 import dev.imabad.theatrical.blocks.control.BasicLightingDeskBlock;
@@ -121,7 +122,9 @@ public class BasicLightingDeskBlockEntity extends ClientSyncBlockEntity implemen
         if(level != null && level.getServer() != null) {
             var dmxData = DMXNetworkData.getInstance(level.getServer().overworld()).getNetwork(networkId);
             if(dmxData != null) {
-                dmxData.getConsumers(universe).forEach(consumer -> consumer.consume(data));
+                Collection<DMXConsumer> consumers = dmxData.getConsumers(universe);
+                if(consumers != null)
+                    consumers.forEach(consumer -> consumer.consume(data));
             }
         }
     }
