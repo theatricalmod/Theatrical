@@ -37,7 +37,9 @@ public class RedstoneInterfaceBlockEntity extends ClientSyncBlockEntity implemen
         compoundTag.putInt("channelCount", 1);
         compoundTag.putInt("channelStartPoint", channelStartPoint);
         compoundTag.putInt("dmxUniverse", dmxUniverse);
-        compoundTag.putByteArray("deviceId", deviceId.toBytes());
+        if(deviceId != null) {
+            compoundTag.putByteArray("deviceId", deviceId.toBytes());
+        }
         if(networkId != null){
             compoundTag.putUUID("network", networkId);
         }

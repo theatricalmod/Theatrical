@@ -48,7 +48,6 @@ public class FresnelScreen extends GenericDMXConfigurationScreen<FresnelBlockEnt
 
     @Override
     protected void renderLabels(GuiGraphics guiGraphics) {
-        this.renderBackground(guiGraphics);
         super.renderLabels(guiGraphics);
 //        renderLabel(guiGraphics, "fixture.tilt", 0, 36);
 //        renderLabel(guiGraphics, "fixture.pan", 0, 66);

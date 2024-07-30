@@ -16,6 +16,7 @@ public class LabeledEditBox extends EditBox {
     private Font font;
 
     private int color = 4210752;
+    private boolean shadow = false;
 
     public LabeledEditBox(Font font, int x, int y, int width, int height, Component message) {
         super(font, x, y, width, height, message);
@@ -52,6 +53,10 @@ public class LabeledEditBox extends EditBox {
         this.color = color;
         return this;
     }
+    public LabeledEditBox shadow(boolean shadow) {
+        this.shadow = shadow;
+        return this;
+    }
 
     @Override
     public void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
@@ -63,7 +68,7 @@ public class LabeledEditBox extends EditBox {
         int l = this.getY() + (this.getHeight() - 9) / 2;
         // j > i ? this.clipText(component, i) :
         FormattedCharSequence formattedCharSequence =  component.getVisualOrderText();
-        guiGraphics.drawString(font, formattedCharSequence, k, l - (font.lineHeight), color, false);
+        guiGraphics.drawString(font, formattedCharSequence, k, l - (font.lineHeight), color, shadow);
     }
 
     private FormattedCharSequence clipText(Component message, int width) {

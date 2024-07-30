@@ -36,6 +36,7 @@ public class LEDPanelBlockEntity extends BaseDMXConsumerLightBlockEntity{
         red = convertByteToInt(ourValues[1]);
         green = convertByteToInt(ourValues[2]);
         blue = convertByteToInt(ourValues[3]);
+        setChanged();
         level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
     }
 

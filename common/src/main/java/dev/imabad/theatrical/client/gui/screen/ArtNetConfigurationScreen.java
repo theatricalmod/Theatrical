@@ -15,6 +15,7 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.CycleButton;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.layouts.FrameLayout;
+import net.minecraft.client.gui.layouts.GridLayout;
 import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
@@ -33,7 +34,7 @@ public class ArtNetConfigurationScreen extends Screen {
     private boolean enabled;
     private UUID networkId;
     private Screen lastScreen;
-    private LinearLayout layout;
+    private GridLayout layout;
 
     public ArtNetConfigurationScreen(Screen lastScreen) {
         super(Component.translatable("button.artnetconfig"));
@@ -51,31 +52,32 @@ public class ArtNetConfigurationScreen extends Screen {
     @Override
     protected void init() {
         super.init();
-        layout = new LinearLayout(0, 0, LinearLayout.Orientation.VERTICAL);
-        layout.defaultChildLayoutSetting().alignHorizontallyCenter().padding(10);
+        layout = new GridLayout();
+//        layout = new LinearLayout(0, 0, LinearLayout.Orientation.VERTICAL);
+        layout.defaultCellSetting().alignHorizontallyCenter().padding(10);
         xCenter = (this.width / 2);
         yCenter = (this.height / 2);
-        this.ipAddressBox = new LabeledEditBox(this.font, xCenter, yCenter, 100, 20, Component.translatable("artneti.ipAddress")).color(0xffffff);
+        this.ipAddressBox = new LabeledEditBox(this.font, xCenter, yCenter, 100, 20, Component.translatable("artneti.ipAddress")).color(0xffffff).shadow(true);
         this.ipAddressBox.setValue(ipAddress);
-        layout.addChild(this.ipAddressBox);
-        this.universeBox1 = new LabeledEditBox(this.font, xCenter, yCenter, 100, 20, Component.translatable("artneti.dmxUniverse").append(" 1")).color(0xffffff);
+        layout.addChild(this.ipAddressBox, 1, 1, 1, 2);
+        this.universeBox1 = new LabeledEditBox(this.font, xCenter, yCenter, 100, 20, Component.translatable("artneti.dmxUniverse").append(" 1")).color(0xffffff).shadow(true);
         this.universeBox1.setValue(Integer.toString(universe[0]));
-        layout.addChild(this.universeBox1);
-        this.universeBox2 = new LabeledEditBox(this.font, xCenter, yCenter , 100, 20, (Component)Component.translatable("artneti.dmxUniverse").append(" 2")).color(0xffffff);
+        layout.addChild(this.universeBox1,2, 1);
+        this.universeBox2 = new LabeledEditBox(this.font, xCenter, yCenter , 100, 20, (Component)Component.translatable("artneti.dmxUniverse").append(" 2")).color(0xffffff).shadow(true);
         this.universeBox2.setValue(Integer.toString(universe[1]));
-        layout.addChild(this.universeBox2);
-        this.universeBox3 = new LabeledEditBox(this.font, xCenter, yCenter , 100, 20, (Component)Component.translatable("artneti.dmxUniverse").append(" 3")).color(0xffffff);
+        layout.addChild(this.universeBox2, 2, 2);
+        this.universeBox3 = new LabeledEditBox(this.font, xCenter, yCenter , 100, 20, (Component)Component.translatable("artneti.dmxUniverse").append(" 3")).color(0xffffff).shadow(true);
         this.universeBox3.setValue(Integer.toString(universe[2]));
-        layout.addChild(this.universeBox3);
-        this.universeBox4 = new LabeledEditBox(this.font, xCenter, yCenter, 100, 20, (Component)Component.translatable("artneti.dmxUniverse").append(" 4")).color(0xffffff);
+        layout.addChild(this.universeBox3, 3, 1);
+        this.universeBox4 = new LabeledEditBox(this.font, xCenter, yCenter, 100, 20, (Component)Component.translatable("artneti.dmxUniverse").append(" 4")).color(0xffffff).shadow(true);
         this.universeBox4.setValue(Integer.toString(universe[3]));
-        layout.addChild(this.universeBox4);
+        layout.addChild(this.universeBox4, 3, 2);
 //        new OptionInstance.Enum<>(List.of(true, false), Codec.BOOL).createButton()
         layout.addChild(new CycleButton.Builder<Boolean>((enabled) ->
             Component.translatable("screen.artnetconfig.enabled", enabled ? "Yes" : "No")
         ).withValues(List.of(true, false)).displayOnlyValue().withInitialValue(enabled).create(xCenter, yCenter, 150, 20, Component.translatable("screen.artnetconfig.enabled"), (obj, val) -> {
             this.enabled = val;
-        }));
+        }), 4, 1);
         layout.addChild(new CycleButton.Builder<UUID>((networkId) ->
         {
             if (TheatricalClient.getArtNetManager().getKnownNetworks().containsKey(networkId)) {
@@ -89,7 +91,7 @@ public class ArtNetConfigurationScreen extends Screen {
                 .create(xCenter, yCenter, 150, 20,
                         Component.translatable("screen.artnetconfig.enabled"), (obj, val) -> {
                             this.networkId = val;
-                        }));
+                        }), 4, 2);
 //        layout.addChild(new Button.Builder(
 //                ,
 //                button -> {
@@ -102,7 +104,8 @@ public class ArtNetConfigurationScreen extends Screen {
                 new Button.Builder(Component.translatable("artneti.save"), button -> this.update())
                         .pos(xCenter + 40, yCenter + 200)
                         .size(150, 20)
-                        .build()
+                        .build(),
+                5, 1
         );
         layout.addChild(
                 new Button.Builder(Component.translatable("gui.back"), button -> {
@@ -110,7 +113,8 @@ public class ArtNetConfigurationScreen extends Screen {
                 })
                         .pos(xCenter + 40, yCenter + 200)
                         .size(150, 20)
-                        .build()
+                        .build(),
+                5, 2
         );
         layout.arrangeElements();
         layout.visitWidgets(this::addRenderableWidget);
@@ -169,6 +173,7 @@ public class ArtNetConfigurationScreen extends Screen {
             TheatricalConfig.INSTANCE.CLIENT.artnetEnabled = enabled;
             if(networkId != TheatricalClient.getArtNetManager().getNetworkId()) {
                 TheatricalClient.getArtNetManager().setNetworkId(networkId);
+
             }
             ConfigHandler.INSTANCE.saveConfig(ConfigHandler.ConfigSide.CLIENT);
             boolean isInGame = Minecraft.getInstance().level != null;

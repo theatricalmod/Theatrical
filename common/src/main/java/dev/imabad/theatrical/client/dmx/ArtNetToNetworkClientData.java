@@ -12,6 +12,10 @@ public class ArtNetToNetworkClientData extends SavedData {
     private static ArtNetToNetworkClientData INSTANCE;
     private static final String KEY = "artnet_network_map";
 
+    public static void unload(){
+        INSTANCE = null;
+    }
+
     public static ArtNetToNetworkClientData getInstance(Level level){
         if(INSTANCE == null){
             INSTANCE = level.getServer()
@@ -37,6 +41,7 @@ public class ArtNetToNetworkClientData extends SavedData {
 
     public void setNetworkId(UUID networkId) {
         this.networkId = networkId;
+        setDirty(true);
     }
 
     @Override
