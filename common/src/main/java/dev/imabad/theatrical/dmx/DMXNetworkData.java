@@ -5,10 +5,12 @@ import dev.imabad.theatrical.net.artnet.NotifyNetworks;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.SavedData;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -20,11 +22,6 @@ public class DMXNetworkData extends SavedData {
     private static final String KEY = "dmx_networks";
 
     private static DMXNetworkData INSTANCE;
-    private static final SavedData.Factory<DMXNetworkData> factory = new Factory<>(
-            DMXNetworkData::new,
-            DMXNetworkData::read,
-            null
-    );
 
     public static void unloadLevel(){
         INSTANCE = null;
@@ -33,14 +30,15 @@ public class DMXNetworkData extends SavedData {
     public static DMXNetworkData getInstance(Level level){
         if(INSTANCE == null){
             INSTANCE = level.getServer()
-                    .overworld().getDataStorage().computeIfAbsent(factory, KEY);
+                    .overworld().getDataStorage().computeIfAbsent(DMXNetworkData::read, DMXNetworkData::new, KEY);
         }
         return INSTANCE;
     }
 
     public static DMXNetworkData getInstance(){
         if(INSTANCE == null){
-            INSTANCE = GameInstance.getServer().overworld().getDataStorage().computeIfAbsent(factory, KEY);
+            INSTANCE = GameInstance.getServer().overworld().getDataStorage()
+                    .computeIfAbsent(DMXNetworkData::read, DMXNetworkData::new, KEY);
         }
         return INSTANCE;
     }

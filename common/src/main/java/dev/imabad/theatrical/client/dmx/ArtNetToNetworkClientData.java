@@ -12,15 +12,10 @@ public class ArtNetToNetworkClientData extends SavedData {
     private static ArtNetToNetworkClientData INSTANCE;
     private static final String KEY = "artnet_network_map";
 
-    private static final SavedData.Factory<ArtNetToNetworkClientData> factory = new Factory<>(
-            ArtNetToNetworkClientData::new,
-            ArtNetToNetworkClientData::read,
-            null
-    );
     public static ArtNetToNetworkClientData getInstance(Level level){
         if(INSTANCE == null){
             INSTANCE = level.getServer()
-                    .overworld().getDataStorage().computeIfAbsent(factory, KEY);
+                    .overworld().getDataStorage().computeIfAbsent(ArtNetToNetworkClientData::read, ArtNetToNetworkClientData::new, KEY);
         }
         return INSTANCE;
     }
