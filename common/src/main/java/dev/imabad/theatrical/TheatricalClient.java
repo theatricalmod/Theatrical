@@ -4,6 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import dev.architectury.event.events.client.ClientPlayerEvent;
+import dev.architectury.platform.Platform;
 import dev.architectury.registry.client.rendering.BlockEntityRendererRegistry;
 import dev.imabad.theatrical.blockentities.BlockEntities;
 import dev.imabad.theatrical.blockentities.light.BaseLightBlockEntity;
@@ -90,47 +91,49 @@ public class TheatricalClient {
     public static void renderWorldLast(PoseStack poseStack, Matrix4f projectionMatrix, Camera camera, float tickDelta){
         Minecraft mc = Minecraft.getInstance();
         LazyRenderers.doRender(camera,poseStack, mc.renderBuffers().bufferSource(), tickDelta);
-        if(mc.options.renderDebug){
-            Vec3 cameraPos = camera.getPosition();
-            //#region translateToCamera
-            poseStack.pushPose();
-            poseStack.translate(-cameraPos.x, -cameraPos.y, -cameraPos.z);
-            for(BlockPos MY_BLOCK : DEBUG_BLOCKS) {
-                //#region translateToBlock
+        if(Platform.isDevelopmentEnvironment()) {
+            if (mc.options.renderDebug) {
+                Vec3 cameraPos = camera.getPosition();
+                //#region translateToCamera
                 poseStack.pushPose();
-                poseStack.translate(MY_BLOCK.getX(), MY_BLOCK.getY(), MY_BLOCK.getZ());
-                //#region MainRender
-                poseStack.pushPose();
-                MultiBufferSource.BufferSource bufferSource = Minecraft.getInstance().renderBuffers().bufferSource();
-                VertexConsumer buffer = bufferSource.getBuffer(RenderType.lines());
-                poseStack.pushPose();
-                poseStack.translate(0.5, 0.5, 0.5);
-                LevelRenderer.renderLineBox(poseStack, buffer, AABB.ofSize(new Vec3(0, 0, 0), 1d, 1d, 1d), 1, 1, 1, 1);
-                poseStack.popPose();
-                float[] values = null;
-                if (Minecraft.getInstance().level.getBlockEntity(MY_BLOCK) != null) {
-                    values = renderThings(MY_BLOCK, buffer, poseStack, (BaseLightBlockEntity) Minecraft.getInstance().level.getBlockEntity(MY_BLOCK), bufferSource);
-                }
-                bufferSource.endBatch(RenderType.lines());
-                if(values != null) {
+                poseStack.translate(-cameraPos.x, -cameraPos.y, -cameraPos.z);
+                for (BlockPos MY_BLOCK : DEBUG_BLOCKS) {
+                    //#region translateToBlock
                     poseStack.pushPose();
-                    poseStack.translate(-0.5, 1.25, 0.5);
-                    poseStack.scale(0.025f, 0.025f, 0.025f);
-                    BlockState blockState = Minecraft.getInstance().level.getBlockState(MY_BLOCK);
-                    Direction opposite = blockState.getValue(MovingLightBlock.HANG_DIRECTION).getOpposite();
-                    poseStack.mulPose(Axis.XP.rotationDegrees(180));
-                    poseStack.mulPose(Axis.YP.rotationDegrees(opposite.toYRot()));
-                    Minecraft.getInstance().font.drawInBatch(String.format("OG Tilt: %s OG Pan: %s", values[0], values[1]), 0, -10, 0xffffff, false, poseStack.last().pose(), bufferSource, Font.DisplayMode.NORMAL, 0, 0xF000F0, false);
-                    Minecraft.getInstance().font.drawInBatch(String.format("DIR: %s", blockState.getValue(MovingLightBlock.FACING)), 0, -30, 0xffffff, false, poseStack.last().pose(), bufferSource, Font.DisplayMode.NORMAL, 0, 0xF000F0, false);
+                    poseStack.translate(MY_BLOCK.getX(), MY_BLOCK.getY(), MY_BLOCK.getZ());
+                    //#region MainRender
+                    poseStack.pushPose();
+                    MultiBufferSource.BufferSource bufferSource = Minecraft.getInstance().renderBuffers().bufferSource();
+                    VertexConsumer buffer = bufferSource.getBuffer(RenderType.lines());
+                    poseStack.pushPose();
+                    poseStack.translate(0.5, 0.5, 0.5);
+                    LevelRenderer.renderLineBox(poseStack, buffer, AABB.ofSize(new Vec3(0, 0, 0), 1d, 1d, 1d), 1, 1, 1, 1);
+                    poseStack.popPose();
+                    float[] values = null;
+                    if (Minecraft.getInstance().level.getBlockEntity(MY_BLOCK) != null) {
+                        values = renderThings(MY_BLOCK, buffer, poseStack, (BaseLightBlockEntity) Minecraft.getInstance().level.getBlockEntity(MY_BLOCK), bufferSource);
+                    }
+                    bufferSource.endBatch(RenderType.lines());
+                    if (values != null) {
+                        poseStack.pushPose();
+                        poseStack.translate(-0.5, 1.25, 0.5);
+                        poseStack.scale(0.025f, 0.025f, 0.025f);
+                        BlockState blockState = Minecraft.getInstance().level.getBlockState(MY_BLOCK);
+                        Direction opposite = blockState.getValue(MovingLightBlock.HANG_DIRECTION).getOpposite();
+                        poseStack.mulPose(Axis.XP.rotationDegrees(180));
+                        poseStack.mulPose(Axis.YP.rotationDegrees(opposite.toYRot()));
+                        Minecraft.getInstance().font.drawInBatch(String.format("OG Tilt: %s OG Pan: %s", values[0], values[1]), 0, -10, 0xffffff, false, poseStack.last().pose(), bufferSource, Font.DisplayMode.NORMAL, 0, 0xF000F0, false);
+                        Minecraft.getInstance().font.drawInBatch(String.format("DIR: %s", blockState.getValue(MovingLightBlock.FACING)), 0, -30, 0xffffff, false, poseStack.last().pose(), bufferSource, Font.DisplayMode.NORMAL, 0, 0xF000F0, false);
+                        poseStack.popPose();
+                    }
+                    //#endregion
+                    poseStack.popPose();
+                    //#endregion
                     poseStack.popPose();
                 }
                 //#endregion
                 poseStack.popPose();
-                //#endregion
-                poseStack.popPose();
             }
-            //#endregion
-            poseStack.popPose();
         }
     }
 

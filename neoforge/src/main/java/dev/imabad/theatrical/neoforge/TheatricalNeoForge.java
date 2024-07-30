@@ -44,11 +44,11 @@ public class TheatricalNeoForge {
                 if (renderLevelStageEvent.getStage() == RenderLevelStageEvent.Stage.AFTER_TRIPWIRE_BLOCKS) {
                     TheatricalClient.renderWorldLastAfterTripwire(renderLevelStageEvent.getLevelRenderer());
                 }
-                if(Platform.isDevelopmentEnvironment()) {
-                    if(renderLevelStageEvent.getStage() == RenderLevelStageEvent.Stage.AFTER_PARTICLES){
-                        TheatricalClient.renderWorldLast(renderLevelStageEvent.getPoseStack(), renderLevelStageEvent.getProjectionMatrix(), renderLevelStageEvent.getCamera(), renderLevelStageEvent.getRenderTick());
-                    }
+//                if(Platform.isDevelopmentEnvironment()) {
+                if(renderLevelStageEvent.getStage() == RenderLevelStageEvent.Stage.AFTER_PARTICLES){
+                    TheatricalClient.renderWorldLast(renderLevelStageEvent.getPoseStack(), renderLevelStageEvent.getProjectionMatrix(), renderLevelStageEvent.getCamera(), renderLevelStageEvent.getRenderTick());
                 }
+//                }
             });
         }
     }
