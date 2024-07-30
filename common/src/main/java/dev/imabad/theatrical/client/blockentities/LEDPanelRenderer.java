@@ -87,4 +87,42 @@ public class LEDPanelRenderer extends FixtureRenderer<LEDPanelBlockEntity> {
             addVertex(beamConsumer, m, normal, r, g, b, a,0, 0, 0);
         }
     }
+
+    @Override
+    public void preparePoseStack(LEDPanelBlockEntity blockEntity, PoseStack poseStack, Direction facing, float partialTicks, boolean isFlipped, BlockState blockState, boolean isHanging) {
+        //#region Fixture Hanging
+        poseStack.translate(0.5F, 0, .5F);
+        if(isHanging){
+            Direction hangDirection = blockState.getValue(HangableBlock.HANG_DIRECTION);
+            poseStack.translate(0, 0.5, 0F);
+            if(hangDirection.getAxis() != Direction.Axis.Y){
+                if(hangDirection.getAxis() == Direction.Axis.Z){
+                    if(hangDirection == Direction.SOUTH) {
+//                        poseStack.mulPose(Axis.ZP.rotationDegrees(90));
+                        poseStack.mulPose(Axis.XN.rotationDegrees(180));
+                    } else {
+                        poseStack.mulPose(Axis.XN.rotationDegrees(180));
+                    }
+                }
+            } else {
+                if(hangDirection == Direction.UP){
+                    poseStack.mulPose(Axis.ZN.rotationDegrees(90));
+                    poseStack.mulPose(Axis.XP.rotationDegrees(90));
+                }
+            }
+            poseStack.translate(0, -0.5, 0F);
+        }
+        //#endregion
+        poseStack.mulPose(Axis.YP.rotationDegrees(facing.toYRot()));
+        poseStack.translate(-0.5F, 0, -.5F);
+        if (isHanging) {
+            Optional<BlockState> optionalSupport = blockEntity.getSupportingStructure();
+            if (optionalSupport.isPresent()) {
+                float[] transforms = blockEntity.getFixture().getTransforms(blockState, optionalSupport.get());
+                poseStack.translate(transforms[0], transforms[1], transforms[2]);
+            } else {
+                poseStack.translate(0, 0.19, 0);
+            }
+        }
+    }
 }

@@ -112,17 +112,19 @@ public class FresnelBlock extends BaseLightBlock{
     @Override
     @Environment(EnvType.CLIENT)
     public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
-        if(level.isClientSide){
-            if(player.isCrouching()){
-                if(TheatricalClient.DEBUG_BLOCKS.contains(pos)){
-                    TheatricalClient.DEBUG_BLOCKS.remove(pos);
-                } else {
-                    TheatricalClient.DEBUG_BLOCKS.add(pos);
+        if(super.use(state, level, pos, player, hand, hit) != InteractionResult.SUCCESS) {
+            if (level.isClientSide) {
+                if (player.isCrouching()) {
+                    if (TheatricalClient.DEBUG_BLOCKS.contains(pos)) {
+                        TheatricalClient.DEBUG_BLOCKS.remove(pos);
+                    } else {
+                        TheatricalClient.DEBUG_BLOCKS.add(pos);
+                    }
+                    return InteractionResult.SUCCESS;
                 }
-                return InteractionResult.SUCCESS;
+                FresnelBlockEntity be = (FresnelBlockEntity) level.getBlockEntity(pos);
+                Minecraft.getInstance().setScreen(new FresnelScreen(be));
             }
-            FresnelBlockEntity be = (FresnelBlockEntity)level.getBlockEntity(pos);
-            Minecraft.getInstance().setScreen(new FresnelScreen(be));
         }
         return InteractionResult.SUCCESS;
     }

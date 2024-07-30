@@ -3,12 +3,23 @@ package dev.imabad.theatrical.fixtures;
 import dev.imabad.theatrical.Theatrical;
 import dev.imabad.theatrical.api.Fixture;
 import dev.imabad.theatrical.api.HangType;
+import dev.imabad.theatrical.api.dmx.DMXPersonality;
 import dev.imabad.theatrical.blocks.rigging.PipeBlock;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.state.BlockState;
 
+import java.util.Collections;
+import java.util.List;
+
 public class LEDPanelFixture extends Fixture {
 
+    private static final List<DMXPersonality> PERSONALITIES = Collections.singletonList(
+            new DMXPersonality(4, "4-Channel Mode")
+                    .addSlot(SharedSlots.INTENSITY)
+                    .addSlot(SharedSlots.RED)
+                    .addSlot(SharedSlots.GREEN)
+                    .addSlot(SharedSlots.BLUE)
+    );
     private static final ResourceLocation STATIC_MODEL = new ResourceLocation(Theatrical.MOD_ID, "block/led_panel");
 
 
@@ -73,6 +84,11 @@ public class LEDPanelFixture extends Fixture {
             return new float[]{0, 0, 1f};
         }
         return new float[]{0,0,0};
+    }
+
+    @Override
+    public List<DMXPersonality> getDMXPersonalities() {
+        return PERSONALITIES;
     }
 
 }

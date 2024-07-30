@@ -33,20 +33,20 @@ public class ArtNetInterfaceScreen extends Screen {
         yCenter = (this.height - this.imageHeight) / 2;
         this.dmxUniverse = new EditBox(this.font, xCenter + 62, yCenter + 25, 50, 10, (Component)Component.translatable("artneti.dmxUniverse"));
         this.dmxUniverse.setValue(Integer.toString(this.be.getUniverse()));
-        this.dmxUniverse.setEditable(be.isOwnedByCurrentClient());
+//        this.dmxUniverse.setEditable(be.isOwnedByCurrentClient());
         this.addWidget(this.dmxUniverse);
         this.ipAddress = new EditBox(this.font, xCenter + 40, yCenter + 50, 100, 20, (Component)Component.translatable("artneti.ipAddress"));
         this.ipAddress.setValue(this.be.getIp());
-        this.ipAddress.setEditable(be.isOwnedByCurrentClient());
+//        this.ipAddress.setEditable(be.isOwnedByCurrentClient());
         this.addWidget(this.ipAddress);
-        if(be.isOwnedByCurrentClient()) {
-            this.addRenderableWidget(
-                new Button.Builder(Component.translatable("artneti.save"), button -> this.update())
-                    .pos(xCenter + 40, yCenter + 90)
-                    .size(100, 20)
-                    .build()
-            );
-        }
+//        if(be.isOwnedByCurrentClient()) {
+//            this.addRenderableWidget(
+//                new Button.Builder(Component.translatable("artneti.save"), button -> this.update())
+//                    .pos(xCenter + 40, yCenter + 90)
+//                    .size(100, 20)
+//                    .build()
+//            );
+//        }
     }
 
     private void update(){
@@ -86,16 +86,16 @@ public class ArtNetInterfaceScreen extends Screen {
         renderLabel(guiGraphics, "block.theatrical.artnet_interface", 5,5);
         renderLabel(guiGraphics, "artneti.dmxUniverse", 0,15);
         renderLabel(guiGraphics, "artneti.ipAddress", 5,40);
-        if(!this.be.isOwnedByCurrentClient()){
+//        if(!this.be.isOwnedByCurrentClient()){
             renderLabel(guiGraphics, "artneti.notAuthorized", 5,75);
-        } else {
-            if(this.be.hasReceivedPacket()){
-                long inSeconds = Math.round((float) (System.currentTimeMillis() - this.be.getLastReceivedPacket()) / 1000);
-                renderLabel(guiGraphics, "artneti.lastReceived", 5,75, inSeconds);
-            } else {
-                renderLabel(guiGraphics, "artneti.notConnected", 5,75);
-            }
-        }
+//        } else {
+//            if(this.be.hasReceivedPacket()){
+//                long inSeconds = Math.round((float) (System.currentTimeMillis() - this.be.getLastReceivedPacket()) / 1000);
+//                renderLabel(guiGraphics, "artneti.lastReceived", 5,75, inSeconds);
+//            } else {
+//                renderLabel(guiGraphics, "artneti.notConnected", 5,75);
+//            }
+//        }
     }
 
     private void renderLabel(GuiGraphics guiGraphics, String translationKey, int offSetX, int offSetY, Object... replacements){

@@ -1,5 +1,6 @@
-// 1.20.2	2023-12-07T01:40:15.2734792	Block States: theatrical
+// 1.20.2	2024-07-20T13:12:19.1864232	Block States: theatrical
 80cf9e35e8b8fffe5da0b45777ab6c39c15c3533 assets/theatrical/blockstates/artnet_interface.json
+23028e0ed9d109f6b753e8711b1d16642a1c0b55 assets/theatrical/blockstates/basic_lighting_desk.json
 2b77646a280f9864671a9d80a1e992e50b713946 assets/theatrical/blockstates/redstone_interface.json
 761af2b928f16739c5b198b1310007e9284b3603 assets/theatrical/blockstates/tank_trap.json
 be395e721add9d37a0ee65988b72ae8680a37307 assets/theatrical/blockstates/truss.json

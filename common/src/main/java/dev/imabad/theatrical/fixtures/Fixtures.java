@@ -20,6 +20,11 @@ public class Fixtures {
 
 	public static final RegistrySupplier<Fixture> LED_PANEL =
 			FIXTURES.register(new ResourceLocation(Theatrical.MOD_ID, "led_panel"), LEDPanelFixture::new);
+
+	public static final RegistrySupplier<Fixture> REDSTONE_INTERFACE = FIXTURES.register(
+			new ResourceLocation(Theatrical.MOD_ID, "redstone_interface"),
+			RedstoneInterfaceFixture::new
+	);
 	public static void init() {
 		// NOOP
 	}
