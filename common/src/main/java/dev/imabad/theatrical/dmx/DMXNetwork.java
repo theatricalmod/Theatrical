@@ -201,7 +201,7 @@ public class DMXNetwork {
     @Nullable
     private DMXNetworkMember getDmxNetworkMember(UUID uuid) {
         Optional<DMXNetworkMember> first = members.stream()
-                .filter(dmxNetworkMember -> dmxNetworkMember.playerId() == uuid).findFirst();
+                .filter(dmxNetworkMember -> dmxNetworkMember.playerId().equals(uuid)).findFirst();
         return first.orElse(null);
     }
 

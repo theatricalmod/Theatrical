@@ -46,6 +46,7 @@ public class MovingLightBlockEntity extends BaseDMXConsumerLightBlockEntity {
         pan = (int) ((convertByteToInt(ourValues[5]) * 360) / 255f) - 180;
         tilt = (int) ((convertByteToInt(ourValues[6]) * 180) / 255F) - 180;
         level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
+        setChanged();
     }
 
     @Override

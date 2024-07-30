@@ -62,7 +62,7 @@ public class GenericDMXConfigurationScreen<T extends DMXConsumer> extends Screen
         this.dmxAddress.setValue(Integer.toString(this.be.getChannelStart()));
         layout.addChild(dmxAddress);
         this.dmxUniverse = new LabeledEditBox(this.font, xCenter, yCenter, 50, 10, Component.translatable("artneti.dmxUniverse"));
-        this.dmxUniverse.setValue(Integer.toString(this.be.getChannelStart()));
+        this.dmxUniverse.setValue(Integer.toString(this.be.getUniverse()));
         layout.addChild(dmxUniverse);
         addExtraWidgetsToUI();
         layout.addChild(new CycleButton.Builder<UUID>((networkId) ->
