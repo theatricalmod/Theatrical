@@ -1,5 +1,5 @@
-# 1.20.1-alpha.12
+# 1.20.1-alpha.13
 
-* Huge overhaul of how DMX / ArtNet works in-game
-* Devices now belong to networks
-* Improved light beam rendering
+* Fix beams not rendering correctly
+* Prevent crashing when getting the consumers for a network
+* Change color of text in the ArtNet configuration screen
