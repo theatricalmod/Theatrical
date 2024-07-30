@@ -47,4 +47,8 @@ public class Items {
             "basic_lighting_desk",
             () -> new BlockItem(Blocks.BASIC_LIGHTING_DESK.get(), new Item.Properties().arch$tab(Theatrical.TAB))
     );
+    public static final RegistrySupplier<Item> CONFIGURATION_CARD = ITEMS.register(
+            "configuration_card",
+            ConfigurationCard::new
+    );
 }

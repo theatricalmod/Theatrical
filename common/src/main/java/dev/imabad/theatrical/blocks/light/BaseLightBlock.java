@@ -5,8 +5,13 @@ import dev.imabad.theatrical.blockentities.light.BaseDMXConsumerLightBlockEntity
 import dev.imabad.theatrical.blockentities.light.LightCollisionContext;
 import dev.imabad.theatrical.blocks.HangableBlock;
 import dev.imabad.theatrical.dmx.DMXNetworkData;
+import dev.imabad.theatrical.items.Items;
 import dev.imabad.theatrical.util.UUIDUtil;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -65,5 +70,31 @@ public abstract class BaseLightBlock extends HangableBlock implements EntityBloc
                 consumerLightBlockEntity.setNetworkId(DMXNetworkData.getInstance(level.getServer().overworld()).getDefaultNetworkForPlayer(player).id());
             }
         }
+    }
+    @Override
+    @Environment(EnvType.CLIENT)
+    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+        if(player.getItemInHand(hand).getItem() == Items.CONFIGURATION_CARD.get()){
+            if(!level.isClientSide()) {
+                ItemStack itemInHand = player.getItemInHand(hand);
+                CompoundTag tagData = itemInHand.getOrCreateTag();
+                BlockEntity be = level.getBlockEntity(pos);
+                if (be instanceof BaseDMXConsumerLightBlockEntity consumerLightBlockEntity) {
+                    consumerLightBlockEntity.setNetworkId(tagData.getUUID("network"));
+                    consumerLightBlockEntity.setUniverse(tagData.getInt("dmxUniverse"));
+                    consumerLightBlockEntity.setChannelStartPoint(tagData.getInt("dmxAddress"));
+                    if (tagData.getBoolean("autoIncrement")) {
+                        tagData.putInt("dmxAddress", tagData.getInt("dmxAddress") + consumerLightBlockEntity.getChannelCount());
+                    }
+                    itemInHand.save(tagData);
+                    DMXNetworkData instance = DMXNetworkData.getInstance(level.getServer().overworld());
+                    player.sendSystemMessage(Component.translatable("item.configurationcard.success", instance.getNetwork(consumerLightBlockEntity.getNetworkId()).name(), Integer.toString(consumerLightBlockEntity.getUniverse()),  Integer.toString(consumerLightBlockEntity.getChannelStart()),  Integer.toString(tagData.getInt("dmxAddress"))));
+                    return InteractionResult.SUCCESS;
+                }
+            } else {
+                return InteractionResult.SUCCESS;
+            }
+        }
+        return super.use(state, level, pos, player, hand, hit);
     }
 }

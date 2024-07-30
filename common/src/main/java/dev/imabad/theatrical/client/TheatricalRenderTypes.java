@@ -16,4 +16,14 @@ public class TheatricalRenderTypes {
             RenderType.CompositeState.builder()
                     .setShaderState(new RenderStateShard.ShaderStateShard(GameRenderer::getPositionColorShader))
                     .createCompositeState(false));
+
+    public static final RenderType BEAM = RenderType.create(
+            "TheatricalBeam",
+            DefaultVertexFormat.POSITION_COLOR,
+            VertexFormat.Mode.QUADS,
+            256,
+            false,
+            true,
+            RenderType.translucentState(new RenderStateShard.ShaderStateShard(GameRenderer::getPositionColorShader))
+    );
 }

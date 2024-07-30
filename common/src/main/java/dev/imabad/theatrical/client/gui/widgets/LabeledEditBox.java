@@ -15,7 +15,7 @@ public class LabeledEditBox extends EditBox {
     private float alignX = 0.5F;
     private Font font;
 
-    private int color = 0xffffff;
+    private int color = 4210752;
 
     public LabeledEditBox(Font font, int width, int height, Component message) {
         super(font, width, height, message);
@@ -69,7 +69,7 @@ public class LabeledEditBox extends EditBox {
         int l = this.getY() + (this.getHeight() - 9) / 2;
         // j > i ? this.clipText(component, i) :
         FormattedCharSequence formattedCharSequence =  component.getVisualOrderText();
-        guiGraphics.drawString(font, formattedCharSequence, k, l - (font.lineHeight), color);
+        guiGraphics.drawString(font, formattedCharSequence, k, l - (font.lineHeight), color, false);
     }
 
     private FormattedCharSequence clipText(Component message, int width) {

@@ -8,6 +8,7 @@ import dev.architectury.registry.client.rendering.BlockEntityRendererRegistry;
 import dev.imabad.theatrical.blockentities.BlockEntities;
 import dev.imabad.theatrical.blockentities.light.BaseLightBlockEntity;
 import dev.imabad.theatrical.blocks.light.MovingLightBlock;
+import dev.imabad.theatrical.client.LazyRenderers;
 import dev.imabad.theatrical.client.blockentities.BasicLightingConsoleRenderer;
 import dev.imabad.theatrical.client.blockentities.FresnelRenderer;
 import dev.imabad.theatrical.client.blockentities.LEDPanelRenderer;
@@ -88,6 +89,7 @@ public class TheatricalClient {
 
     public static void renderWorldLast(PoseStack poseStack, Matrix4f projectionMatrix, Camera camera, float tickDelta){
         Minecraft mc = Minecraft.getInstance();
+        LazyRenderers.doRender(camera,poseStack, mc.renderBuffers().bufferSource(), tickDelta);
         if(mc.getDebugOverlay().showDebugScreen()){
             Vec3 cameraPos = camera.getPosition();
             //#region translateToCamera

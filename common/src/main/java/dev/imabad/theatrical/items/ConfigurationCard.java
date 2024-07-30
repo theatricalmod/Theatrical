@@ -1,6 +1,9 @@
 package dev.imabad.theatrical.items;
 
 import dev.imabad.theatrical.Theatrical;
+import dev.imabad.theatrical.client.gui.screen.ConfigurationCardScreen;
+import net.minecraft.client.Minecraft;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
@@ -15,7 +18,9 @@ public class ConfigurationCard extends Item {
 
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand usedHand) {
-        if(player.isCrouching()){
+        if(player.isCrouching() && level.isClientSide()){
+            CompoundTag cardData = player.getItemInHand(usedHand).getOrCreateTag();
+            Minecraft.getInstance().setScreen(new ConfigurationCardScreen(cardData));
             //TODO: Open UI
             return InteractionResultHolder.pass(player.getItemInHand(usedHand));
         }
