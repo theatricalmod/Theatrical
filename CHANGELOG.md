@@ -1,4 +1,5 @@
-# 1.20.1-alpha.11
+# 1.20.1-alpha.12
 
-* Fix crash when using create on fabric
-* Fix a bug where sometimes dmx addresses wouldn't save
+* Huge overhaul of how DMX / ArtNet works in-game
+* Devices now belong to networks
+* Improved light beam rendering
