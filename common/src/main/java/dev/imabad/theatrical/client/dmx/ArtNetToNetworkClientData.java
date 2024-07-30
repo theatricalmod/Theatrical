@@ -12,6 +12,10 @@ public class ArtNetToNetworkClientData extends SavedData {
     private static ArtNetToNetworkClientData INSTANCE;
     private static final String KEY = "artnet_network_map";
 
+    public static void unload(){
+        INSTANCE = null;
+    }
+
     private static final SavedData.Factory<ArtNetToNetworkClientData> factory = new Factory<>(
             ArtNetToNetworkClientData::new,
             ArtNetToNetworkClientData::read,
@@ -42,6 +46,7 @@ public class ArtNetToNetworkClientData extends SavedData {
 
     public void setNetworkId(UUID networkId) {
         this.networkId = networkId;
+        setDirty(true);
     }
 
     @Override

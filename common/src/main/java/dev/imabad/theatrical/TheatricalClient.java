@@ -14,6 +14,7 @@ import dev.imabad.theatrical.client.blockentities.BasicLightingConsoleRenderer;
 import dev.imabad.theatrical.client.blockentities.FresnelRenderer;
 import dev.imabad.theatrical.client.blockentities.LEDPanelRenderer;
 import dev.imabad.theatrical.client.blockentities.MovingLightRenderer;
+import dev.imabad.theatrical.client.dmx.ArtNetToNetworkClientData;
 import dev.imabad.theatrical.config.TheatricalConfig;
 import dev.imabad.theatrical.dmx.DMXDevice;
 import dev.imabad.theatrical.client.dmx.TheatricalArtNetClient;
@@ -82,6 +83,7 @@ public class TheatricalClient {
 
     public static void onWorldClose(){
         artNetManager.shutdownAll();
+        ArtNetToNetworkClientData.unload();
     }
 
     public static void renderWorldLastAfterTripwire(LevelRenderer levelRenderer){

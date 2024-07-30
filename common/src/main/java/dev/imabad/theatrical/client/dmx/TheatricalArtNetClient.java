@@ -184,9 +184,10 @@ public class TheatricalArtNetClient extends ArtNetClient {
                 int subnet = dmxPacket.getSubnetID();
                 int universe = dmxPacket.getUniverseID();
                 lastPacketMS = System.currentTimeMillis();
-
                 getInputBuffer().setDmxData((short) subnet, (short) universe, dmxPacket.getDmxData());
-                new SendArtNetData(manager.getNetworkId(), universe, dmxPacket.getDmxData()).sendToServer();
+                if(subnet == 0) {
+                    new SendArtNetData(manager.getNetworkId(), universe, dmxPacket.getDmxData()).sendToServer();
+                }
                 break;
             }
             case ART_TOD_REQUEST: {

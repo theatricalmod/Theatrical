@@ -34,6 +34,15 @@ public class ArtNetManager {
         if(artNetClient != null){
             artNetClient.networkChange();
         }
+        ServerData currentServer = Minecraft.getInstance().getCurrentServer();
+        if(currentServer != null){
+            SavedClientNetworkManager.getInstance().saveNetworkForIP(currentServer.ip, networkId);
+        } else {
+            if(Minecraft.getInstance().getSingleplayerServer() != null) {
+                ArtNetToNetworkClientData instance = ArtNetToNetworkClientData.getInstance(Minecraft.getInstance().getSingleplayerServer().overworld());
+                instance.setNetworkId(networkId);
+            }
+        }
     }
 
     public UUID getNetworkId(){
