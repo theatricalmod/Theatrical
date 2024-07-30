@@ -34,7 +34,7 @@ public class FresnelScreen extends GenericDMXConfigurationScreen<FresnelBlockEnt
         this.panSlider = new BasicSlider(xCenter, yCenter + 75, 150, 20, Component.empty(), be.getPan(),-180, 180, (newPan) -> {
             be.setPan(newPan.intValue());
         });
-        LayoutSettings layoutSettings = layout.newCellSettings().paddingVertical(2);
+        LayoutSettings layoutSettings = layout.newChildLayoutSettings().paddingVertical(2);
         layout.addChild(new StringWidget(Component.translatable("fixture.tilt"), font), layoutSettings);
         layout.addChild(tiltSlider, layoutSettings);
         layout.addChild(new StringWidget(Component.translatable("fixture.pan"), font), layoutSettings);

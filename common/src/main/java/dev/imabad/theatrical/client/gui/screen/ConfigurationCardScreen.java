@@ -49,7 +49,7 @@ public class ConfigurationCardScreen extends Screen {
     protected void init() {
         super.init();
         layout = new LinearLayout(imageWidth, imageHeight, LinearLayout.Orientation.VERTICAL);
-        layout.defaultCellSetting().alignHorizontallyCenter().padding(10);
+        layout.defaultChildLayoutSetting().alignHorizontallyCenter().padding(10);
         layout.addChild(new BetterStringWidget(Component.translatable("screen.configurationcard"), this.font).setColor(4210752).setShadow(false));
         this.dmxUniverse = new LabeledEditBox(this.font, xCenter, yCenter, 50, 10, Component.translatable("artneti.dmxUniverse"));
         if(itemData.contains("dmxUniverse")){
@@ -120,11 +120,14 @@ public class ConfigurationCardScreen extends Screen {
             //We need a nicer way to show that this is invalid?
         }
     }
+
+
     @Override
-    public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        super.renderBackground(guiGraphics, mouseX, mouseY, partialTick);
+    public void renderBackground(GuiGraphics guiGraphics) {
+        super.renderBackground(guiGraphics);
         this.renderWindow(guiGraphics);
     }
+
     private void renderWindow(GuiGraphics guiGraphics){
         int layoutHeight = 0;
         if(layout != null) {

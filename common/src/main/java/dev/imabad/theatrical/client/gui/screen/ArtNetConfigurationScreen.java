@@ -51,8 +51,8 @@ public class ArtNetConfigurationScreen extends Screen {
     @Override
     protected void init() {
         super.init();
-        layout = LinearLayout.vertical();
-        layout.defaultCellSetting().alignHorizontallyCenter().padding(10);
+        layout = new LinearLayout(0, 0, LinearLayout.Orientation.VERTICAL);
+        layout.defaultChildLayoutSetting().alignHorizontallyCenter().padding(10);
         xCenter = (this.width / 2);
         yCenter = (this.height / 2);
         this.ipAddressBox = new LabeledEditBox(this.font, xCenter, yCenter, 100, 20, Component.translatable("artneti.ipAddress"));
@@ -211,8 +211,8 @@ public class ArtNetConfigurationScreen extends Screen {
     }
 
     @Override
-    public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        super.renderBackground(guiGraphics, mouseX, mouseY, partialTick);
+    public void renderBackground(GuiGraphics guiGraphics) {
+        super.renderBackground(guiGraphics);
     }
 
     @Override

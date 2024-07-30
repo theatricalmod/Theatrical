@@ -17,12 +17,6 @@ public class LabeledEditBox extends EditBox {
 
     private int color = 4210752;
 
-    public LabeledEditBox(Font font, int width, int height, Component message) {
-        super(font, width, height, message);
-        this.width = width + 10;
-        this.font = font;
-    }
-
     public LabeledEditBox(Font font, int x, int y, int width, int height, Component message) {
         super(font, x, y, width, height, message);
         this.font = font;
