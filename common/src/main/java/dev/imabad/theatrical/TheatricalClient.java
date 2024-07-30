@@ -3,16 +3,24 @@ package dev.imabad.theatrical;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
+import dev.architectury.event.events.client.ClientPlayerEvent;
 import dev.architectury.registry.client.rendering.BlockEntityRendererRegistry;
 import dev.imabad.theatrical.blockentities.BlockEntities;
 import dev.imabad.theatrical.blockentities.light.BaseLightBlockEntity;
 import dev.imabad.theatrical.blocks.light.MovingLightBlock;
+import dev.imabad.theatrical.client.LazyRenderers;
+import dev.imabad.theatrical.client.blockentities.BasicLightingConsoleRenderer;
 import dev.imabad.theatrical.client.blockentities.FresnelRenderer;
 import dev.imabad.theatrical.client.blockentities.LEDPanelRenderer;
 import dev.imabad.theatrical.client.blockentities.MovingLightRenderer;
-import dev.imabad.theatrical.fixtures.Fixtures;
+import dev.imabad.theatrical.config.TheatricalConfig;
+import dev.imabad.theatrical.dmx.DMXDevice;
+import dev.imabad.theatrical.client.dmx.TheatricalArtNetClient;
 import dev.imabad.theatrical.lighting.LightManager;
-import dev.imabad.theatrical.protocols.artnet.ArtNetManager;
+import dev.imabad.theatrical.net.artnet.ListConsumers;
+import dev.imabad.theatrical.net.artnet.NotifyConsumerChange;
+import dev.imabad.theatrical.client.dmx.ArtNetManager;
+import dev.imabad.theatrical.net.artnet.RequestNetworks;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -41,8 +49,18 @@ public class TheatricalClient {
         BlockEntityRendererRegistry.register(BlockEntities.MOVING_LIGHT.get(), MovingLightRenderer::new);
         BlockEntityRendererRegistry.register(BlockEntities.LED_FRESNEL.get(), FresnelRenderer::new);
         BlockEntityRendererRegistry.register(BlockEntities.LED_PANEL.get(), LEDPanelRenderer::new);
+        BlockEntityRendererRegistry.register(BlockEntities.BASIC_LIGHTING_DESK.get(), BasicLightingConsoleRenderer::new);
 //        BlockEntityRendererRegistry.register(BlockEntities.CABLE.get(), CableRenderer::new);
         artNetManager = new ArtNetManager();
+        ClientPlayerEvent.CLIENT_PLAYER_JOIN.register((event) -> {
+            new RequestNetworks().sendToServer();
+            if(TheatricalConfig.INSTANCE.CLIENT.artnetEnabled){
+                artNetManager.getClient();
+            }
+        });
+        ClientPlayerEvent.CLIENT_PLAYER_QUIT.register((event) -> {
+            onWorldClose();
+        });
     }
 
     public static ArtNetManager getArtNetManager(){
@@ -61,12 +79,17 @@ public class TheatricalClient {
         return new float[]{be.getTilt(), be.getPan()};
     }
 
+    public static void onWorldClose(){
+        artNetManager.shutdownAll();
+    }
+
     public static void renderWorldLastAfterTripwire(LevelRenderer levelRenderer){
         LightManager.updateAll(levelRenderer);
     }
 
     public static void renderWorldLast(PoseStack poseStack, Matrix4f projectionMatrix, Camera camera, float tickDelta){
         Minecraft mc = Minecraft.getInstance();
+        LazyRenderers.doRender(camera,poseStack, mc.renderBuffers().bufferSource(), tickDelta);
         if(mc.getDebugOverlay().showDebugScreen()){
             Vec3 cameraPos = camera.getPosition();
             //#region translateToCamera
@@ -127,5 +150,32 @@ public class TheatricalClient {
         long hi = uuid.getMostSignificantBits();
         long lo = uuid.getLeastSignificantBits();
         return ByteBuffer.allocate(16).putLong(hi).putLong(lo).array();
+    }
+
+    public static void handleConsumerChange(NotifyConsumerChange notifyConsumerChange){
+        if(TheatricalConfig.INSTANCE.CLIENT.artnetEnabled){
+            TheatricalArtNetClient artNetClient = getArtNetManager().getClient();
+            if(artNetClient.isSubscribedTo(notifyConsumerChange.getUniverse())){
+                DMXDevice dmxDevice = notifyConsumerChange.getDmxDevice();
+                if(notifyConsumerChange.getChangeType() == NotifyConsumerChange.ChangeType.ADD){
+                    artNetClient.addDevice(notifyConsumerChange.getUniverse(), dmxDevice.getDeviceId(), dmxDevice);
+                } else if(notifyConsumerChange.getChangeType() == NotifyConsumerChange.ChangeType.UPDATE) {
+                    artNetClient.updateDevice(notifyConsumerChange.getUniverse(), dmxDevice.getDeviceId(), dmxDevice);
+                } else {
+                    artNetClient.removeDevice(notifyConsumerChange.getUniverse(), dmxDevice.getDeviceId());
+                }
+            }
+        }
+    }
+
+    public static void handleListConsumers(ListConsumers listConsumers){
+        if(TheatricalConfig.INSTANCE.CLIENT.artnetEnabled) {
+            TheatricalArtNetClient artNetClient = getArtNetManager().getClient();
+            if (artNetClient.isSubscribedTo(listConsumers.getUniverse())) {
+                for (DMXDevice dmxDevice : listConsumers.getDmxDevices()) {
+                    artNetClient.addDevice(listConsumers.getUniverse(), dmxDevice.getDeviceId(), dmxDevice);
+                }
+            }
+        }
     }
 }

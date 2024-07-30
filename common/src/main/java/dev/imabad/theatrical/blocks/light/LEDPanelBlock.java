@@ -105,17 +105,19 @@ public class LEDPanelBlock extends BaseLightBlock {
     @Override
     @Environment(EnvType.CLIENT)
     public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
-        if(level.isClientSide){
-            if(player.isCrouching()){
-                if(TheatricalClient.DEBUG_BLOCKS.contains(pos)){
-                    TheatricalClient.DEBUG_BLOCKS.remove(pos);
-                } else {
-                    TheatricalClient.DEBUG_BLOCKS.add(pos);
+        if(super.use(state, level, pos, player, hand, hit) != InteractionResult.SUCCESS) {
+            if (level.isClientSide) {
+                if (player.isCrouching()) {
+                    if (TheatricalClient.DEBUG_BLOCKS.contains(pos)) {
+                        TheatricalClient.DEBUG_BLOCKS.remove(pos);
+                    } else {
+                        TheatricalClient.DEBUG_BLOCKS.add(pos);
+                    }
+                    return InteractionResult.SUCCESS;
                 }
-                return InteractionResult.SUCCESS;
+                LEDPanelBlockEntity be = (LEDPanelBlockEntity) level.getBlockEntity(pos);
+                Minecraft.getInstance().setScreen(new GenericDMXConfigurationScreen<>(be, pos, "block.theatrical.led_panel"));
             }
-            LEDPanelBlockEntity be = (LEDPanelBlockEntity)level.getBlockEntity(pos);
-            Minecraft.getInstance().setScreen(new GenericDMXConfigurationScreen<>(be, pos, "block.theatrical.led_panel"));
         }
         return InteractionResult.SUCCESS;
     }

@@ -6,6 +6,7 @@ import dev.imabad.theatrical.blocks.light.MovingLightBlock;
 import dev.imabad.theatrical.fixtures.Fixtures;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -28,8 +29,9 @@ public class MovingLightBlockEntity extends BaseDMXConsumerLightBlockEntity {
 
     @Override
     public void consume(byte[] dmxValues) {
-        byte[] ourValues = Arrays.copyOfRange(dmxValues, this.getChannelStart(),
-                this.getChannelStart() + this.getChannelCount());
+        int start = this.getChannelStart() > 0 ? this.getChannelStart() - 1 : 0;
+        byte[] ourValues = Arrays.copyOfRange(dmxValues, start,
+                start+ this.getChannelCount());
         if(ourValues.length < 7){
             return;
         }
@@ -44,7 +46,29 @@ public class MovingLightBlockEntity extends BaseDMXConsumerLightBlockEntity {
         pan = (int) ((convertByteToInt(ourValues[5]) * 360) / 255f) - 180;
         tilt = (int) ((convertByteToInt(ourValues[6]) * 180) / 255F) - 180;
         level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
+        setChanged();
     }
+
+    @Override
+    public int getDeviceTypeId() {
+        return 0x01;
+    }
+
+    @Override
+    public String getModelName() {
+        return "Moving Head";
+    }
+
+    @Override
+    public ResourceLocation getFixtureId() {
+        return Fixtures.MOVING_LIGHT.getId();
+    }
+
+    @Override
+    public int getActivePersonality() {
+        return 0;
+    }
+
     public int convertByteToInt(byte val) {
         return Byte.toUnsignedInt(val);
     }

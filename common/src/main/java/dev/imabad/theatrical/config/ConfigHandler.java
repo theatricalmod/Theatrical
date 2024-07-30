@@ -22,6 +22,13 @@ import java.util.Set;
 import java.util.function.Supplier;
 
 public class ConfigHandler {
+
+    public static ConfigHandler INSTANCE;
+    public static ConfigHandler initialize(Path configFolder){
+        INSTANCE = new ConfigHandler(configFolder);
+        return INSTANCE;
+    }
+
     public enum ConfigSide {
         COMMON,
         CLIENT
@@ -32,7 +39,7 @@ public class ConfigHandler {
 
     private final Map<ResourceLocation, BaseConfig> registered_configs = new HashMap<>();
 
-    public ConfigHandler(Path configFolder){
+    private ConfigHandler(Path configFolder){
         this.configFolder = configFolder;
         File file = this.configFolder.toFile();
         if(!file.exists()){
@@ -60,6 +67,12 @@ public class ConfigHandler {
             return config;
         }
         return null;
+    }
+
+    public void saveConfig(ConfigSide configSide){
+        ResourceLocation resourceLocation = new ResourceLocation(Theatrical.MOD_ID, configSide.name().toLowerCase(Locale.ENGLISH));
+        File sideConfig = Paths.get(this.configFolder.toString(), Theatrical.MOD_ID + "-" + configSide.name().toLowerCase(Locale.ENGLISH) + ".yml").toFile();
+        save(registered_configs.get(resourceLocation), sideConfig);
     }
 
     private <T> void save(T config, File output){
