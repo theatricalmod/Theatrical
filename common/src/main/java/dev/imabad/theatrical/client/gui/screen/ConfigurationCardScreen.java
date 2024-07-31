@@ -127,11 +127,6 @@ public class ConfigurationCardScreen extends Screen {
         super.render(guiGraphics, mouseX, mouseY, partialTick);
     }
 
-    @Override
-    public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        super.renderBackground(guiGraphics, mouseX, mouseY, partialTick);
-        this.renderWindow(guiGraphics);
-    }
     private void renderWindow(GuiGraphics guiGraphics){
         int layoutHeight = 0;
         if(layout != null) {
