@@ -2,6 +2,8 @@ package dev.imabad.theatrical.items;
 
 import dev.imabad.theatrical.Theatrical;
 import dev.imabad.theatrical.client.gui.screen.ConfigurationCardScreen;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.InteractionHand;
@@ -20,10 +22,14 @@ public class ConfigurationCard extends Item {
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand usedHand) {
         if(player.isCrouching() && level.isClientSide()){
             CompoundTag cardData = player.getItemInHand(usedHand).getOrCreateTag();
-            Minecraft.getInstance().setScreen(new ConfigurationCardScreen(cardData));
-            //TODO: Open UI
+            openUI(cardData);
             return InteractionResultHolder.pass(player.getItemInHand(usedHand));
         }
         return super.use(level, player, usedHand);
+    }
+
+    @Environment(EnvType.CLIENT)
+    private static void openUI(CompoundTag data){
+        Minecraft.getInstance().setScreen(new ConfigurationCardScreen(data));
     }
 }
