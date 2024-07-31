@@ -34,7 +34,7 @@ public class GenericDMXConfigurationScreen<T extends DMXConsumer> extends Screen
     protected int xCenter;
     protected int yCenter;
     private LabeledEditBox dmxAddress, dmxUniverse;
-    private UUID networkId;
+    private UUID networkId = UUIDUtil.NULL;
     private final T be;
     private final BlockPos blockPos;
     private final String titleTranslationKey;

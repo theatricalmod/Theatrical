@@ -4,6 +4,7 @@ import dev.imabad.theatrical.blockentities.BlockEntities;
 import dev.imabad.theatrical.blockentities.ClientSyncBlockEntity;
 import dev.imabad.theatrical.config.TheatricalConfig;
 import dev.imabad.theatrical.dmx.DMXNetworkData;
+import dev.imabad.theatrical.util.UUIDUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -31,7 +32,7 @@ public class ArtNetInterfaceBlockEntity extends ClientSyncBlockEntity {
 
     private int subnet, universe, tickTimer = 0;
     private String ip = "127.0.0.1";
-    private UUID networkId;
+    private UUID networkId = UUIDUtil.NULL;
 
     public ArtNetInterfaceBlockEntity(BlockPos blockPos, BlockState blockState) {
         super(BlockEntities.ART_NET_INTERFACE.get(), blockPos, blockState);

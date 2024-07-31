@@ -48,7 +48,7 @@ public class ConfigurationCardScreen extends Screen {
     @Override
     protected void init() {
         super.init();
-        layout = new LinearLayout(imageWidth, imageHeight, LinearLayout.Orientation.VERTICAL);
+        layout = new LinearLayout(imageWidth, imageHeight + 50, LinearLayout.Orientation.VERTICAL);
         layout.defaultChildLayoutSetting().alignHorizontallyCenter().padding(10);
         layout.addChild(new BetterStringWidget(Component.translatable("screen.configurationcard"), this.font).setColor(4210752).setShadow(false));
         this.dmxUniverse = new LabeledEditBox(this.font, xCenter, yCenter, 50, 10, Component.translatable("artneti.dmxUniverse"));
@@ -121,6 +121,11 @@ public class ConfigurationCardScreen extends Screen {
         }
     }
 
+    @Override
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        this.renderBackground(guiGraphics);
+        super.render(guiGraphics, mouseX, mouseY, partialTick);
+    }
 
     @Override
     public void renderBackground(GuiGraphics guiGraphics) {
@@ -136,5 +141,10 @@ public class ConfigurationCardScreen extends Screen {
         int relX = (this.width - this.imageWidth) / 2;
         int relY = (this.height - layoutHeight) / 2;
         guiGraphics.blit(GUI, relX, relY, imageWidth, layoutHeight, 0, 0, this.imageWidth, this.imageHeight, 256,256);
+    }
+
+    @Override
+    public boolean isPauseScreen() {
+        return false;
     }
 }

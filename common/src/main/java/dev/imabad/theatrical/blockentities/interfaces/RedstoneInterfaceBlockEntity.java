@@ -8,6 +8,7 @@ import dev.imabad.theatrical.blockentities.ClientSyncBlockEntity;
 import dev.imabad.theatrical.dmx.DMXNetworkData;
 import dev.imabad.theatrical.fixtures.Fixtures;
 import dev.imabad.theatrical.util.RndUtils;
+import dev.imabad.theatrical.util.UUIDUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
@@ -26,7 +27,7 @@ public class RedstoneInterfaceBlockEntity extends ClientSyncBlockEntity implemen
     private int channelStartPoint, dmxUniverse = 0;
     private int redstoneOutput = 0;
     private RDMDeviceId deviceId;
-    private UUID networkId;
+    private UUID networkId = UUIDUtil.NULL;
 
     public RedstoneInterfaceBlockEntity(BlockPos blockPos, BlockState blockState) {
         super(BlockEntities.REDSTONE_INTERFACE.get(), blockPos, blockState);

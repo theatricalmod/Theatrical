@@ -7,6 +7,7 @@ import dev.imabad.theatrical.blockentities.ClientSyncBlockEntity;
 import dev.imabad.theatrical.blocks.control.BasicLightingDeskBlock;
 import dev.imabad.theatrical.config.TheatricalConfig;
 import dev.imabad.theatrical.dmx.DMXNetworkData;
+import dev.imabad.theatrical.util.UUIDUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.Level;
@@ -76,7 +77,7 @@ public class BasicLightingDeskBlockEntity extends ClientSyncBlockEntity implemen
     private boolean isFadingOut = false;
     private byte grandMaster = -1;
 
-    private UUID networkId;
+    private UUID networkId = UUIDUtil.NULL;
     private int universe = 0;
 
     public BasicLightingDeskBlockEntity(BlockPos blockPos, BlockState blockState) {
