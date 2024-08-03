@@ -185,25 +185,27 @@ public class ArtNetConfigurationScreen extends Screen {
                         TheatricalClient.getArtNetManager().shutdownAll();
                         TheatricalClient.getArtNetManager().getClient();
                     }
-                    for (int i = 0; i < oldUniverses.length; i++) {
-                        boolean found = false;
-                        if (oldUniverses[i] >= 0) {
-                            for (int x = 0; x < universe.length; x++) {
-                                if (universe[x] == oldUniverses[i]) {
-                                    found = true;
-                                    break;
+                    if(TheatricalClient.getArtNetManager().getClient() != null){
+                        for (int oldUnivers : oldUniverses) {
+                            boolean found = false;
+                            if (oldUnivers >= 0) {
+                                for (int x = 0; x < universe.length; x++) {
+                                    if (universe[x] == oldUnivers) {
+                                        found = true;
+                                        break;
+                                    }
                                 }
-                            }
-                            if (!found) {
-                                if (TheatricalClient.getArtNetManager().getClient().isSubscribedTo(oldUniverses[i])) {
-                                    TheatricalClient.getArtNetManager().getClient().unsubscribeFromUniverse(oldUniverses[i]);
+                                if (!found) {
+                                    if (TheatricalClient.getArtNetManager().getClient().isSubscribedTo(oldUnivers)) {
+                                        TheatricalClient.getArtNetManager().getClient().unsubscribeFromUniverse(oldUnivers);
+                                    }
                                 }
                             }
                         }
-                    }
-                    for (int i = 0; i < universe.length; i++) {
-                        if (universe[i] >= 0 && !TheatricalClient.getArtNetManager().getClient().isSubscribedTo(universe[i])) {
-                            TheatricalClient.getArtNetManager().getClient().subscribeToUniverse(universe[i]);
+                        for (int j : universe) {
+                            if (j >= 0 && !TheatricalClient.getArtNetManager().getClient().isSubscribedTo(j)) {
+                                TheatricalClient.getArtNetManager().getClient().subscribeToUniverse(j);
+                            }
                         }
                     }
                 }
