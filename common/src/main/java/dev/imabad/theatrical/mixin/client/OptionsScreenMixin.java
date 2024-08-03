@@ -1,6 +1,7 @@
 package dev.imabad.theatrical.mixin.client;
 
 import dev.imabad.theatrical.client.gui.screen.ArtNetConfigurationScreen;
+import dev.imabad.theatrical.net.artnet.RequestNetworks;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.layouts.GridLayout;
@@ -30,6 +31,7 @@ public abstract class OptionsScreenMixin extends Screen {
     @Inject(method = "init()V", at = @At(value = "INVOKE", target="Lnet/minecraft/client/gui/layouts/GridLayout$RowHelper;addChild(Lnet/minecraft/client/gui/layouts/LayoutElement;ILnet/minecraft/client/gui/layouts/LayoutSettings;)Lnet/minecraft/client/gui/layouts/LayoutElement;"), locals = LocalCapture.CAPTURE_FAILHARD)
     private void onCreatePauseMenu(CallbackInfo ci, GridLayout gridLayout, GridLayout.RowHelper rowHelper){
         if(Minecraft.getInstance().level != null) {
+            new RequestNetworks().sendToServer();
             rowHelper.addChild(this.openScreenButton(Component.translatable("button.artnetconfig"), () -> new ArtNetConfigurationScreen((OptionsScreen) (Object) this)));
         }
     }

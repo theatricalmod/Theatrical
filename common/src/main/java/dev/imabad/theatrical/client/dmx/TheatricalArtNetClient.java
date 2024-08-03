@@ -8,6 +8,7 @@ import ch.bildspur.artnet.rdm.RDMDeviceId;
 import ch.bildspur.artnet.rdm.RDMPacket;
 import ch.bildspur.artnet.rdm.RDMParameter;
 import dev.imabad.theatrical.Constants;
+import dev.imabad.theatrical.Theatrical;
 import dev.imabad.theatrical.TheatricalExpectPlatform;
 import dev.imabad.theatrical.api.Fixture;
 import dev.imabad.theatrical.api.dmx.DMXPersonality;
@@ -174,6 +175,10 @@ public class TheatricalArtNetClient extends ArtNetClient {
         getArtNetServer().broadcastPacket(replyPacket);
     }
 
+    public int[] getUniverses(){
+        return this.universes;
+    }
+
     private void onPacketReceived(InetAddress sourceAddress, final ArtNetPacket packet) {
         switch(packet.getType()){
             case ART_OUTPUT: {
@@ -185,7 +190,7 @@ public class TheatricalArtNetClient extends ArtNetClient {
                 int universe = dmxPacket.getUniverseID();
                 lastPacketMS = System.currentTimeMillis();
                 getInputBuffer().setDmxData((short) subnet, (short) universe, dmxPacket.getDmxData());
-                if(subnet == 0) {
+                if(subnet == 0 && isSubscribedTo(universe)) {
                     new SendArtNetData(manager.getNetworkId(), universe, dmxPacket.getDmxData()).sendToServer();
                 }
                 break;

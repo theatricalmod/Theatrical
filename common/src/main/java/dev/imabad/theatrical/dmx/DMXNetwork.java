@@ -15,6 +15,7 @@ import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class DMXNetwork {
     private final UUID id;
@@ -101,7 +102,7 @@ public class DMXNetwork {
     }
 
     public void addConsumer(BlockPos pos, DMXConsumer consumer){
-        Map<BlockPos, DMXConsumer> universe = universeToNodeMap.computeIfAbsent(consumer.getUniverse(), (uni) -> new HashMap<>());
+        Map<BlockPos, DMXConsumer> universe = universeToNodeMap.computeIfAbsent(consumer.getUniverse(), (uni) -> new ConcurrentHashMap<>());
         universe.put(pos, consumer);
         universeToNodeMap.put(consumer.getUniverse(), universe);
         new NotifyConsumerChange(consumer.getUniverse(),
