@@ -63,6 +63,20 @@ public class TheatricalClient {
         ClientPlayerEvent.CLIENT_PLAYER_QUIT.register((event) -> {
             onWorldClose();
         });
+/*      We send straight from the ArtNetClient now instead of looping on a tick.
+        ClientTickEvent.CLIENT_LEVEL_POST.register(instance -> {
+            if(instance.dimension().equals(Level.OVERWORLD)) {
+                if (TheatricalConfig.INSTANCE.CLIENT.artnetEnabled) {
+                    for (int univers : artNetManager.getClient().getUniverses()) {
+                        if(univers != -1) {
+                            byte[] data = artNetManager.getClient().readDmxData(0, univers);
+                            new SendArtNetData(artNetManager.getNetworkId(), univers, data).sendToServer();
+                        }
+                    }
+                }
+            }
+        });
+*/
     }
 
     public static ArtNetManager getArtNetManager(){

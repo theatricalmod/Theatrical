@@ -41,7 +41,7 @@ public class TheatricalForge {
             }
 //            if(Platform.isDevelopmentEnvironment()) {
             if (renderLevelStageEvent.getStage() == RenderLevelStageEvent.Stage.AFTER_PARTICLES) {
-                TheatricalClient.renderWorldLast(renderLevelStageEvent.getPoseStack(), renderLevelStageEvent.getProjectionMatrix(), renderLevelStageEvent.getCamera(), renderLevelStageEvent.getRenderTick());
+                TheatricalClient.renderWorldLast(renderLevelStageEvent.getPoseStack(), renderLevelStageEvent.getProjectionMatrix(), renderLevelStageEvent.getCamera(), renderLevelStageEvent.getPartialTick());
             }
 //            }
         });
