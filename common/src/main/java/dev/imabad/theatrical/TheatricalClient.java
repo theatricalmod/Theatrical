@@ -16,6 +16,7 @@ import dev.imabad.theatrical.client.blockentities.LEDPanelRenderer;
 import dev.imabad.theatrical.client.blockentities.MovingLightRenderer;
 import dev.imabad.theatrical.client.dmx.ArtNetToNetworkClientData;
 import dev.imabad.theatrical.config.TheatricalConfig;
+import dev.imabad.theatrical.config.UniverseConfig;
 import dev.imabad.theatrical.dmx.DMXDevice;
 import dev.imabad.theatrical.client.dmx.TheatricalArtNetClient;
 import dev.imabad.theatrical.lighting.LightManager;
@@ -174,14 +175,15 @@ public class TheatricalClient {
     public static void handleConsumerChange(NotifyConsumerChange notifyConsumerChange){
         if(TheatricalConfig.INSTANCE.CLIENT.artnetEnabled){
             TheatricalArtNetClient artNetClient = getArtNetManager().getClient();
-            if(artNetClient.isSubscribedTo(notifyConsumerChange.getUniverse())){
+            if(TheatricalConfig.INSTANCE.CLIENT.universes.containsKey(notifyConsumerChange.getUniverse())){
+                UniverseConfig universeConfig = TheatricalConfig.INSTANCE.CLIENT.universes.get(notifyConsumerChange.getUniverse());
                 DMXDevice dmxDevice = notifyConsumerChange.getDmxDevice();
                 if(notifyConsumerChange.getChangeType() == NotifyConsumerChange.ChangeType.ADD){
-                    artNetClient.addDevice(notifyConsumerChange.getUniverse(), dmxDevice.getDeviceId(), dmxDevice);
+                    artNetClient.addDevice((short) universeConfig.subnet,(short)  universeConfig.universe, dmxDevice.getDeviceId(), dmxDevice);
                 } else if(notifyConsumerChange.getChangeType() == NotifyConsumerChange.ChangeType.UPDATE) {
-                    artNetClient.updateDevice(notifyConsumerChange.getUniverse(), dmxDevice.getDeviceId(), dmxDevice);
+                    artNetClient.updateDevice((short) universeConfig.subnet,(short)  universeConfig.universe, dmxDevice.getDeviceId(), dmxDevice);
                 } else {
-                    artNetClient.removeDevice(notifyConsumerChange.getUniverse(), dmxDevice.getDeviceId());
+                    artNetClient.removeDevice((short) universeConfig.subnet,(short)  universeConfig.universe, dmxDevice.getDeviceId());
                 }
             }
         }
@@ -190,9 +192,10 @@ public class TheatricalClient {
     public static void handleListConsumers(ListConsumers listConsumers){
         if(TheatricalConfig.INSTANCE.CLIENT.artnetEnabled) {
             TheatricalArtNetClient artNetClient = getArtNetManager().getClient();
-            if (artNetClient.isSubscribedTo(listConsumers.getUniverse())) {
+            if(TheatricalConfig.INSTANCE.CLIENT.universes.containsKey(listConsumers.getUniverse())) {
+                UniverseConfig universeConfig = TheatricalConfig.INSTANCE.CLIENT.universes.get(listConsumers.getUniverse());
                 for (DMXDevice dmxDevice : listConsumers.getDmxDevices()) {
-                    artNetClient.addDevice(listConsumers.getUniverse(), dmxDevice.getDeviceId(), dmxDevice);
+                    artNetClient.addDevice((short) universeConfig.subnet, (short) universeConfig.universe, dmxDevice.getDeviceId(), dmxDevice);
                 }
             }
         }

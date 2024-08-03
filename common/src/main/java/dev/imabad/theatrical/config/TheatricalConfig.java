@@ -2,6 +2,13 @@ package dev.imabad.theatrical.config;
 
 import dev.imabad.theatrical.Theatrical;
 import dev.imabad.theatrical.config.api.TheatricalConfigItem;
+import io.netty.util.collection.IntObjectHashMap;
+import io.netty.util.collection.IntObjectMap;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class TheatricalConfig {
 
@@ -29,15 +36,8 @@ public class TheatricalConfig {
         public boolean artnetEnabled = false;
         @TheatricalConfigItem
         public String artNetIP = "";
-        @TheatricalConfigItem(minValue = "0", maxValue = "16")
-        public int universe1 = 1;
-        @TheatricalConfigItem(minValue = "-1", maxValue = "16")
-        public int universe2 = -1;
-        @TheatricalConfigItem(minValue = "-1", maxValue = "16")
-        public int universe3 = -1;
-        @TheatricalConfigItem(minValue = "-1", maxValue = "16")
-        public int universe4 = -1;
-
+        @TheatricalConfigItem
+        public Map<Integer, UniverseConfig> universes =  new IntObjectHashMap<>();
     }
 
     public static class ServerConfig extends BaseConfig{
@@ -49,4 +49,5 @@ public class TheatricalConfig {
         @TheatricalConfigItem(minValue = "25")
         public int defaultMaxLightDist = 25;
     }
+
 }

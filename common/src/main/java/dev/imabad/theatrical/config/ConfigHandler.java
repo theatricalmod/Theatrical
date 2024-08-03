@@ -7,7 +7,11 @@ import dev.imabad.theatrical.config.api.TheatricalConfigItem;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 import org.yaml.snakeyaml.DumperOptions;
+import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.constructor.Constructor;
+import org.yaml.snakeyaml.inspector.TagInspector;
+import org.yaml.snakeyaml.representer.Representer;
 
 import java.io.File;
 import java.io.FileReader;
@@ -49,7 +53,11 @@ public class ConfigHandler {
         options.setIndent(2);
         options.setPrettyFlow(true);
         options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
-        this.yaml = new Yaml(options);
+        LoaderOptions loaderOptions = new LoaderOptions();
+        TagInspector taginspector =
+                tag -> tag.getClassName().equals(UniverseConfig.class.getName());
+        loaderOptions.setTagInspector(taginspector);
+        this.yaml = new Yaml(new Constructor(loaderOptions), new Representer(options));
     }
 
     @Nullable

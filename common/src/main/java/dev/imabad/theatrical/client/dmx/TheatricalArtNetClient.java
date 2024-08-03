@@ -9,11 +9,13 @@ import ch.bildspur.artnet.rdm.RDMPacket;
 import ch.bildspur.artnet.rdm.RDMParameter;
 import dev.imabad.theatrical.Constants;
 import dev.imabad.theatrical.Theatrical;
+import dev.imabad.theatrical.TheatricalClient;
 import dev.imabad.theatrical.TheatricalExpectPlatform;
 import dev.imabad.theatrical.api.Fixture;
 import dev.imabad.theatrical.api.dmx.DMXPersonality;
 import dev.imabad.theatrical.api.dmx.DMXSlot;
 import dev.imabad.theatrical.config.TheatricalConfig;
+import dev.imabad.theatrical.config.UniverseConfig;
 import dev.imabad.theatrical.dmx.DMXDevice;
 import dev.imabad.theatrical.fixtures.Fixtures;
 import dev.imabad.theatrical.net.artnet.RDMUpdateConsumer;
@@ -30,6 +32,7 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.nio.ByteBuffer;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class TheatricalArtNetClient extends ArtNetClient {
     private ArtNetManager manager;
@@ -41,7 +44,6 @@ public class TheatricalArtNetClient extends ArtNetClient {
     private IntObjectMap<Map<RDMDeviceId, DMXDevice>> proxiedDevices;
     private boolean listChanged = false;
     private Queue<RDMPacket> queuedMessages;
-    private int[] universes = new int[]{-1, -1, -1, -1};
 
     public TheatricalArtNetClient(InetAddress address, ArtNetManager manager) {
         super();
@@ -50,17 +52,22 @@ public class TheatricalArtNetClient extends ArtNetClient {
         RDM_DEVICE_ID = buildDeviceId();
         proxiedDevices = new IntObjectHashMap<>();
         queuedMessages = new ArrayDeque<>();
-        universes = new int[]{TheatricalConfig.INSTANCE.CLIENT.universe1,TheatricalConfig.INSTANCE.CLIENT.universe2,TheatricalConfig.INSTANCE.CLIENT.universe3,TheatricalConfig.INSTANCE.CLIENT.universe4};
-        for (int i = 0; i < universes.length; i++) {
-            new RequestConsumers(manager.getNetworkId(), i).sendToServer();
+//        universes = TheatricalConfig.INSTANCE.CLIENT.universes.values().stream().filter((i) -> i.enabled).map(universeConfig -> universeConfig.getUniverse()).collect(Collectors.toList());
+//        universes = new int[]{TheatricalConfig.INSTANCE.CLIENT.universe1,TheatricalConfig.INSTANCE.CLIENT.universe2,TheatricalConfig.INSTANCE.CLIENT.universe3,TheatricalConfig.INSTANCE.CLIENT.universe4};
+        for (Map.Entry<Integer, UniverseConfig> integerUniverseConfigEntry : TheatricalConfig.INSTANCE.CLIENT.universes.entrySet()) {
+            if(integerUniverseConfigEntry.getValue().enabled){
+                new RequestConsumers(manager.getNetworkId(), integerUniverseConfigEntry.getKey()).sendToServer();
+            }
         }
     }
 
     public void networkChange(){
         proxiedDevices.clear();
         queuedMessages.clear();
-        for (int i = 0; i < universes.length; i++) {
-            new RequestConsumers(manager.getNetworkId(), i).sendToServer();
+        for (Map.Entry<Integer, UniverseConfig> integerUniverseConfigEntry : TheatricalConfig.INSTANCE.CLIENT.universes.entrySet()) {
+            if(integerUniverseConfigEntry.getValue().enabled){
+                new RequestConsumers(manager.getNetworkId(), integerUniverseConfigEntry.getKey()).sendToServer();
+            }
         }
     }
 
@@ -82,74 +89,56 @@ public class TheatricalArtNetClient extends ArtNetClient {
         return wrap.array();
     }
 
-    public boolean isSubscribedTo(int universe){
-        for (int univers : universes) {
-            if (univers == universe) {
-                return true;
-            }
-        }
-        return false;
+    public boolean isSubscribedTo(int subnet, int universe){
+        return TheatricalConfig.INSTANCE.CLIENT.universes.values()
+                .stream().anyMatch(x -> x.enabled && x.subnet == subnet && x.universe == universe);
     }
 
-    public boolean subscribeToUniverse(int universe){
-        // Prevent duplicates!
-        for (int univers : universes) {
-            if (univers == universe) {
-                return false;
-            }
+    public int getNetworkUniverse(int subnet, int universe){
+        Optional<Map.Entry<Integer, UniverseConfig>> first = TheatricalConfig.INSTANCE.CLIENT.universes.entrySet()
+                .stream().filter(x -> x.getValue().enabled && x.getValue().subnet == subnet && x.getValue().universe == universe).findFirst();
+        if(first.isPresent()){
+            return first.get().getKey();
         }
-        for (int i = 0; i < universes.length; i++) {
-            if(universes[i] == -1){
-                universes[i] = universe;
-                buildAndSetPollReply();
-                return true;
-            }
-        }
-        return false;
+        return -1;
     }
 
-    public boolean unsubscribeFromUniverse(int universe){
-        for(int i = 0; i <universes.length; i++){
-            if(universes[i] == universe){
-                universes[i] = -1;
-                buildAndSetPollReply();
-                return true;
-            }
-        }
-        return false;
+    public void refreshSubscriptions(){
+        buildAndSetPollReply();
     }
 
-    private Map<RDMDeviceId, DMXDevice> getProxyMap(int universe){
-        if(!proxiedDevices.containsKey(universe)){
-            proxiedDevices.put(universe, new HashMap<>());
+    private Map<RDMDeviceId, DMXDevice> getProxyMap(short subnet, short universe){
+        int key = hashKeyFromPair(subnet, universe);
+        if(!proxiedDevices.containsKey(key)){
+            proxiedDevices.put(key, new HashMap<>());
         }
-        return proxiedDevices.get(universe);
+        return proxiedDevices.get(key);
     }
 
-    public void addDevice(int universe, RDMDeviceId deviceId, DMXDevice dmxDevice){
-        if(getProxyMap(universe).containsKey(deviceId)){
+    public void addDevice(short subnet, short universe, RDMDeviceId deviceId, DMXDevice dmxDevice){
+        if(getProxyMap(subnet, universe).containsKey(deviceId)){
             return;
         }
-        getProxyMap(universe).put(deviceId, dmxDevice);
+        getProxyMap(subnet, universe).put(deviceId, dmxDevice);
         listChanged = true;
-        sendTOD(universe);
+        sendTOD(subnet, universe);
         //queueProxiedDevicesUpdate();
     }
-    public void updateDevice(int universe, RDMDeviceId deviceId, DMXDevice dmxDevice){
-        getProxyMap(universe).put(deviceId, dmxDevice);
+    public void updateDevice(short subnet, short universe, RDMDeviceId deviceId, DMXDevice dmxDevice){
+        getProxyMap(subnet, universe).put(deviceId, dmxDevice);
     }
 
     public void clearDevices(){
         this.proxiedDevices.clear();
     }
 
-    public void removeDevice(int universe, RDMDeviceId deviceId){
-        if(!getProxyMap(universe).containsKey(deviceId)){
+    public void removeDevice(short subnet, short universe, RDMDeviceId deviceId){
+        if(!getProxyMap(subnet, universe).containsKey(deviceId)){
             return;
         }
-        getProxyMap(universe).remove(deviceId);
+        getProxyMap(subnet, universe).remove(deviceId);
         listChanged = true;
-        sendTOD(universe);
+        sendTOD(subnet, universe);
 //        queueProxiedDevicesUpdate();
     }
 
@@ -164,19 +153,22 @@ public class TheatricalArtNetClient extends ArtNetClient {
 //        queuedMessages.add(getCommandResponse);
     }
 
-    private void sendTOD(int universe){
+    private void sendTOD(short subnet, short universe){
         ArtTodDataPacket replyPacket = new ArtTodDataPacket();
         replyPacket.setTotalDevices(proxiedDevices.size() + 1);
-        replyPacket.setUniverse(0, universe);
-//        replyPacket.addDevice(RDM_DEVICE_ID);
-        for (RDMDeviceId proxiedDevice : getProxyMap(universe).keySet()) {
+        replyPacket.setUniverse(subnet, universe);
+        for (RDMDeviceId proxiedDevice : getProxyMap(subnet, universe).keySet()) {
             replyPacket.addDevice(proxiedDevice.toBytes());
         }
         getArtNetServer().broadcastPacket(replyPacket);
     }
 
-    public int[] getUniverses(){
-        return this.universes;
+
+    public static int hashKeyFromPair(short a, short b) {
+        assert a >= 0;
+        assert b >= 0;
+        long sum = (long) a + (long) b;
+        return (int) (sum * (sum + 1) / 2) + a;
     }
 
     private void onPacketReceived(InetAddress sourceAddress, final ArtNetPacket packet) {
@@ -190,29 +182,31 @@ public class TheatricalArtNetClient extends ArtNetClient {
                 int universe = dmxPacket.getUniverseID();
                 lastPacketMS = System.currentTimeMillis();
                 getInputBuffer().setDmxData((short) subnet, (short) universe, dmxPacket.getDmxData());
-                if(subnet == 0 && isSubscribedTo(universe)) {
-                    new SendArtNetData(manager.getNetworkId(), universe, dmxPacket.getDmxData()).sendToServer();
+                int networkUniverse = getNetworkUniverse(subnet, universe);
+                if(networkUniverse != -1){
+                    new SendArtNetData(manager.getNetworkId(), networkUniverse, dmxPacket.getDmxData()).sendToServer();
                 }
                 break;
             }
             case ART_TOD_REQUEST: {
                 ArtTodRequestPacket requestPacket = (ArtTodRequestPacket) packet;
-                sendTOD(requestPacket.getUniverseID());
+                sendTOD((short) requestPacket.getSubnetID(), (short)  requestPacket.getUniverseID());
                 break;
             }
             case ART_TOD_CONTROL: {
                 ArtTodControlPacket controlPacket = (ArtTodControlPacket) packet;
                 if (controlPacket.isFlush()) {
-                    sendTOD(controlPacket.getUniverseID());
+                    sendTOD((short) controlPacket.getSubnetID(), (short)  controlPacket.getUniverseID());
                 }
                 break;
             }
             case ART_RDM:
                 ArtRdmPacket artRdmPacket = (ArtRdmPacket) packet;
                 RDMPacket rdmPacket = artRdmPacket.getRdmPacket();
-                int universe = getUniverseFromPortAddress(artRdmPacket.getAddress());
+                short universe = getUniverseFromPortAddress(artRdmPacket.getAddress());
+                short subnet = getSubnetFromPortAddress(artRdmPacket.getAddress());
                 RDMDeviceId destinationID = new RDMDeviceId(rdmPacket.getDestinationID());
-                if(!getProxyMap(universe).containsKey(destinationID) && !Arrays.equals(rdmPacket.getDestinationID(), RDM_DEVICE_ID)){
+                if(!getProxyMap(subnet, universe).containsKey(destinationID) && !Arrays.equals(rdmPacket.getDestinationID(), RDM_DEVICE_ID)){
                     return;
                 }
                 if(rdmPacket.getCommandClass() != null && rdmPacket.getParameter() != null) {
@@ -245,7 +239,7 @@ public class TheatricalArtNetClient extends ArtNetClient {
                                     deviceInfoData.setInt8(0x01, 0);
                                     deviceInfoData.setInt8(0x00, 1);
                                     if (!Arrays.equals(rdmPacket.getDestinationID(), RDM_DEVICE_ID)) {
-                                        DMXDevice dmxDevice = getProxyMap(universe).get(destinationID);
+                                        DMXDevice dmxDevice = getProxyMap(subnet, universe).get(destinationID);
                                         Fixture fixture = Fixtures.FIXTURES.get(dmxDevice.getFixtureID());
                                         deviceInfoData.setInt16(dmxDevice.getDeviceTypeId(), 2);
                                         deviceInfoData.setInt16(0x01 >> 8, 4);
@@ -271,7 +265,7 @@ public class TheatricalArtNetClient extends ArtNetClient {
                                     getCommandResponse.setParameter(RDMParameter.DMX_START_ADDRESS);
                                     ch.bildspur.artnet.packets.ByteUtils dmxStartAddress = new ch.bildspur.artnet.packets.ByteUtils(new byte[0x02]);
                                     if (!Arrays.equals(rdmPacket.getDestinationID(), RDM_DEVICE_ID)) {
-                                        DMXDevice dmxDevice = getProxyMap(universe).get(destinationID);
+                                        DMXDevice dmxDevice = getProxyMap(subnet, universe).get(destinationID);
                                         dmxStartAddress.setInt16(dmxDevice.getDmxStartAddress(), 0);
                                     } else {
                                         dmxStartAddress.setInt16(0, 0);
@@ -305,7 +299,7 @@ public class TheatricalArtNetClient extends ArtNetClient {
                                     getCommandResponse.setParameter(RDMParameter.DEVICE_MODEL_DESCRIPTION);
                                     String deviceModel = "";
                                     if (!Arrays.equals(rdmPacket.getDestinationID(), RDM_DEVICE_ID)) {
-                                        DMXDevice dmxDevice = getProxyMap(universe).get(destinationID);
+                                        DMXDevice dmxDevice = getProxyMap(subnet, universe).get(destinationID);
                                         deviceModel = dmxDevice.getModelName();
                                     }
                                     if (deviceModel.length() > 32) {
@@ -319,7 +313,7 @@ public class TheatricalArtNetClient extends ArtNetClient {
                                     getCommandResponse.setParameter(RDMParameter.DMX_PERSONALITY);
                                     ch.bildspur.artnet.packets.ByteUtils byteUtils = new ch.bildspur.artnet.packets.ByteUtils(new byte[2]);
                                     if (!Arrays.equals(rdmPacket.getDestinationID(), RDM_DEVICE_ID)) {
-                                        DMXDevice dmxDevice = getProxyMap(universe).get(destinationID);
+                                        DMXDevice dmxDevice = getProxyMap(subnet, universe).get(destinationID);
                                         Fixture fixture = Fixtures.FIXTURES.get(dmxDevice.getFixtureID());
                                         int activePersonality = dmxDevice.getActivePersonality() + 1;
                                         byteUtils.setInt8(activePersonality, 0);
@@ -334,7 +328,7 @@ public class TheatricalArtNetClient extends ArtNetClient {
                                     String personalityText = "";
                                     int footprint = 0;
                                     if (!Arrays.equals(rdmPacket.getDestinationID(), RDM_DEVICE_ID)) {
-                                        DMXDevice dmxDevice = getProxyMap(universe).get(destinationID);
+                                        DMXDevice dmxDevice = getProxyMap(subnet, universe).get(destinationID);
                                         Fixture fixture = Fixtures.FIXTURES.get(dmxDevice.getFixtureID());
                                         personalityText = fixture.getDMXPersonalities()
                                                 .get(dmxDevice.getActivePersonality()).getDescription();
@@ -356,7 +350,7 @@ public class TheatricalArtNetClient extends ArtNetClient {
                                     getCommandResponse.setParameter(RDMParameter.SLOT_INFO);
                                     ch.bildspur.artnet.packets.ByteUtils byteUtils;
                                     if(!Arrays.equals(rdmPacket.getDestinationID(), RDM_DEVICE_ID)) {
-                                        DMXDevice dmxDevice = getProxyMap(universe).get(destinationID);
+                                        DMXDevice dmxDevice = getProxyMap(subnet, universe).get(destinationID);
                                         Fixture fixture = Fixtures.FIXTURES.get(dmxDevice.getFixtureID());
                                         DMXPersonality activePersonality = fixture.getDMXPersonalities()
                                                 .get(dmxDevice.getActivePersonality());
@@ -378,7 +372,7 @@ public class TheatricalArtNetClient extends ArtNetClient {
                                     getCommandResponse.setParameter(RDMParameter.SLOT_DESCRIPTION);
                                     ch.bildspur.artnet.packets.ByteUtils byteUtils;
                                     if(!Arrays.equals(rdmPacket.getDestinationID(), RDM_DEVICE_ID)) {
-                                        DMXDevice dmxDevice = getProxyMap(universe).get(destinationID);
+                                        DMXDevice dmxDevice = getProxyMap(subnet, universe).get(destinationID);
                                         Fixture fixture = Fixtures.FIXTURES.get(dmxDevice.getFixtureID());
                                         DMXPersonality activePersonality = fixture.getDMXPersonalities()
                                                 .get(dmxDevice.getActivePersonality());
@@ -399,7 +393,7 @@ public class TheatricalArtNetClient extends ArtNetClient {
                                     getCommandResponse.setParameter(RDMParameter.DEFAULT_SLOT_VALUE);
                                     ch.bildspur.artnet.packets.ByteUtils byteUtils;
                                     if(!Arrays.equals(rdmPacket.getDestinationID(), RDM_DEVICE_ID)) {
-                                        DMXDevice dmxDevice = getProxyMap(universe).get(destinationID);
+                                        DMXDevice dmxDevice = getProxyMap(subnet, universe).get(destinationID);
                                         Fixture fixture = Fixtures.FIXTURES.get(dmxDevice.getFixtureID());
                                         DMXPersonality activePersonality = fixture.getDMXPersonalities()
                                                 .get(dmxDevice.getActivePersonality());
@@ -456,7 +450,7 @@ public class TheatricalArtNetClient extends ArtNetClient {
                             setCommandResponse.setMessageCount(queuedMessages.size());
                             setCommandResponse.setSubDevice((short) 0);
                             setCommandResponse.setCommandClass(RDMCommandClass.SET_COMMAND_RESPONSE);
-                            DMXDevice targetDevice = getProxyMap(universe).get(new RDMDeviceId(rdmPacket.getDestinationID()));
+                            DMXDevice targetDevice = getProxyMap(subnet, universe).get(new RDMDeviceId(rdmPacket.getDestinationID()));
                             if(targetDevice == null){
                                 return;
                             }
@@ -487,9 +481,14 @@ public class TheatricalArtNetClient extends ArtNetClient {
         // only store input data if buffer is created
     }
 
-    private int getUniverseFromPortAddress(int portAddress)
+    private short getUniverseFromPortAddress(int portAddress)
     {
-        return portAddress & 0xF;
+        return (short) (portAddress & 0xFF);
+    }
+
+    private short getSubnetFromPortAddress(int portAddress)
+    {
+        return (short) ((portAddress >> 8) & 0x0F);
     }
 
     public boolean hasReceivedPacket(){
@@ -545,14 +544,8 @@ public class TheatricalArtNetClient extends ArtNetClient {
         defaultReplyPacket.setNodeStatus(nodeStatus);
         PortDescriptor[] ports = new PortDescriptor[4];
         int portCount = 0;
-        for(int i = 0; i < universes.length; i++){
-            int universe = universes[i];
-            if(universe == -1){
-                ports[i] = new PortDescriptor(false, false, PortType.DMX512, (byte) 0 ,(byte) 0, 0, 0);
-            } else {
-                portCount++;
-                ports[i] = new PortDescriptor(true, false, PortType.DMX512, (byte) 0 ,(byte) 0, 0, universe);
-            }
+        for(int i = 0; i < 4; i++){
+            ports[i] = new PortDescriptor(true, false, PortType.DMX512, (byte) 0 ,(byte) 0, 0, 0);
         }
         defaultReplyPacket.setNumPorts(portCount);
         defaultReplyPacket.setPorts(ports);

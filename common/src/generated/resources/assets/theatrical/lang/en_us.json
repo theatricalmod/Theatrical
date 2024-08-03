@@ -44,5 +44,10 @@
   "ui.control.fadeOut": "Fade out",
   "ui.control.modes.program": "Program Mode",
   "ui.control.modes.run": "Run Mode",
-  "ui.control.step": "Step - %s"
+  "ui.control.step": "Step - %s",
+  "screen.artnetconfig.entry.subnet": "Subnet: %s",
+  "screen.artnetconfig.entry.universe": "Universe: %s",
+  "screen.artnetconfig.subnet": "DMX Subnet",
+  "screen.artnetconfig.networkUniverse": "Network Universe",
+  "screen.artnetconfig.networkEnabled": "Enabled"
 }
