@@ -4,6 +4,7 @@ import dev.architectury.networking.simple.MessageType;
 import dev.architectury.networking.simple.SimpleNetworkManager;
 import dev.imabad.theatrical.Theatrical;
 import dev.imabad.theatrical.net.artnet.*;
+import dev.imabad.theatrical.net.compat.create.SendBEDataToContraption;
 
 public interface TheatricalNet {
     SimpleNetworkManager MAIN = SimpleNetworkManager.create(Theatrical.MOD_ID);
@@ -27,6 +28,7 @@ public interface TheatricalNet {
     MessageType LIST_CONSUMERS = MAIN.registerS2C("list_consumers", ListConsumers::new);
     MessageType NOTIFY_NETWORKS = MAIN.registerS2C("notify_networks", NotifyNetworks::new);
     MessageType OPEN_SCREEN = MAIN.registerS2C("open_screen", OpenScreen::new);
+    MessageType SEND_BE_DATA_TO_CONTRAPTION = MAIN.registerS2C("send_be_data_to_contraption", SendBEDataToContraption::new);
 
     static void init(){}
 }

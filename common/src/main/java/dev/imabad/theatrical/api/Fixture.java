@@ -42,4 +42,7 @@ public abstract class Fixture {
     public boolean invertTilt() { return false; }
     public boolean invertPan() { return false; }
     public abstract double getLightRadius();
+    public boolean isUpsideDown(BlockState blockState) {
+        return false;
+    }
 }

@@ -28,4 +28,6 @@ public interface DMXConsumer extends BelongsToNetwork {
     UUID getNetworkId();
 
     String getTranslationKey();
+
+    void setStartAddress(int startAddress);
 }

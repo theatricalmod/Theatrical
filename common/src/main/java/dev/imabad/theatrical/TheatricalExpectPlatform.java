@@ -1,6 +1,7 @@
 package dev.imabad.theatrical;
 
 import dev.architectury.injectables.annotations.ExpectPlatform;
+import dev.imabad.theatrical.net.compat.create.SendBEDataToContraption;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.resources.ResourceLocation;
 
@@ -20,6 +21,11 @@ public class TheatricalExpectPlatform {
     }
     @ExpectPlatform
     public static String getModVersion() {
+        throw new AssertionError();
+    }
+
+    @ExpectPlatform
+    public static void handleBEDataForContraption(SendBEDataToContraption packet){
         throw new AssertionError();
     }
 

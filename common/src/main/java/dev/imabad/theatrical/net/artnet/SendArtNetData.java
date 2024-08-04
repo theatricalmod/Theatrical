@@ -53,6 +53,7 @@ public class SendArtNetData extends BaseC2SMessage {
             if(network != null) {
                 if (network.members().isMember(uuid) && network.members().canSendDMX(uuid)) {
                     Collection<DMXConsumer> consumers = network.dmx().getConsumers(universe);
+                    network.setDmxData(universe, artNetData);
                     if(consumers != null) {
                         consumers.forEach(consumer -> {
                             consumer.consume(artNetData);
