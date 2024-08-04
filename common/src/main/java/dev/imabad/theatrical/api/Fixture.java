@@ -40,4 +40,7 @@ public abstract class Fixture {
     }
     public abstract float[] getTransforms(BlockState fixtureBlockState, BlockState supportBlockState);
     public abstract List<DMXPersonality> getDMXPersonalities();
+    public boolean isUpsideDown(BlockState blockState) {
+        return false;
+    }
 }

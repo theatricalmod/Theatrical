@@ -5,8 +5,6 @@ import dev.imabad.theatrical.api.dmx.DMXConsumer;
 import dev.imabad.theatrical.net.artnet.NotifyConsumerChange;
 import io.netty.util.collection.IntObjectHashMap;
 import io.netty.util.collection.IntObjectMap;
-import net.minecraft.client.Minecraft;
-import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
@@ -15,14 +13,14 @@ import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class DMXNetwork {
     private final UUID id;
     private String name;
     private DMXNetworkMode mode;
     private final Set<DMXNetworkMember> members;
-    private final IntObjectMap<Map<BlockPos, DMXConsumer>> universeToNodeMap = new IntObjectHashMap<>();
+    private final IntObjectMap<Set<DMXConsumer>> universeToNodeMap = new IntObjectHashMap<>();
+    private final Map<Integer, byte[]> universeDataMap = new HashMap<>();
     private final Set<ServerPlayer> knownSenders = new HashSet<>();
     public DMXNetwork(UUID id, String name, DMXNetworkMode mode, Set<DMXNetworkMember> members) {
         this.id = id;
@@ -80,6 +78,18 @@ public class DMXNetwork {
         return members;
     }
 
+    public byte[] getDmxData(int universe){
+        if(!universeDataMap.containsKey(universe))
+            universeDataMap.put(universe, new byte[512]);
+
+        return universeDataMap.get(universe);
+    }
+
+    public void setDmxData(int universe, final byte[] dmxData)
+    {
+        universeDataMap.put(universe, dmxData);
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (obj == this) return true;
@@ -101,9 +111,9 @@ public class DMXNetwork {
                 "members=" + members + ']';
     }
 
-    public void addConsumer(BlockPos pos, DMXConsumer consumer){
-        Map<BlockPos, DMXConsumer> universe = universeToNodeMap.computeIfAbsent(consumer.getUniverse(), (uni) -> new ConcurrentHashMap<>());
-        universe.put(pos, consumer);
+    public void addConsumer(DMXConsumer consumer){
+        Set<DMXConsumer> universe = universeToNodeMap.computeIfAbsent(consumer.getUniverse(), (uni) -> new HashSet<>());
+        universe.add(consumer);
         universeToNodeMap.put(consumer.getUniverse(), universe);
         new NotifyConsumerChange(consumer.getUniverse(),
                 NotifyConsumerChange.ChangeType.ADD,
@@ -120,13 +130,12 @@ public class DMXNetwork {
                         consumer.getDeviceTypeId(),consumer.getActivePersonality(), consumer.getModelName(), consumer.getFixtureId()))
                 .sendTo(knownSenders);
     }
-
-    public void removeConsumer(DMXConsumer consumer, BlockPos pos){
+    public void removeConsumer(DMXConsumer consumer){
         if(!universeToNodeMap.containsKey(consumer.getUniverse())){
             return;
         }
-        Map<BlockPos, DMXConsumer> universe = universeToNodeMap.get(consumer.getUniverse());
-        universe.remove(pos);
+        Set<DMXConsumer> universe = universeToNodeMap.get(consumer.getUniverse());
+        universe.remove(consumer);
         new NotifyConsumerChange(consumer.getUniverse(), NotifyConsumerChange.ChangeType.REMOVE,
                 new DMXDevice(consumer.getDeviceId(), 0, 0,0,
                         0, "", new ResourceLocation("")))
@@ -135,32 +144,32 @@ public class DMXNetwork {
     @Nullable
     public Collection<DMXConsumer> getConsumers(int universe){
         if(universeToNodeMap.get(universe) != null) {
-            return universeToNodeMap.get(universe).values();
+            return universeToNodeMap.get(universe);
         }
         return null;
     }
 
-    public BlockPos getConsumerPos(int universe, RDMDeviceId deviceId){
-        for (Map.Entry<BlockPos, DMXConsumer> blockPosDMXConsumerEntry : universeToNodeMap.get(universe).entrySet()) {
-            if(blockPosDMXConsumerEntry.getValue().getDeviceId().equals(deviceId)){
-                return blockPosDMXConsumerEntry.getKey();
+    public DMXConsumer getConsumer(int universe, RDMDeviceId deviceId){
+        for (DMXConsumer blockPosDMXConsumerEntry : universeToNodeMap.get(universe)) {
+            if(blockPosDMXConsumerEntry.getDeviceId().equals(deviceId)){
+                return blockPosDMXConsumerEntry;
             }
         }
         return null;
     }
 
-    public Collection<DMXConsumer> getConsumersInRange(int universe, BlockPos fromPos, int radius){
-        Collection<DMXConsumer> consumers = new HashSet<>();
-        if(!universeToNodeMap.containsKey(universe) || universeToNodeMap.get(universe).isEmpty()){
-            return consumers;
-        }
-        for(Map.Entry<BlockPos, DMXConsumer> entry : universeToNodeMap.get(universe).entrySet()){
-            if(Math.sqrt(fromPos.distToCenterSqr(entry.getKey().getX(), entry.getKey().getY(), entry.getKey().getZ())) <= radius){
-                consumers.add(entry.getValue());
-            }
-        }
-        return consumers;
-    }
+//    public Collection<DMXConsumer> getConsumersInRange(int universe, BlockPos fromPos, int radius){
+//        Collection<DMXConsumer> consumers = new HashSet<>();
+//        if(!universeToNodeMap.containsKey(universe) || universeToNodeMap.get(universe).isEmpty()){
+//            return consumers;
+//        }
+//        for(Map.Entry<BlockPos, DMXConsumer> entry : universeToNodeMap.get(universe).entrySet()){
+//            if(Math.sqrt(fromPos.distToCenterSqr(entry.getKey().getX(), entry.getKey().getY(), entry.getKey().getZ())) <= radius){
+//                consumers.add(entry.getValue());
+//            }
+//        }
+//        return consumers;
+//    }
 
     public Set<Integer> getUniverses(){
         return universeToNodeMap.keySet();

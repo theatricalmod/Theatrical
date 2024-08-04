@@ -26,4 +26,6 @@ public interface DMXConsumer extends BelongsToNetwork {
     int getActivePersonality();
 
     UUID getNetworkId();
+
+    void setStartAddress(int startAddress);
 }

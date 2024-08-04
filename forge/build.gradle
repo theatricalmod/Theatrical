@@ -39,6 +39,13 @@ configurations {
     developmentForge.extendsFrom common
 }
 
+repositories {
+    maven {
+        name = 'tterrag maven'
+        url = 'https://maven.tterrag.com/'
+    }
+}
+
 dependencies {
     forge "net.minecraftforge:forge:${rootProject.forge_version}"
     // Remove the next line if you don't want to depend on the API
@@ -50,7 +57,7 @@ dependencies {
     //ArtNet
     implementation "ch.bildspur:artnet4j:${rootProject.artnet4j_version}"
     forgeRuntimeLibrary "ch.bildspur:artnet4j:${rootProject.artnet4j_version}"
-    shadowCommon "ch.bildspur:artnet4j:${rootProject.artnet4j_version}"
+    include "ch.bildspur:artnet4j:${rootProject.artnet4j_version}"
 
     implementation 'com.sun.activation:javax.activation:1.2.0'
     forgeRuntimeLibrary 'com.sun.activation:javax.activation:1.2.0'
@@ -58,7 +65,12 @@ dependencies {
     //YAML
     implementation "org.yaml:snakeyaml:${rootProject.snakeyaml_version}"
     forgeRuntimeLibrary "org.yaml:snakeyaml:${rootProject.snakeyaml_version}"
-    shadowCommon "org.yaml:snakeyaml:${rootProject.snakeyaml_version}"
+    include "org.yaml:snakeyaml:${rootProject.snakeyaml_version}"
+
+    // Create
+    modImplementation("com.simibubi.create:create-${minecraft_version}:${create_forge_version}:slim") { transitive = false }
+    modImplementation("com.tterrag.registrate:Registrate:${registrate_forge_version}")
+    modImplementation("com.jozufozu.flywheel:flywheel-forge-${flywheel_forge_minecraft_version}:${flywheel_forge_version}")
 }
 
 processResources {

@@ -152,7 +152,7 @@ public abstract class BaseLightBlockEntity extends ClientSyncBlockEntity impleme
     }
 
     @Override
-    public boolean isUpsideDown() {
+    public boolean isUpsideDown(){
         return false;
     }
 
@@ -178,6 +178,32 @@ public abstract class BaseLightBlockEntity extends ClientSyncBlockEntity impleme
                     LightManager.updateTracking(tile);
                 }
             }
+//        } else {
+//        }
+    }
+
+    public static <T extends BlockEntity> void tickInContraption(Level level, T be, Vec3 position) {
+        BaseLightBlockEntity tile = (BaseLightBlockEntity) be;
+//        if(!level.isClientSide){
+        tile.tickTimer++;
+        if(tile.tickTimer >= 5){
+//                if(tile.storePrev()){
+//                    level.sendBlockUpdated(pos, state, state, Block.UPDATE_CLIENTS);
+//                }
+
+            tile.tickTimer = 0;
+        }
+        if(tile.shouldTrace()){
+            tile.distance = tile.doRayTrace(position);
+        }
+        if (level.isClientSide() && LightManager.shouldUpdateDynamicLight()) {
+            if (tile.isRemoved()) {
+                tile.setDynamicLightEnabled(false);
+            } else {
+                tile.dynamicLightTick();
+                LightManager.updateTracking(tile);
+            }
+        }
 //        } else {
 //        }
     }
@@ -242,10 +268,10 @@ public abstract class BaseLightBlockEntity extends ClientSyncBlockEntity impleme
         return (getPrevRed() << 16) | (getPrevGreen() << 8) | getPrevBlue();
     }
 
-    public Optional<BlockState> getSupportingStructure(){
-        if(getLevel() != null){
-            BlockState blockState = getLevel().getBlockState(getBlockPos()
-                    .relative(getBlockState().getValue(HangableBlock.HANG_DIRECTION)));
+    public static Optional<BlockState> getSupportingStructure(Level level, BlockPos pos, BlockState state){
+        if(level != null){
+            BlockState blockState = level.getBlockState(pos
+                    .relative(state.getValue(HangableBlock.HANG_DIRECTION)));
             if(blockState.getBlock() instanceof Support) {
                 return Optional.of(blockState);
             }
@@ -271,6 +297,14 @@ public abstract class BaseLightBlockEntity extends ClientSyncBlockEntity impleme
         int b = (int) (getPrevBlue() + ((getBlue()) - getPrevBlue()) * partialTicks);
         return (r << 16) | (g << 8) | b;
     }
+
+    public static int calculatePartialColour(int prevRed, int prevGreen, int prevBlue, int red, int green, int blue, float partialTicks){
+        int r = (int) (prevRed + ((red) - prevRed) * partialTicks);
+        int g = (int) (prevGreen + ((green) - prevGreen) * partialTicks);
+        int b = (int) (prevBlue + ((blue) - prevBlue) * partialTicks);
+        return (r << 16) | (g << 8) | b;
+    }
+
 
     public static final Vec3 calculateViewVector(float xRot, float yRot) {
         float f = xRot * 0.017453292F;
@@ -337,17 +371,20 @@ public abstract class BaseLightBlockEntity extends ClientSyncBlockEntity impleme
         }
     }
 
-    public double doRayTrace() {
+    public double doRayTrace(){
+        return doRayTrace(getBlockPos().getCenter());
+    }
+
+    public double doRayTrace(Vec3 position) {
         Vec3 viewVector = BaseLightBlockEntity.rayTraceDir(this);
         double distance = getMaxLightDistance();
-        Vec3 vec3 = getBlockPos().getCenter();
-        Vec3 vec33 = vec3.add(viewVector.x * distance, viewVector.y * distance, viewVector.z * distance);
-        ClipContext context = new ClipContext(vec3, vec33, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, null);
+        Vec3 vec33 = position.add(viewVector.x * distance, viewVector.y * distance, viewVector.z * distance);
+        ClipContext context = new ClipContext(position, vec33, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, null);
         ((ClipContextAccessor) context).setCollisionContext(new LightCollisionContext(getBlockPos()));
         BlockHitResult result = this.level.clip(context);
         BlockPos lightPos = result.getBlockPos();
         if (result.getType() != HitResult.Type.MISS && !result.isInside()) {
-            distance = result.getLocation().distanceTo(vec3);
+            distance = result.getLocation().distanceTo(position);
             if (!result.getBlockPos().equals(getBlockPos())) {
                 lightPos = result.getBlockPos().relative(result.getDirection(), 1);
             }

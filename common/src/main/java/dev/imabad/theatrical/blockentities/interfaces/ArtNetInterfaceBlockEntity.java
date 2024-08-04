@@ -62,7 +62,7 @@ public class ArtNetInterfaceBlockEntity extends ClientSyncBlockEntity {
         if(level != null && level.getServer() != null) {
             var dmxData = DMXNetworkData.getInstance(level.getServer().overworld()).getNetwork(networkId);
             if(dmxData != null) {
-                dmxData.getConsumersInRange(universe, getBlockPos(), TheatricalConfig.INSTANCE.COMMON.wirelessDMXRadius).forEach(dmxConsumer -> dmxConsumer.consume(data));
+//                dmxData.getConsumersInRange(universe, getBlockPos(), TheatricalConfig.INSTANCE.COMMON.wirelessDMXRadius).forEach(dmxConsumer -> dmxConsumer.consume(data));
             }
         }
     }

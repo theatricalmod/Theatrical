@@ -5,6 +5,7 @@ import dev.architectury.networking.NetworkManager;
 import dev.architectury.networking.simple.BaseC2SMessage;
 import dev.architectury.networking.simple.MessageType;
 import dev.imabad.theatrical.Theatrical;
+import dev.imabad.theatrical.api.dmx.DMXConsumer;
 import dev.imabad.theatrical.blockentities.interfaces.RedstoneInterfaceBlockEntity;
 import dev.imabad.theatrical.blockentities.light.BaseDMXConsumerLightBlockEntity;
 import dev.imabad.theatrical.dmx.DMXNetwork;
@@ -60,14 +61,9 @@ public class RDMUpdateConsumer extends BaseC2SMessage {
                 if(network == null){
                     return;
                 }
-                BlockPos consumerPos = network.getConsumerPos(universe, dmxDevice);
-                if(consumerPos != null){
-                    BlockEntity be = context.getPlayer().level().getBlockEntity(consumerPos);
-                    if(be instanceof BaseDMXConsumerLightBlockEntity dmxConsumerLightBlock){
-                        dmxConsumerLightBlock.setChannelStartPoint(newAddress);
-                    } else if(be instanceof RedstoneInterfaceBlockEntity redstoneInterfaceBlockEntity){
-                        redstoneInterfaceBlockEntity.setChannelStartPoint(newAddress);
-                    }
+                DMXConsumer consumer = network.getConsumer(universe, dmxDevice);
+                if(consumer != null){
+                    consumer.setStartAddress(newAddress);
                 }
             } else {
                 Theatrical.LOGGER.info("{} tried to send ArtNet data but is not authorized!", context.getPlayer().getName());

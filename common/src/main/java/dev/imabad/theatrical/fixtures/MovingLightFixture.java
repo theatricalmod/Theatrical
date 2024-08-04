@@ -5,6 +5,7 @@ import dev.imabad.theatrical.api.Fixture;
 import dev.imabad.theatrical.api.HangType;
 import dev.imabad.theatrical.api.dmx.DMXPersonality;
 import dev.imabad.theatrical.blocks.light.BaseLightBlock;
+import dev.imabad.theatrical.blocks.light.MovingLightBlock;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.state.BlockState;
@@ -95,5 +96,10 @@ public class MovingLightFixture extends Fixture {
     @Override
     public List<DMXPersonality> getDMXPersonalities() {
         return PERSONALITIES;
+    }
+
+    @Override
+    public boolean isUpsideDown(BlockState blockState) {
+        return blockState.getValue(MovingLightBlock.HANGING) && blockState.getValue(MovingLightBlock.HANG_DIRECTION) == Direction.UP;
     }
 }

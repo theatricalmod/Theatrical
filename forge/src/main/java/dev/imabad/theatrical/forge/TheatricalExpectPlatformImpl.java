@@ -2,10 +2,12 @@ package dev.imabad.theatrical.forge;
 
 import dev.imabad.theatrical.Theatrical;
 import dev.imabad.theatrical.TheatricalExpectPlatform;
+import dev.imabad.theatrical.net.compat.create.SendBEDataToContraption;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.fml.ModContainer;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.ModLoader;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLLoader;
@@ -35,5 +37,9 @@ public class TheatricalExpectPlatformImpl {
         }
         return "Unknown";
     }
-
+    public static void handleBEDataForContraption(SendBEDataToContraption packet) {
+        if (ModList.get().isLoaded("create")) {
+            dev.imabad.theatrical.forge.compat.create.CreateCompat.handleBEDataForContraption(packet);
+        }
+    }
 }

@@ -109,6 +109,11 @@ public class RedstoneInterfaceBlockEntity extends ClientSyncBlockEntity implemen
         return networkId;
     }
 
+    @Override
+    public void setStartAddress(int startAddress) {
+        setChannelStartPoint(startAddress);
+    }
+
     public void setNetworkId(UUID networkId) {
         if(networkId == this.networkId){
             return;
@@ -178,14 +183,14 @@ public class RedstoneInterfaceBlockEntity extends ClientSyncBlockEntity implemen
             if(deviceId == null){
                 generateDeviceId();
             }
-            dmxData.addConsumer(getBlockPos(), this);
+            dmxData.addConsumer(this);
         }
     }
 
     private void removeConsumer(){
         var dmxData = DMXNetworkData.getInstance(level.getServer().overworld()).getNetwork(networkId);
         if (dmxData != null) {
-            dmxData.removeConsumer(this, getBlockPos());
+            dmxData.removeConsumer(this);
         }
     }
 
