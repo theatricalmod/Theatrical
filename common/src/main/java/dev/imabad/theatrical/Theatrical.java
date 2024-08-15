@@ -63,7 +63,7 @@ public class Theatrical {
         DeferredRegister<ArgumentTypeInfo<?, ?>> argTypes = TheatricalRegistry.get(Registries.COMMAND_ARGUMENT_TYPE);
         registerArgument(argTypes, SingletonArgumentInfo.contextFree(DMXNetworkModeArgument::networkMode), "network_mode", DMXNetworkModeArgument.class);
         registerArgument(argTypes, SingletonArgumentInfo.contextFree(MemberRoleArgument::memberRole), "member_role", MemberRoleArgument.class);
-
+        argTypes.register();
         dev.imabad.theatrical.items.Items.ITEMS.register();
         PlayerEvent.PLAYER_JOIN.register((event) -> {
             DMXNetworkData instance = DMXNetworkData.getInstance(event.server.overworld());

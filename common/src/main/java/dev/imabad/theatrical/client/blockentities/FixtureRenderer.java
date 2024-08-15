@@ -46,7 +46,7 @@ public abstract class FixtureRenderer<T extends BaseLightBlockEntity> implements
                     preparePoseStack(blockEntity, poseStack, facing, partialTick, isFlipped, blockState, isHanging);
                     VertexConsumer beamConsumer = bufferSource.getBuffer(TheatricalRenderTypes.BEAM);
                     poseStack.translate(blockEntity.getFixture().getBeamStartPosition()[0], blockEntity.getFixture().getBeamStartPosition()[1], blockEntity.getFixture().getBeamStartPosition()[2]);
-                    float intensity = (blockEntity.getPrevIntensity() + ((blockEntity.getIntensity()) - blockEntity.getPrevIntensity()) * partialTick);
+                    float intensity = blockEntity.getIntensity();
                     int color = blockEntity.getColour();
                     if(color != 0) {
                         renderLightBeam(beamConsumer, poseStack, blockEntity, partialTick, (float) ((intensity * beamOpacity) / 255f), blockEntity.getFixture().getBeamWidth(), (float) blockEntity.getDistance(), color);
