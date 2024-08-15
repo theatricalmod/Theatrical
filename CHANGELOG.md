@@ -1,4 +1,4 @@
-# 1.20.1-alpha.19
+# 1.20.1-alpha.20
 
-* Fix crash with null ArtNet client
-* Fix lights sometimes flashing weirdly
+* Fix lights sometimes flashing weirdly with intensity
+* Fix command arg types not registering properly in forge servers
