@@ -1,3 +1,4 @@
-# 1.20.1-alpha.21
+# 1.20.1-alpha.22
 
-* Add shimmer support
+* Fix overriding existing methods in dynamiclightsprovider interface
+* Fix standing on LED panels
