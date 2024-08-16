@@ -41,8 +41,10 @@ public class PipeBlock extends DirectionalBlock implements Support {
     public static final DirectionProperty FACING = DirectionalBlock.FACING;
     private final VoxelShape Z_BOX = Shapes.create(new AABB(0.35, 0.4, 0, 0.65, 0.6, 1));
     private final VoxelShape Z_BOX_DOWN = Shapes.create(new AABB(0, 0, 0, 1, 0.6, 1));
+    private final VoxelShape Z_BOX_UP = Shapes.create(new AABB(0, 0.4, 0, 1, 1, 1));
     private final VoxelShape X_BOX = Shapes.create(new AABB(0, 0.4, 0.4, 1, 0.6, 0.6));
     private final VoxelShape X_BOX_DOWN = Shapes.create(new AABB(0, 0, 0, 1, 0.6, 1));
+    private final VoxelShape X_BOX_UP = Shapes.create(new AABB(0, 0.4, 0, 1, 1, 1));
     private final VoxelShape Y_BOX = Shapes.create(new AABB(0.4, 0, 0.4, 0.6, 1, 0.6));
     private final VoxelShape Y_BOX_SOUTH = Shapes.create(new AABB(0, 0, 0.4, 1, 1, 1));
     private final VoxelShape Y_BOX_NORTH = Shapes.create(new AABB(0, 0, 0, 1, 1, 0.6));
@@ -103,6 +105,10 @@ public class PipeBlock extends DirectionalBlock implements Support {
             if(level.getBlockState(pos.relative(Direction.DOWN)).getBlock() instanceof HangableBlock){
                 VoxelShape ogShape = state.getValue(FACING).getAxis() == Direction.Axis.Z ? Z_BOX : X_BOX;
                 VoxelShape extensionShape = state.getValue(FACING).getAxis() == Direction.Axis.Z ? Z_BOX_DOWN : X_BOX_DOWN;
+                return Shapes.or(ogShape, extensionShape);
+            } else if(level.getBlockState(pos.relative(Direction.UP)).getBlock() instanceof HangableBlock){
+                VoxelShape ogShape = state.getValue(FACING).getAxis() == Direction.Axis.Z ? Z_BOX : X_BOX;
+                VoxelShape extensionShape = state.getValue(FACING).getAxis() == Direction.Axis.Z ? Z_BOX_UP : X_BOX_UP;
                 return Shapes.or(ogShape, extensionShape);
             }
         }
