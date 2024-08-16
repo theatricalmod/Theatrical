@@ -35,7 +35,7 @@ public class LightManager {
     public static int lastUpdateCount = 0;
 
     public static void addLightSource(DynamicLightProvider lightSource) {
-        if (!lightSource.getLevel().isClientSide())
+        if (!lightSource.getLightWorld().isClientSide())
             return;
         if (!shouldUpdateDynamicLight())
             return;
@@ -56,7 +56,7 @@ public class LightManager {
      * @return {@code true} if the light source is tracked, else {@code false}
      */
     public static boolean containsLightSource(@NotNull DynamicLightProvider lightSource) {
-        if (!lightSource.getLevel().isClientSide())
+        if (!lightSource.getLightWorld().isClientSide())
             return false;
 
         boolean result;
