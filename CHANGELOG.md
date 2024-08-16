@@ -1,4 +1,3 @@
-# 1.20.2-alpha.20
+# 1.20.2-alpha.21
 
-* Fix lights sometimes flashing weirdly with intensity
-* Fix command arg types not registering properly in forge servers
+* Add shimmer support
