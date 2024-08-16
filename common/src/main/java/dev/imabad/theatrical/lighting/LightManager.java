@@ -1,13 +1,20 @@
 package dev.imabad.theatrical.lighting;
 
+import dev.imabad.theatrical.api.DynamicLightProvider;
+import dev.imabad.theatrical.blockentities.light.BaseLightBlockEntity;
+import dev.imabad.theatrical.compat.ModCompat;
+import dev.imabad.theatrical.compat.ShimmerCompat;
 import dev.imabad.theatrical.config.TheatricalConfig;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
+import net.minecraft.world.level.ChunkPos;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Vector3f;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -21,14 +28,14 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  *
  */
 public class LightManager {
-    private final static Set<LambDynamicLight> dynamicLightSources = new HashSet<>();
+    private final static Set<DynamicLightProvider> dynamicLightSources = new HashSet<>();
     private final static ReentrantReadWriteLock lightSourcesLock = new ReentrantReadWriteLock();
     public static long lastUpdate = System.currentTimeMillis();
     public static List<Integer> jarHoldingEntityList = new ArrayList<>();
     public static int lastUpdateCount = 0;
 
-    public static void addLightSource(LambDynamicLight lightSource) {
-        if (!lightSource.getDynamicLightWorld().isClientSide())
+    public static void addLightSource(DynamicLightProvider lightSource) {
+        if (!lightSource.getLevel().isClientSide())
             return;
         if (!shouldUpdateDynamicLight())
             return;
@@ -36,6 +43,9 @@ public class LightManager {
             return;
         lightSourcesLock.writeLock().lock();
         dynamicLightSources.add(lightSource);
+        if(ModCompat.SHIMMER){
+            ShimmerCompat.addLight(lightSource);
+        }
         lightSourcesLock.writeLock().unlock();
     }
 
@@ -45,8 +55,8 @@ public class LightManager {
      * @param lightSource the light source to check
      * @return {@code true} if the light source is tracked, else {@code false}
      */
-    public static boolean containsLightSource(@NotNull LambDynamicLight lightSource) {
-        if (!lightSource.getDynamicLightWorld().isClientSide())
+    public static boolean containsLightSource(@NotNull DynamicLightProvider lightSource) {
+        if (!lightSource.getLevel().isClientSide())
             return false;
 
         boolean result;
@@ -76,17 +86,21 @@ public class LightManager {
      *
      * @param lightSource the light source to remove
      */
-    public static void removeLightSource(LambDynamicLight lightSource) {
+    public static void removeLightSource(DynamicLightProvider lightSource) {
         lightSourcesLock.writeLock().lock();
 
         var sourceIterator = dynamicLightSources.iterator();
-        LambDynamicLight it;
+        DynamicLightProvider it;
         while (sourceIterator.hasNext()) {
             it = sourceIterator.next();
             if (it.equals(lightSource)) {
                 sourceIterator.remove();
-                if (Minecraft.getInstance().level != null)
-                    lightSource.lambdynlights$scheduleTrackedChunksRebuild(Minecraft.getInstance().levelRenderer);
+                if(ModCompat.SHIMMER){
+                    ShimmerCompat.removeLight(lightSource.getOwnerPos());
+                } else {
+                    if (Minecraft.getInstance().level != null)
+                        lightSource.scheduleTrackedChunksRebuild(Minecraft.getInstance().levelRenderer);
+                }
                 break;
             }
         }
@@ -101,14 +115,18 @@ public class LightManager {
         lightSourcesLock.writeLock().lock();
 
         var sourceIterator = dynamicLightSources.iterator();
-        LambDynamicLight it;
+        DynamicLightProvider it;
         while (sourceIterator.hasNext()) {
             it = sourceIterator.next();
             sourceIterator.remove();
-            if (Minecraft.getInstance().levelRenderer != null) {
-                if (it.getLuminance() > 0)
-                    it.resetDynamicLight();
-                it.lambdynlights$scheduleTrackedChunksRebuild(Minecraft.getInstance().levelRenderer);
+            if(ModCompat.SHIMMER){
+                ShimmerCompat.removeLight(it.getOwnerPos());
+            } else {
+                if (Minecraft.getInstance().levelRenderer != null) {
+                    if (it.getLightLuminance() > 0)
+                        it.resetLight();
+                    it.scheduleTrackedChunksRebuild(Minecraft.getInstance().levelRenderer);
+                }
             }
         }
         LightManager.jarHoldingEntityList = new ArrayList<>();
@@ -156,7 +174,7 @@ public class LightManager {
 
         lightSourcesLock.readLock().lock();
         for (var lightSource : dynamicLightSources) {
-            if (lightSource.lambdynlights$updateDynamicLight(renderer)) {
+            if (lightSource.updateDynamicLight(renderer)) {
                 lastUpdateCount++;
             }
         }
@@ -241,13 +259,14 @@ public class LightManager {
      * @param currentLightLevel the current surrounding dynamic light level
      * @return the dynamic light level at the specified position
      */
-    public static double maxDynamicLightLevel(@NotNull BlockPos pos, @NotNull LambDynamicLight lightSource, double currentLightLevel) {
-        int luminance = lightSource.getLuminance();
+    public static double maxDynamicLightLevel(@NotNull BlockPos pos, @NotNull DynamicLightProvider lightSource, double currentLightLevel) {
+        int luminance = lightSource.getLightLuminance();
         if (luminance > 0) {
             // Can't use Entity#squaredDistanceTo because of eye Y coordinate.
-            double dx = pos.getX() - lightSource.getDynamicLightX() + 0.5;
-            double dy = pos.getY() - lightSource.getDynamicLightY() + 0.5;
-            double dz = pos.getZ() - lightSource.getDynamicLightZ() + 0.5;
+            Vector3f lightPos = lightSource.getLightPos();
+            double dx = pos.getX() - lightPos.x + 0.5;
+            double dy = pos.getY() - lightPos.y + 0.5;
+            double dz = pos.getZ() - lightPos.z + 0.5;
 
             double distanceSquared = dx * dx + dy * dy + dz * dz;
             // 7.75 because else we would have to update more chunks and that's not a good idea.
@@ -268,17 +287,75 @@ public class LightManager {
      *
      * @param lightSource the light source
      */
-    public static void updateTracking(@NotNull LambDynamicLight lightSource) {
-        boolean enabled = lightSource.isDynamicLightEnabled();
-        int luminance = lightSource.getLuminance();
+    public static void updateTracking(@NotNull DynamicLightProvider lightSource) {
+        boolean enabled = lightSource.isLightEnabled();
+        int luminance = lightSource.getLightLuminance();
         if (!enabled && luminance > 0) {
-            lightSource.setDynamicLightEnabled(true);
+            lightSource.setLightEnabled(true);
         } else if (enabled && luminance < 1) {
-            lightSource.setDynamicLightEnabled(false);
+            lightSource.setLightEnabled(false);
         }
     }
 
     public static boolean shouldUpdateDynamicLight() {
         return TheatricalConfig.INSTANCE.COMMON.shouldEmitLight;
+    }
+
+    public static boolean updateDynamicLight(BaseLightBlockEntity light, LevelRenderer renderer){
+        int luminance = light.getLightLuminance();
+
+        BlockPos emissionBlock = light.getEmissionBlock();
+        if(!emissionBlock.equals(light.getPrevEmissionBlock()) || luminance != light.getPrevLuminance()){
+            light.setPrevEmissionBlock(emissionBlock);
+            light.setPrevLuminance(luminance);
+            if(ModCompat.SHIMMER){
+                ShimmerCompat.handleLightUpdate(light);
+            } else {
+                theatricalLightHandler(light, renderer, luminance, emissionBlock);
+            }
+            return true;
+        } else if(ModCompat.SHIMMER){
+            if(light.getPrevColour() != light.getLightColour() || light.getPrevSpread() != light.getLightSpread()){
+                light.setPrevColour(light.getLightColour());
+                light.setPrevSpread(light.getLightSpread());
+                ShimmerCompat.handleLightUpdate(light);
+            }
+        }
+        return false;
+    }
+
+    private static void theatricalLightHandler(BaseLightBlockEntity light, LevelRenderer renderer, int luminance, BlockPos emissionBlock) {
+        var newPos = new LongOpenHashSet();
+
+        if (luminance > 0) {
+            var entityChunkPos = new ChunkPos(emissionBlock);
+            var chunkPos = new BlockPos.MutableBlockPos(entityChunkPos.x, LambDynamicLightUtil.getSectionCoord(emissionBlock.getY()), entityChunkPos.z);
+
+            LightManager.scheduleChunkRebuild(renderer, chunkPos);
+            LightManager.updateTrackedChunks(chunkPos, light.getTrackedLitChunkPos(), newPos);
+
+            var directionX = (emissionBlock.getX() & 15) >= 8 ? Direction.EAST : Direction.WEST;
+            var directionY = (emissionBlock.getY() & 15) >= 8 ? Direction.UP : Direction.DOWN;
+            var directionZ = (emissionBlock.getZ() & 15) >= 8 ? Direction.SOUTH : Direction.NORTH;
+
+            for (int i = 0; i < 7; i++) {
+                if (i % 4 == 0) {
+                    chunkPos.move(directionX); // X
+                } else if (i % 4 == 1) {
+                    chunkPos.move(directionZ); // XZ
+                } else if (i % 4 == 2) {
+                    chunkPos.move(directionX.getOpposite()); // Z
+                } else {
+                    chunkPos.move(directionZ.getOpposite()); // origin
+                    chunkPos.move(directionY); // Y
+                }
+                LightManager.scheduleChunkRebuild(renderer, chunkPos);
+                LightManager.updateTrackedChunks(chunkPos, light.getTrackedLitChunkPos(), newPos);
+            }
+        }
+        // Schedules the rebuild of removed chunks.
+        light.scheduleTrackedChunksRebuild(renderer);
+        // Update tracked lit chunks.
+        light.setTrackedLitChunkPos(newPos);
     }
 }

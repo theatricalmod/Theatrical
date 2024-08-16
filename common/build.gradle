@@ -30,6 +30,9 @@ dependencies {
     //YAML
     implementation "org.yaml:snakeyaml:${rootProject.snakeyaml_version}"
     shadowCommon "org.yaml:snakeyaml:${rootProject.snakeyaml_version}"
+
+    // Shimmer
+    modImplementation "com.lowdragmc.shimmer:Shimmer-common:${minecraft_version}-${shimmer_version}"
 }
 
 publishing {

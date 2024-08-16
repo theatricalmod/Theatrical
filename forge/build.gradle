@@ -50,7 +50,7 @@ dependencies {
     //ArtNet
     implementation "ch.bildspur:artnet4j:${rootProject.artnet4j_version}"
     forgeRuntimeLibrary "ch.bildspur:artnet4j:${rootProject.artnet4j_version}"
-    shadowCommon "ch.bildspur:artnet4j:${rootProject.artnet4j_version}"
+    include "ch.bildspur:artnet4j:${rootProject.artnet4j_version}"
 
     implementation 'com.sun.activation:javax.activation:1.2.0'
     forgeRuntimeLibrary 'com.sun.activation:javax.activation:1.2.0'
@@ -58,7 +58,14 @@ dependencies {
     //YAML
     implementation "org.yaml:snakeyaml:${rootProject.snakeyaml_version}"
     forgeRuntimeLibrary "org.yaml:snakeyaml:${rootProject.snakeyaml_version}"
-    shadowCommon "org.yaml:snakeyaml:${rootProject.snakeyaml_version}"
+    include "org.yaml:snakeyaml:${rootProject.snakeyaml_version}"
+
+    // Shimmer
+    modImplementation("com.lowdragmc.shimmer:Shimmer-forge:${minecraft_version}-${shimmer_version}") {
+        exclude group: "maven.modrinth"
+        exclude group: "icyllis.modernui"
+        exclude group: "com.jozufozu.flywheel"
+    }
 }
 
 processResources {

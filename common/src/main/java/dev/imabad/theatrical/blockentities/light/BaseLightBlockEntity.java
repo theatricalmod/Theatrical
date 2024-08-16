@@ -1,12 +1,13 @@
 package dev.imabad.theatrical.blockentities.light;
 
+import dev.imabad.theatrical.api.DynamicLightProvider;
+import dev.imabad.theatrical.api.Fixture;
 import dev.imabad.theatrical.api.FixtureProvider;
 import dev.imabad.theatrical.api.Support;
 import dev.imabad.theatrical.blockentities.ClientSyncBlockEntity;
 import dev.imabad.theatrical.blocks.HangableBlock;
 import dev.imabad.theatrical.blocks.light.BaseLightBlock;
 import dev.imabad.theatrical.config.TheatricalConfig;
-import dev.imabad.theatrical.lighting.LambDynamicLight;
 import dev.imabad.theatrical.lighting.LambDynamicLightUtil;
 import dev.imabad.theatrical.lighting.LightManager;
 import dev.imabad.theatrical.mixin.ClipContextAccessor;
@@ -28,14 +29,15 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import org.joml.Vector3f;
 
 import java.util.Optional;
 
-public abstract class BaseLightBlockEntity extends ClientSyncBlockEntity implements FixtureProvider, LambDynamicLight {
+public abstract class BaseLightBlockEntity extends ClientSyncBlockEntity implements FixtureProvider, DynamicLightProvider {
     AABB INFINITE_EXTENT_AABB = new AABB(Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
     private double distance = 0;
     protected int pan, tilt, focus, intensity, red, green, blue = 0;
-    protected int prevTilt, prevPan, prevFocus, prevIntensity, prevRed, prevGreen, prevBlue = 0;
+    protected int prevTilt, prevPan, prevFocus, prevIntensity, prevRed, prevGreen, prevBlue, prevColour, prevSpread = 0;
     private long tickTimer = 0;
     private BlockPos emissionBlock, prevEmissionBlock;
     private int prevLuminance;
@@ -91,6 +93,34 @@ public abstract class BaseLightBlockEntity extends ClientSyncBlockEntity impleme
 
     public AABB getRenderBoundingBox(){
         return INFINITE_EXTENT_AABB;
+    }
+
+    public BlockPos getEmissionBlock(){
+        return emissionBlock;
+    }
+
+    public BlockPos getPrevEmissionBlock() {
+        return prevEmissionBlock;
+    }
+
+    public void setPrevEmissionBlock(BlockPos prevEmissionBlock) {
+        this.prevEmissionBlock = prevEmissionBlock;
+    }
+
+    public int getPrevLuminance() {
+        return prevLuminance;
+    }
+
+    public void setPrevLuminance(int prevLuminance) {
+        this.prevLuminance = prevLuminance;
+    }
+
+    public LongOpenHashSet getTrackedLitChunkPos() {
+        return trackedLitChunkPos;
+    }
+
+    public void setTrackedLitChunkPos(LongOpenHashSet trackedLitChunkPos) {
+        this.trackedLitChunkPos = trackedLitChunkPos;
     }
 
     protected boolean storePrev(){
@@ -167,9 +197,9 @@ public abstract class BaseLightBlockEntity extends ClientSyncBlockEntity impleme
             }
             if (level.isClientSide() && LightManager.shouldUpdateDynamicLight()) {
                 if (tile.isRemoved()) {
-                    tile.setDynamicLightEnabled(false);
+                    tile.setLightEnabled(false);
                 } else {
-                    tile.dynamicLightTick();
+                    tile.lightTick();
                     LightManager.updateTracking(tile);
                 }
             }
@@ -235,6 +265,14 @@ public abstract class BaseLightBlockEntity extends ClientSyncBlockEntity impleme
 
     public int getPrevColor(){
         return (getPrevRed() << 16) | (getPrevGreen() << 8) | getPrevBlue();
+    }
+
+    public int getPrevColour() {
+        return prevColour;
+    }
+
+    public void setPrevColour(int prevColour) {
+        this.prevColour = prevColour;
     }
 
     public Optional<BlockState> getSupportingStructure(){
@@ -366,7 +404,7 @@ public abstract class BaseLightBlockEntity extends ClientSyncBlockEntity impleme
     @Override
     public void setRemoved() {
         if(emissionBlock != null){
-            this.setDynamicLightEnabled(false);
+            this.setLightEnabled(false);
             emissionBlock = null;
         }
         super.setRemoved();
@@ -383,96 +421,72 @@ public abstract class BaseLightBlockEntity extends ClientSyncBlockEntity impleme
     }
 
     @Override
-    public double getDynamicLightX() {
-        return emissionBlock.getX();
-    }
-
-    @Override
-    public double getDynamicLightY() {
-        return emissionBlock.getY();
-    }
-
-    @Override
-    public double getDynamicLightZ() {
-        return emissionBlock.getZ();
-    }
-
-    @Override
-    public Level getDynamicLightWorld() {
-        return this.getLevel();
-    }
-
-    @Override
-    public void resetDynamicLight() {
-
-    }
-    @Override
-    public int getLuminance() {
+    public int getLightLuminance() {
         float newVal = intensity / 255f;
         return (int) (newVal * 15f);
     }
 
     @Override
-    public void dynamicLightTick() {
+    public Vector3f getLightPos() {
+        return Vec3.atCenterOf(emissionBlock).toVector3f();
+    }
+
+    @Override
+    public boolean isLightEnabled() {
+        return DynamicLightProvider.super.isLightEnabled();
+    }
+
+    @Override
+    public void resetLight() {
 
     }
 
     @Override
-    public boolean shouldUpdateDynamicLight() {
+    public void lightTick() {
+
+    }
+
+    @Override
+    public boolean shouldUpdateLight() {
         return LightManager.shouldUpdateDynamicLight() && emitsLight() && emissionBlock != null;
     }
 
     @Override
-    public boolean lambdynlights$updateDynamicLight(LevelRenderer renderer) {
-        if (!this.shouldUpdateDynamicLight())
+    public boolean updateDynamicLight(LevelRenderer renderer) {
+        if (!this.shouldUpdateLight())
             return false;
-        int luminance = this.getLuminance();
-
-        if(!emissionBlock.equals(prevEmissionBlock) || luminance != prevLuminance){
-            this.prevEmissionBlock = emissionBlock;
-            this.prevLuminance = luminance;
-            var newPos = new LongOpenHashSet();
-
-            if (luminance > 0) {
-                var entityChunkPos = new ChunkPos(emissionBlock);
-                var chunkPos = new BlockPos.MutableBlockPos(entityChunkPos.x, LambDynamicLightUtil.getSectionCoord(emissionBlock.getY()), entityChunkPos.z);
-
-                LightManager.scheduleChunkRebuild(renderer, chunkPos);
-                LightManager.updateTrackedChunks(chunkPos, this.trackedLitChunkPos, newPos);
-
-                var directionX = (emissionBlock.getX() & 15) >= 8 ? Direction.EAST : Direction.WEST;
-                var directionY = (emissionBlock.getY() & 15) >= 8 ? Direction.UP : Direction.DOWN;
-                var directionZ = (emissionBlock.getZ() & 15) >= 8 ? Direction.SOUTH : Direction.NORTH;
-
-                for (int i = 0; i < 7; i++) {
-                    if (i % 4 == 0) {
-                        chunkPos.move(directionX); // X
-                    } else if (i % 4 == 1) {
-                        chunkPos.move(directionZ); // XZ
-                    } else if (i % 4 == 2) {
-                        chunkPos.move(directionX.getOpposite()); // Z
-                    } else {
-                        chunkPos.move(directionZ.getOpposite()); // origin
-                        chunkPos.move(directionY); // Y
-                    }
-                    LightManager.scheduleChunkRebuild(renderer, chunkPos);
-                    LightManager.updateTrackedChunks(chunkPos, this.trackedLitChunkPos, newPos);
-                }
-            }
-            // Schedules the rebuild of removed chunks.
-            this.lambdynlights$scheduleTrackedChunksRebuild(renderer);
-            // Update tracked lit chunks.
-            this.trackedLitChunkPos = newPos;
-            return true;
-        }
-        return false;
+        return LightManager.updateDynamicLight(this, renderer);
     }
 
     @Override
-    public void lambdynlights$scheduleTrackedChunksRebuild(LevelRenderer renderer) {
-        if (Minecraft.getInstance().level == this.level)
+    public void scheduleTrackedChunksRebuild(LevelRenderer renderer) {
+        if (Minecraft.getInstance().level == this.level) {
             for (long pos : this.trackedLitChunkPos) {
                 LightManager.scheduleChunkRebuild(renderer, pos);
             }
+        }
+    }
+
+    @Override
+    public BlockPos getOwnerPos() {
+        return getBlockPos();
+    }
+
+    @Override
+    public int getLightColour() {
+        return ((int)getIntensity() << 24) | getColour();
+    }
+
+    public int getPrevSpread() {
+        return prevSpread;
+    }
+
+    public void setPrevSpread(int prevSpread) {
+        this.prevSpread = prevSpread;
+    }
+
+    @Override
+    public int getLightSpread() {
+        return (getFocus() / 255) * 8;
     }
 }
