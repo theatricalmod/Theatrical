@@ -42,7 +42,7 @@ dependencies {
 
     if(include_shimmer == "true") {
         //Shimmer
-        modImplementation("com.lowdragmc.shimmer:Shimmer-fabric:${minecraft_version}-${shimmer_version}") {
+        modImplementation("com.lowdragmc.shimmer:Shimmer-fabric:${shimmer_version}") {
             exclude group: "maven.modrinth"
             exclude group: "com.jozufozu.flywheel"
         }
