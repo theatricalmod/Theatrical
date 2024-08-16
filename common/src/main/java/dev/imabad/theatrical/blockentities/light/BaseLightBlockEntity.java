@@ -489,4 +489,9 @@ public abstract class BaseLightBlockEntity extends ClientSyncBlockEntity impleme
     public int getLightSpread() {
         return (getFocus() / 255) * 8;
     }
+
+    @Override
+    public Level getLightWorld() {
+        return getLevel();
+    }
 }

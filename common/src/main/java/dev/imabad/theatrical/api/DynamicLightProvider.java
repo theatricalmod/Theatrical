@@ -10,7 +10,7 @@ public interface DynamicLightProvider {
 
     BlockPos getOwnerPos();
     Vector3f getLightPos();
-    Level getLevel();
+    Level getLightWorld();
     default boolean isLightEnabled() {
         return LightManager.containsLightSource(this);
     }
