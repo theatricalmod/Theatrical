@@ -60,11 +60,13 @@ dependencies {
     forgeRuntimeLibrary "org.yaml:snakeyaml:${rootProject.snakeyaml_version}"
     include "org.yaml:snakeyaml:${rootProject.snakeyaml_version}"
 
-    // Shimmer
-    modImplementation("com.lowdragmc.shimmer:Shimmer-forge:${minecraft_version}-${shimmer_version}") {
-        exclude group: "maven.modrinth"
-        exclude group: "icyllis.modernui"
-        exclude group: "com.jozufozu.flywheel"
+    if(include_shimmer == "true") {
+        // Shimmer
+        modImplementation("com.lowdragmc.shimmer:Shimmer-forge:${shimmer_version}") {
+            exclude group: "maven.modrinth"
+            exclude group: "icyllis.modernui"
+            exclude group: "com.jozufozu.flywheel"
+        }
     }
 }
 
