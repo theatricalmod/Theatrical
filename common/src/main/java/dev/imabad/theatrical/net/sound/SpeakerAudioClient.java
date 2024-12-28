@@ -52,8 +52,6 @@ public class SpeakerAudioClient extends BaseS2CMessage {
     @Override
     public void handle(NetworkManager.PacketContext context) {
         SpeakerManager.getSound(sourceId).pushAudio(data);
-        if(SpeakerManager.getSound(sourceId).isReady()) {
-            SpeakerManager.getSound(sourceId).playAudio(pos);
-        }
+        SpeakerManager.getSound(sourceId).playAudio(pos);
     }
 }

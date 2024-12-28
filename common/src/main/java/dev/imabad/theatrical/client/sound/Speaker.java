@@ -21,9 +21,8 @@ public class Speaker {
         if(opusStream == null){
             opusStream = new OpusStreamedAudioStream();
         }
-        boolean isExhausted = opusStream.isEmpty();
         opusStream.push(buffer);
-        if(isExhausted && sound != null && sound.stream == opusStream && opusStream.channel != null && opusStream.executor != null){
+        if(sound != null && sound.stream == opusStream && opusStream.channel != null && opusStream.executor != null){
             OpusStreamedAudioStream actualStream = sound.stream;
             opusStream.executor.execute(() -> {
                 if(actualStream.channel != null){
@@ -32,11 +31,6 @@ public class Speaker {
             });
         }
     }
-
-    public boolean isReady(){
-        return opusStream.ready();
-    }
-
     public void playAudio(BlockPos pos){
         SoundManager soundManager = Minecraft.getInstance().getSoundManager();
         if(sound != null && sound.stream != opusStream){

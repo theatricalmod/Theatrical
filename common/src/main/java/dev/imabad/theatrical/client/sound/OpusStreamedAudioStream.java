@@ -1,11 +1,8 @@
 package dev.imabad.theatrical.client.sound;
 
-import com.google.common.base.Preconditions;
 import com.mojang.blaze3d.audio.Channel;
 import dev.imabad.theatrical.client.sound.mic.MicrophoneManager;
-import io.netty.buffer.ByteBuf;
 import net.labymod.opus.OpusCodec;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.sounds.AudioStream;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -16,19 +13,11 @@ import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.InvalidMarkException;
-import java.nio.ShortBuffer;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
-import java.util.ArrayDeque;
-import java.util.Queue;
 import java.util.concurrent.Executor;
 
 public class OpusStreamedAudioStream implements AudioStream {
     private static final AudioFormat STEREO_16 = new AudioFormat(AudioFormat.Encoding.PCM_SIGNED, MicrophoneManager.SAMPLE_RATE, 16, 1, MicrophoneManager.FRAME_SIZE, MicrophoneManager.SAMPLE_RATE, false);
-    private final Queue<ByteBuffer> buffers = new ArrayDeque<>(2);
+
     private final OpusCodec opusCodec = OpusCodec.newBuilder()
             .withFrameSize(MicrophoneManager.FRAME_SIZE)
             .withChannels(1)
@@ -52,9 +41,6 @@ public class OpusStreamedAudioStream implements AudioStream {
 
     void push(byte[] input) {
         byte[] bytes = opusCodec.decodeFrame(input);
-//        try {
-//            Files.write(Path.of(Minecraft.getInstance().gameDirectory.getPath(), "raw_audio_data_received"), bytes, StandardOpenOption.CREATE, StandardOpenOption.APPEND);
-//        } catch (IOException e) {}
         if(inputStream == null || inputStream.isClosed()){
             createStreams();
         }
@@ -93,22 +79,5 @@ public class OpusStreamedAudioStream implements AudioStream {
     @Override
     public void close() throws IOException {
         audioInputStream.close();
-    }
-
-    public boolean ready(){
-        return true;
-    }
-
-    public boolean isEmpty() {
-        return buffers.isEmpty();
-    }
-    private byte[] shortToByteTwiddle(final short[] input) {
-        final int len = input.length;
-        final byte[] buffer = new byte[len * 2];
-        for (int i = 0; i < len; i++) {
-            buffer[(i * 2) + 1] = (byte) (input[i]);
-            buffer[(i * 2)] = (byte) (input[i] >> 8);
-        }
-        return buffer;
     }
 }
