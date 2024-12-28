@@ -28,4 +28,11 @@ public class SpeakerManager {
         if(remove != null) remove.stop();
     }
 
+    public static void stopAll(){
+        sounds.forEach((uuid, speaker) -> {
+            speaker.stop();
+        });
+        sounds.clear();
+    }
+
 }

@@ -1,13 +1,10 @@
 package dev.imabad.theatrical.blocks.sound;
 
 import dev.imabad.theatrical.blockentities.BlockEntities;
-import dev.imabad.theatrical.blockentities.light.MovingLightBlockEntity;
 import dev.imabad.theatrical.blockentities.sound.SpeakerBlockEntity;
 import dev.imabad.theatrical.blocks.Blocks;
-import dev.imabad.theatrical.client.gui.screen.MovingLightScreen;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;

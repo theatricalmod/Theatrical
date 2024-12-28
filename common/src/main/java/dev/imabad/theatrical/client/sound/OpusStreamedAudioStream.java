@@ -12,6 +12,8 @@ import org.jetbrains.annotations.Nullable;
 import org.lwjgl.BufferUtils;
 
 import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -25,13 +27,17 @@ import java.util.Queue;
 import java.util.concurrent.Executor;
 
 public class OpusStreamedAudioStream implements AudioStream {
-    private static final AudioFormat STEREO_16 = new AudioFormat(AudioFormat.Encoding.PCM_SIGNED, MicrophoneManager.SAMPLE_RATE, 16, 1, 2, 48000, false);
+    private static final AudioFormat STEREO_16 = new AudioFormat(AudioFormat.Encoding.PCM_SIGNED, MicrophoneManager.SAMPLE_RATE, 16, 1, MicrophoneManager.FRAME_SIZE, MicrophoneManager.SAMPLE_RATE, false);
     private final Queue<ByteBuffer> buffers = new ArrayDeque<>(2);
     private final OpusCodec opusCodec = OpusCodec.newBuilder()
             .withFrameSize(MicrophoneManager.FRAME_SIZE)
             .withChannels(1)
             .withSampleRate(MicrophoneManager.SAMPLE_RATE)
             .build();
+    private PacketInputStream inputStream = new PacketInputStream(5);
+    private AudioInputStream audioInputStream = new AudioInputStream(inputStream, STEREO_16, AudioSystem.NOT_SPECIFIED);
+    private final int frameSize = STEREO_16.getFrameSize();
+    private final byte[] frame = new byte[frameSize];
 
     @Nullable
     Channel channel;
@@ -46,41 +52,51 @@ public class OpusStreamedAudioStream implements AudioStream {
 
     void push(byte[] input) {
         byte[] bytes = opusCodec.decodeFrame(input);
-        ByteBuffer wrap = ByteBuffer.wrap(bytes);
-        synchronized (this) {
-            buffers.add(wrap);
+//        try {
+//            Files.write(Path.of(Minecraft.getInstance().gameDirectory.getPath(), "raw_audio_data_received"), bytes, StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+//        } catch (IOException e) {}
+        if(inputStream == null || inputStream.isClosed()){
+            createStreams();
         }
+        synchronized (this) {
+            try {
+                inputStream.writePacket(bytes);
+            } catch (IOException e) {}
+        }
+    }
+
+    private void createStreams(){
+        inputStream = new PacketInputStream(5);
+        audioInputStream = new AudioInputStream(inputStream, STEREO_16, AudioSystem.NOT_SPECIFIED);
     }
 
     @Override
     public ByteBuffer read(int size) throws IOException {
-        var result = BufferUtils.createByteBuffer(size);
-        while (result.hasRemaining()) {
-            var head = buffers.peek();
-            if (head == null) break;
-
-            var toRead = Math.min(head.remaining(), result.remaining());
-            result.put(result.position(), head, head.position(), toRead);
-            result.position(result.position() + toRead);
-            head.position(head.position() + toRead);
-
-            if (head.hasRemaining()) break;
-            buffers.remove();
-        }
-
-        result.flip();
-
-        // This is naughty, but ensures we're not enqueuing empty buffers when the stream is exhausted.
-        return result.remaining() == 0 ? null : result;
+        // Create a ByteBuffer of the specified size
+        ByteBuffer byteBuffer = BufferUtils.createByteBuffer(size);
+        int bytesRead = 0, count = 0;
+        // Loop to read data until the specified size is reached or the end of the input stream
+        do {
+            // Read the next chunk of data
+            count = this.audioInputStream.read(frame);
+            // Write the read data into the ByteBuffer
+            if (count != -1) {
+                byteBuffer.put(frame);
+            }
+        } while (count != -1 && (bytesRead += frameSize) < size);
+        // Flip the ByteBuffer to prepare for reading
+        byteBuffer.flip();
+        // Return the ByteBuffer containing the read data
+        return byteBuffer;
     }
 
     @Override
     public void close() throws IOException {
-        buffers.clear();
+        audioInputStream.close();
     }
 
     public boolean ready(){
-        return buffers.size() > 5;
+        return true;
     }
 
     public boolean isEmpty() {

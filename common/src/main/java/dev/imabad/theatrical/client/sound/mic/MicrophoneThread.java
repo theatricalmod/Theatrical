@@ -49,12 +49,6 @@ public class MicrophoneThread extends Thread {
             }
             byte[] audioData = SoundUtils.convertShortArrayToByteArray(audio);
             byte[] encodedFrame = opusCodec.encodeFrame(audioData);
-            try {
-                Files.write(Path.of(Minecraft.getInstance().gameDirectory.getPath(), "opus_pre_pre"), encodedFrame, StandardOpenOption.CREATE, StandardOpenOption.APPEND);
-            } catch (IOException e) {
-                e.printStackTrace();
-                //ignored
-            }
             new MicrophoneAudioPacket(soundID, speakerPos, encodedFrame).sendToServer();
         }
     }

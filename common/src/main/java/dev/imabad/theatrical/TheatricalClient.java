@@ -23,6 +23,7 @@ import dev.imabad.theatrical.client.dmx.TheatricalArtNetClient;
 import dev.imabad.theatrical.client.gui.screen.BasicLightingDeskScreen;
 import dev.imabad.theatrical.client.gui.screen.FresnelScreen;
 import dev.imabad.theatrical.client.gui.screen.GenericDMXConfigurationScreen;
+import dev.imabad.theatrical.client.sound.SpeakerManager;
 import dev.imabad.theatrical.config.TheatricalConfig;
 import dev.imabad.theatrical.config.UniverseConfig;
 import dev.imabad.theatrical.dmx.DMXDevice;
@@ -31,9 +32,7 @@ import dev.imabad.theatrical.net.OpenScreen;
 import dev.imabad.theatrical.net.artnet.ListConsumers;
 import dev.imabad.theatrical.net.artnet.NotifyConsumerChange;
 import dev.imabad.theatrical.net.artnet.RequestNetworks;
-import dev.imabad.theatrical.client.blockentities.FixtureRenderer;
 import dev.imabad.theatrical.client.sound.mic.MicrophoneManager;
-import dev.imabad.theatrical.protocols.artnet.ArtNetManager;
 import net.labymod.opus.OpusCodec;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
@@ -119,6 +118,8 @@ public class TheatricalClient {
     public static void onWorldClose(){
         artNetManager.shutdownAll();
         ArtNetToNetworkClientData.unload();
+        SpeakerManager.stopAll();
+        TheatricalClient.getMicrophoneManager().closeMicThread();
     }
 
     public static void renderWorldLastAfterTripwire(LevelRenderer levelRenderer){
