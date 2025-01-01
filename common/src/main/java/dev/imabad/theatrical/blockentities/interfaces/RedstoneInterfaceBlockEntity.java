@@ -2,11 +2,11 @@ package dev.imabad.theatrical.blockentities.interfaces;
 
 import ch.bildspur.artnet.rdm.RDMDeviceId;
 import dev.imabad.theatrical.Constants;
-import dev.imabad.theatrical.api.dmx.DMXConsumer;
+import dev.imabad.theatrical.api.network.dmx.DMXConsumer;
 import dev.imabad.theatrical.blockentities.BlockEntities;
 import dev.imabad.theatrical.blockentities.ClientSyncBlockEntity;
-import dev.imabad.theatrical.dmx.DMXNetworkData;
 import dev.imabad.theatrical.fixtures.Fixtures;
+import dev.imabad.theatrical.networks.AVNetworkData;
 import dev.imabad.theatrical.util.RndUtils;
 import dev.imabad.theatrical.util.UUIDUtil;
 import net.minecraft.core.BlockPos;
@@ -166,26 +166,26 @@ public class RedstoneInterfaceBlockEntity extends ClientSyncBlockEntity implemen
     }
 
     private void updateConsumer(){
-        var dmxData = DMXNetworkData.getInstance(level.getServer().overworld()).getNetwork(networkId);
+        var dmxData = AVNetworkData.getInstance(level.getServer().overworld()).getNetwork(networkId);
         if (dmxData != null) {
-            dmxData.updateConsumer(this);
+            dmxData.getDmxHandler().updateConsumer(this);
         }
     }
 
     private void addConsumer(){
-        var dmxData = DMXNetworkData.getInstance(level.getServer().overworld()).getNetwork(networkId);
+        var dmxData = AVNetworkData.getInstance(level.getServer().overworld()).getNetwork(networkId);
         if (dmxData != null) {
             if(deviceId == null){
                 generateDeviceId();
             }
-            dmxData.addConsumer(getBlockPos(), this);
+            dmxData.getDmxHandler().addConsumer(getBlockPos(), this);
         }
     }
 
     private void removeConsumer(){
-        var dmxData = DMXNetworkData.getInstance(level.getServer().overworld()).getNetwork(networkId);
+        var dmxData = AVNetworkData.getInstance(level.getServer().overworld()).getNetwork(networkId);
         if (dmxData != null) {
-            dmxData.removeConsumer(this, getBlockPos());
+            dmxData.getDmxHandler().removeConsumer(this, getBlockPos());
         }
     }
 

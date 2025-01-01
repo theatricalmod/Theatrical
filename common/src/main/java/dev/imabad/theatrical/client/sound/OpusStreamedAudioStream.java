@@ -1,6 +1,7 @@
 package dev.imabad.theatrical.client.sound;
 
 import com.mojang.blaze3d.audio.Channel;
+import dev.imabad.theatrical.audio.AudioEngine;
 import dev.imabad.theatrical.client.sound.mic.MicrophoneManager;
 import net.labymod.opus.OpusCodec;
 import net.minecraft.client.sounds.AudioStream;
@@ -16,14 +17,16 @@ import java.nio.ByteBuffer;
 import java.util.concurrent.Executor;
 
 public class OpusStreamedAudioStream implements AudioStream {
-    private static final AudioFormat STEREO_16 = new AudioFormat(AudioFormat.Encoding.PCM_SIGNED, MicrophoneManager.SAMPLE_RATE, 16, 1, MicrophoneManager.FRAME_SIZE, MicrophoneManager.SAMPLE_RATE, false);
+    private static final AudioFormat STEREO_16 = new AudioFormat(AudioFormat.Encoding.PCM_SIGNED, AudioEngine.SAMPLE_RATE, 16, 1, AudioEngine.FRAME_SIZE, AudioEngine.SAMPLE_RATE, false);
+
+    private static final int MS_TIMEOUT = 40;
 
     private final OpusCodec opusCodec = OpusCodec.newBuilder()
-            .withFrameSize(MicrophoneManager.FRAME_SIZE)
+            .withFrameSize(AudioEngine.FRAME_SIZE)
             .withChannels(1)
-            .withSampleRate(MicrophoneManager.SAMPLE_RATE)
+            .withSampleRate(AudioEngine.SAMPLE_RATE)
             .build();
-    private PacketInputStream inputStream = new PacketInputStream(5);
+    private PacketInputStream inputStream = new PacketInputStream(MS_TIMEOUT);
     private AudioInputStream audioInputStream = new AudioInputStream(inputStream, STEREO_16, AudioSystem.NOT_SPECIFIED);
     private final int frameSize = STEREO_16.getFrameSize();
     private final byte[] frame = new byte[frameSize];
@@ -52,7 +55,7 @@ public class OpusStreamedAudioStream implements AudioStream {
     }
 
     private void createStreams(){
-        inputStream = new PacketInputStream(5);
+        inputStream = new PacketInputStream(MS_TIMEOUT);
         audioInputStream = new AudioInputStream(inputStream, STEREO_16, AudioSystem.NOT_SPECIFIED);
     }
 

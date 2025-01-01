@@ -42,6 +42,9 @@ dependencies {
     //Opus JNI
     implementation rootProject.files("libs/opus-jni-java-1.0.3.jar")
     shadowCommon rootProject.files("libs/opus-jni-java-1.0.3.jar")
+
+    implementation 'com.sedmelluq:lavaplayer:1.3.77'
+    shadowCommon 'com.sedmelluq:lavaplayer:1.3.77'
 }
 
 publishing {

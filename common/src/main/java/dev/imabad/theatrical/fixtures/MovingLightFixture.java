@@ -3,7 +3,7 @@ package dev.imabad.theatrical.fixtures;
 import dev.imabad.theatrical.Theatrical;
 import dev.imabad.theatrical.api.Fixture;
 import dev.imabad.theatrical.api.HangType;
-import dev.imabad.theatrical.api.dmx.DMXPersonality;
+import dev.imabad.theatrical.api.network.dmx.DMXPersonality;
 import dev.imabad.theatrical.blocks.light.BaseLightBlock;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;

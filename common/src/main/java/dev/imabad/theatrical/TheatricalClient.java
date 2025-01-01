@@ -3,14 +3,17 @@ package dev.imabad.theatrical;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
+import com.mojang.serialization.Codec;
 import dev.architectury.event.events.client.ClientPlayerEvent;
 import dev.architectury.platform.Platform;
 import dev.architectury.registry.client.rendering.BlockEntityRendererRegistry;
-import dev.imabad.theatrical.api.dmx.DMXConsumer;
+import dev.imabad.theatrical.api.network.audio.AudioDeviceDefinition;
+import dev.imabad.theatrical.api.network.dmx.DMXConsumer;
 import dev.imabad.theatrical.blockentities.BlockEntities;
 import dev.imabad.theatrical.blockentities.control.BasicLightingDeskBlockEntity;
 import dev.imabad.theatrical.blockentities.light.BaseLightBlockEntity;
 import dev.imabad.theatrical.blockentities.light.FresnelBlockEntity;
+import dev.imabad.theatrical.blockentities.sound.MixerBlockEntity;
 import dev.imabad.theatrical.blocks.light.MovingLightBlock;
 import dev.imabad.theatrical.client.LazyRenderers;
 import dev.imabad.theatrical.client.blockentities.BasicLightingConsoleRenderer;
@@ -23,6 +26,7 @@ import dev.imabad.theatrical.client.dmx.TheatricalArtNetClient;
 import dev.imabad.theatrical.client.gui.screen.BasicLightingDeskScreen;
 import dev.imabad.theatrical.client.gui.screen.FresnelScreen;
 import dev.imabad.theatrical.client.gui.screen.GenericDMXConfigurationScreen;
+import dev.imabad.theatrical.client.gui.screen.audio.MixerScreen;
 import dev.imabad.theatrical.client.sound.SpeakerManager;
 import dev.imabad.theatrical.config.TheatricalConfig;
 import dev.imabad.theatrical.config.UniverseConfig;
@@ -33,6 +37,7 @@ import dev.imabad.theatrical.net.artnet.ListConsumers;
 import dev.imabad.theatrical.net.artnet.NotifyConsumerChange;
 import dev.imabad.theatrical.net.artnet.RequestNetworks;
 import dev.imabad.theatrical.client.sound.mic.MicrophoneManager;
+import dev.imabad.theatrical.util.DimensionBlockPos;
 import net.labymod.opus.OpusCodec;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
@@ -42,6 +47,7 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -50,9 +56,8 @@ import org.joml.Matrix4f;
 
 import java.awt.*;
 import java.nio.ByteBuffer;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
+import java.util.List;
 
 public class TheatricalClient {
 
@@ -237,6 +242,14 @@ public class TheatricalClient {
             case BASIC_LIGHTING_DESK -> {
                 if(Minecraft.getInstance().level.getBlockEntity(openScreen.getPos()) instanceof BasicLightingDeskBlockEntity bse) {
                     Minecraft.getInstance().setScreen(new BasicLightingDeskScreen(bse));
+                }
+            }
+            case MIXER -> {
+                if(Minecraft.getInstance().level.getBlockEntity(openScreen.getPos()) instanceof MixerBlockEntity bse) {
+                    Map<DimensionBlockPos, AudioDeviceDefinition> knownDevices =  AudioDeviceDefinition.POS_MAP_CODEC
+                            .parse(NbtOps.INSTANCE, openScreen.getExtraData())
+                            .getOrThrow(true, (e) -> System.out.println(e));
+                    Minecraft.getInstance().setScreen(new MixerScreen(bse, knownDevices));
                 }
             }
         }

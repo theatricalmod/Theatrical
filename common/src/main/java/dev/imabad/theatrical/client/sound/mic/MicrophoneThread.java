@@ -1,6 +1,7 @@
 package dev.imabad.theatrical.client.sound.mic;
 
 import dev.imabad.theatrical.Theatrical;
+import dev.imabad.theatrical.audio.AudioEngine;
 import dev.imabad.theatrical.client.sound.SoundUtils;
 import dev.imabad.theatrical.net.sound.MicrophoneAudioPacket;
 import dev.imabad.theatrical.net.sound.SpeakerAudioClient;
@@ -25,9 +26,9 @@ public class MicrophoneThread extends Thread {
 
     public MicrophoneThread(BlockPos speakerPos) {
         this.opusCodec = OpusCodec.newBuilder()
-                .withFrameSize(MicrophoneManager.FRAME_SIZE)
+                .withFrameSize(AudioEngine.FRAME_SIZE)
                 .withChannels(1)
-                .withSampleRate(MicrophoneManager.SAMPLE_RATE)
+                .withSampleRate(AudioEngine.SAMPLE_RATE)
                 .build();
         this.running = true;
         this.soundID = Minecraft.getInstance().player.getUUID();
@@ -61,7 +62,7 @@ public class MicrophoneThread extends Thread {
         if(!mic.isStarted()){
             mic.start();
         }
-        if(mic.captureSamplesAvailable() < MicrophoneManager.FRAME_SIZE){
+        if(mic.captureSamplesAvailable() < AudioEngine.FRAME_SIZE){
             SoundUtils.ezSleep(5);
             return null;
         }

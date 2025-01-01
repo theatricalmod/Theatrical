@@ -2,7 +2,7 @@ package dev.imabad.theatrical.client.gui.screen;
 
 import dev.imabad.theatrical.Theatrical;
 import dev.imabad.theatrical.TheatricalClient;
-import dev.imabad.theatrical.api.dmx.DMXConsumer;
+import dev.imabad.theatrical.api.network.dmx.DMXConsumer;
 import dev.imabad.theatrical.client.gui.widgets.LabeledEditBox;
 import dev.imabad.theatrical.net.UpdateDMXFixture;
 import dev.imabad.theatrical.net.UpdateNetworkId;

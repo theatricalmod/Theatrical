@@ -1,6 +1,6 @@
 package dev.imabad.theatrical.api;
 
-import dev.imabad.theatrical.api.dmx.DMXPersonality;
+import dev.imabad.theatrical.api.network.dmx.DMXPersonality;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.state.BlockState;
 

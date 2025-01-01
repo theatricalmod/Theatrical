@@ -1,65 +1,50 @@
 package dev.imabad.theatrical.blockentities.sound;
 
+import dev.imabad.theatrical.api.network.audio.*;
+import dev.imabad.theatrical.audio.AudioSink;
+import dev.imabad.theatrical.audio.AudioSource;
+import dev.imabad.theatrical.audio.remote.RemoteAudioSink;
 import dev.imabad.theatrical.blockentities.BlockEntities;
-import dev.imabad.theatrical.blockentities.ClientSyncBlockEntity;
-import dev.imabad.theatrical.client.sound.OpusStreamedAudioStream;
-import dev.imabad.theatrical.net.sound.SpeakerAudioClient;
-import dev.imabad.theatrical.net.sound.StartMicrophone;
-import net.labymod.opus.OpusCodec;
-import net.minecraft.client.Minecraft;
+import dev.imabad.theatrical.util.DimensionBlockPos;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
+import java.util.List;
 import java.util.UUID;
 
-public class SpeakerBlockEntity extends ClientSyncBlockEntity {
+public class SpeakerBlockEntity extends BaseAudioNetworkDeviceBlockEntity {
 
-    private OpusCodec codec;
-    private UUID sourceId = UUID.randomUUID();
+    @Override
+    public AudioDeviceDefinition getDefinition() {
+        return new AudioDeviceDefinition("Speaker",
+                List.of(new AudioChannelDefinition("Main Output", 0, AudioChannelType.INPUT)));
+    }
+
+    @Override
+    public AudioSink getSinkForChannel(int channel) {
+        if(channel == 0){
+            return new RemoteAudioSink(new DimensionBlockPos(level.dimension(), getBlockPos()));
+        }
+        return null;
+    }
+
+    @Override
+    public AudioSource getSourceForChannel(int channel) {
+        return null;
+    }
 
     public SpeakerBlockEntity(BlockPos blockPos, BlockState blockState) {
         super(BlockEntities.SPEAKER.get(), blockPos, blockState);
-        codec = OpusCodec.createDefault();
     }
 
     @Override
     public void write(CompoundTag compoundTag) {
-
+        super.write(compoundTag);
     }
 
     @Override
     public void read(CompoundTag compoundTag) {
-
-    }
-    public static <T extends BlockEntity> void tick(Level level, BlockPos pos, BlockState state, T be) {
-        SpeakerBlockEntity speaker = (SpeakerBlockEntity) be;
-    }
-    public void playAudio(){
-        new StartMicrophone(getBlockPos(), true).sendToChunkListeners(level.getChunkAt(getBlockPos()));
-    }
-    public void stopAudio(){
-        new StartMicrophone(getBlockPos(), false).sendToChunkListeners(level.getChunkAt(getBlockPos()));
-    }
-
-    @Override
-    public void setLevel(Level level) {
-        super.setLevel(level);
-    }
-
-    @Override
-    public void setRemoved() {
-        if(!level.isClientSide){
-            stopAudio();
-        }
-        super.setRemoved();
+        super.read(compoundTag);
     }
 }

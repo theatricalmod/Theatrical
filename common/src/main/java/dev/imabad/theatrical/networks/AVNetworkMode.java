@@ -1,16 +1,17 @@
-package dev.imabad.theatrical.dmx;
+package dev.imabad.theatrical.networks;
 
 import net.minecraft.util.StringRepresentable;
 import org.jetbrains.annotations.NotNull;
 
-public enum DMXNetworkMemberRole implements StringRepresentable {
-    NONE("NONE"),
-    SEND("SEND"),
-    ADMIN("ADMIN");
+public enum AVNetworkMode implements StringRepresentable {
+
+    PUBLIC("PUBLIC"),
+    INVITE("INVITE"),
+    PRIVATE("PRIVATE");
 
     private final String name;
 
-    DMXNetworkMemberRole(String name) {
+    AVNetworkMode(String name) {
         this.name = name;
     }
 
@@ -23,8 +24,8 @@ public enum DMXNetworkMemberRole implements StringRepresentable {
         return name;
     }
 
-    public static DMXNetworkMemberRole byName(String name){
-        for (DMXNetworkMemberRole value : values()) {
+    public static AVNetworkMode byName(String name){
+        for (AVNetworkMode value : values()) {
             if(value.getName().equals(name)){
                 return value;
             }

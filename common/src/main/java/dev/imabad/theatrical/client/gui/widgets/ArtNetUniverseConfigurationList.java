@@ -7,72 +7,26 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.ObjectSelectionList;
-import net.minecraft.client.gui.layouts.LayoutElement;
 import net.minecraft.network.chat.Component;
 
-import java.util.Map;
-import java.util.function.Consumer;
+import java.util.Comparator;
 
-public class ArtNetUniverseConfigurationList extends ObjectSelectionList<ArtNetUniverseConfigurationList.Entry> implements LayoutElement {
+public class ArtNetUniverseConfigurationList extends ConfigurationListWidget<ArtNetConfigurationScreen, Integer, UniverseConfig, ArtNetUniverseConfigurationList.Entry> {
 
-    private ArtNetConfigurationScreen parent;
-    public ArtNetUniverseConfigurationList(Minecraft minecraft, ArtNetConfigurationScreen screen, int width, int height, Component title) {
-        super(minecraft, width, height, 32, height - 55 + 4, 30);
-        this.parent = screen;
-        this.setRenderBackground(true);
-        this.setRenderHeader(false, 0);
-    }
 
-    public void setEntries(Map<Integer, UniverseConfig> configs){
-        this.clearEntries();
-        configs.forEach((key, value) -> addEntry(new Entry(parent, key, value)));
+    public ArtNetUniverseConfigurationList(Minecraft minecraft, ArtNetConfigurationScreen parentScreen, int width, int height, Component title) {
+        super(minecraft, parentScreen, width, height, title);
     }
 
     @Override
-    protected int getScrollbarPosition() {
-        return this.getX() + this.getRowWidth() + 6;
+    public Entry createEntry(ArtNetConfigurationScreen parent, Integer key, UniverseConfig value) {
+        return new Entry(parent, key, value);
     }
 
     @Override
-    public int getRowWidth() {
-        return width - 10;
-    }
-
-    @Override
-    public void setX(int x) {
-        setLeftPos(x);
-    }
-
-    @Override
-    public void setY(int y) {
-        this.y0 = y;
-        this.y1 = y + height;
-    }
-
-    @Override
-    public int getX() {
-        return x0;
-    }
-
-    @Override
-    public int getY() {
-        return y0;
-    }
-
-    @Override
-    public int getWidth() {
-        return x1 - x0;
-    }
-
-    @Override
-    public int getHeight() {
-        return height;
-    }
-
-    @Override
-    public void visitWidgets(Consumer<AbstractWidget> consumer) {
+    public Comparator<Integer> getComparator() {
+        return Comparator.naturalOrder();
     }
 
     @Environment(EnvType.CLIENT)
@@ -107,8 +61,6 @@ public class ArtNetUniverseConfigurationList extends ObjectSelectionList<ArtNetU
         public void render(GuiGraphics guiGraphics, int index, int top, int left, int width, int height, int mouseX, int mouseY, boolean hovering, float partialTick) {
             Font font = Minecraft.getInstance().font;
             guiGraphics.drawString(font, Component.translatable("screen.artnetconfig.entry.universe", networkUniverse),  left, top + 1, 16777215 );
-//            guiGraphics.drawString(font, Component.translatable("screen.artnetconfig.entry.subnet", config.getSubnet()),  left, top + 1, 16777215 );
-//            guiGraphics.drawString(font, Component.translatable("screen.artnetconfig.entry.universe", config.getUniverse()),  left, top + 4 + font.lineHeight, 16777215 );
         }
 
         @Override

@@ -1,6 +1,7 @@
-package dev.imabad.theatrical.api.dmx;
+package dev.imabad.theatrical.api.network.dmx;
 
 import ch.bildspur.artnet.rdm.RDMDeviceId;
+import dev.imabad.theatrical.api.network.BelongsToNetwork;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.UUID;

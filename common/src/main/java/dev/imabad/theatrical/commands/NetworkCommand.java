@@ -7,6 +7,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import dev.imabad.theatrical.dmx.*;
+import dev.imabad.theatrical.networks.*;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
@@ -59,7 +60,7 @@ public class NetworkCommand {
                                         .then(Commands.argument("target", GameProfileArgument.gameProfile())
                                                 .suggests(
                                                         (commandContext, suggestionsBuilder) -> {
-                                                            Set<DMXNetworkMember> members =
+                                                            Set<AVNetworkMember> members =
                                                                     getDMXNetwork(commandContext).members();
                                                             GameProfileCache profileCache = commandContext.getSource()
                                                                     .getServer().getProfileCache();
@@ -96,7 +97,7 @@ public class NetworkCommand {
                                         .then(Commands.argument("targets", GameProfileArgument.gameProfile())
                                                 .suggests(
                                                         (commandContext, suggestionsBuilder) -> {
-                                                            Set<DMXNetworkMember> members =
+                                                            Set<AVNetworkMember> members =
                                                                     getDMXNetwork(commandContext).members();
                                                             GameProfileCache profileCache = commandContext.getSource()
                                                                     .getServer().getProfileCache();
@@ -120,43 +121,43 @@ public class NetworkCommand {
     }
 
     private static int changeMemberRole(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
-        DMXNetwork dmxNetwork = getDMXNetwork(context);
+        AVNetwork AVNetwork = getDMXNetwork(context);
         if (!isSourceOperator(context)) {
-            if (context.getSource().isPlayer() && !dmxNetwork.isAdmin(context.getSource().getPlayer().getUUID())) {
+            if (context.getSource().isPlayer() && !AVNetwork.isAdmin(context.getSource().getPlayer().getUUID())) {
                 throw ERROR_NETWORK_DOES_NOT_EXIST.create();
             }
         }
         Collection<GameProfile> players = GameProfileArgument.getGameProfiles(context, "target");
-        DMXNetworkMemberRole role = MemberRoleArgument.getMode(context, "role");
+        AVNetworkMemberRole role = MemberRoleArgument.getMode(context, "role");
         for (GameProfile player : players) {
-            dmxNetwork.setMemberRole(player.getId(), role);
+            AVNetwork.setMemberRole(player.getId(), role);
         }
         context.getSource().sendSuccess(() -> Component.translatable("commands.network.updated"), false);
         return 0;
     }
 
     private static int changeNetworkMode(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
-        DMXNetwork dmxNetwork = getDMXNetwork(context);
+        AVNetwork AVNetwork = getDMXNetwork(context);
         if (!isSourceOperator(context)) {
-            if (context.getSource().isPlayer() && !dmxNetwork.isAdmin(context.getSource().getPlayer().getUUID())) {
+            if (context.getSource().isPlayer() && !AVNetwork.isAdmin(context.getSource().getPlayer().getUUID())) {
                 throw ERROR_NETWORK_DOES_NOT_EXIST.create();
             }
         }
-        DMXNetworkMode mode = DMXNetworkModeArgument.getMode(context, "mode");
-        DMXNetworkMode oldMode = dmxNetwork.mode();
-        dmxNetwork.setMode(mode);
+        AVNetworkMode mode = DMXNetworkModeArgument.getMode(context, "mode");
+        AVNetworkMode oldMode = AVNetwork.mode();
+        AVNetwork.setMode(mode);
         List<UUID> members = new ArrayList<>();
-        for (DMXNetworkMember member : dmxNetwork.members()) {
+        for (AVNetworkMember member : AVNetwork.members()) {
             ServerPlayer player = context.getSource().getServer().getPlayerList().getPlayer(member.playerId());
             if (player != null) {
-                DMXNetworkData.getInstance(context.getSource().getLevel()).notifyNetworks(player);
+                AVNetworkData.getInstance(context.getSource().getLevel()).notifyNetworks(player);
                 members.add(player.getUUID());
             }
         }
-        if (dmxNetwork.mode() == DMXNetworkMode.PUBLIC || oldMode == DMXNetworkMode.PUBLIC) {
+        if (AVNetwork.mode() == AVNetworkMode.PUBLIC || oldMode == AVNetworkMode.PUBLIC) {
             for (ServerPlayer player : context.getSource().getServer().getPlayerList().getPlayers()) {
                 if (!members.contains(player.getUUID())) {
-                    DMXNetworkData.getInstance(context.getSource().getServer().overworld()).notifyNetworks(player);
+                    AVNetworkData.getInstance(context.getSource().getServer().overworld()).notifyNetworks(player);
                 }
             }
         }
@@ -166,14 +167,14 @@ public class NetworkCommand {
 
     private static int createNetwork(CommandContext<CommandSourceStack> context) {
         String newName = StringArgumentType.getString(context, "name");
-        DMXNetworkMode mode = DMXNetworkModeArgument.getMode(context, "mode");
-        DMXNetwork network = DMXNetworkData.getInstance(context.getSource().getServer().overworld()).createNetwork(newName, mode);
+        AVNetworkMode mode = DMXNetworkModeArgument.getMode(context, "mode");
+        AVNetwork network = AVNetworkData.getInstance(context.getSource().getServer().overworld()).createNetwork(newName, mode);
         if (context.getSource().isPlayer()) {
-            network.addMember(context.getSource().getPlayer().getUUID(), DMXNetworkMemberRole.ADMIN);
+            network.addMember(context.getSource().getPlayer().getUUID(), AVNetworkMemberRole.ADMIN);
         }
-        if (network.mode() == DMXNetworkMode.PUBLIC) {
+        if (network.mode() == AVNetworkMode.PUBLIC) {
             for (ServerPlayer player : context.getSource().getServer().getPlayerList().getPlayers()) {
-                DMXNetworkData.getInstance(context.getSource().getServer().overworld()).notifyNetworks(player);
+                AVNetworkData.getInstance(context.getSource().getServer().overworld()).notifyNetworks(player);
             }
         }
         context.getSource().sendSuccess(() -> Component.translatable("commands.network.created"), false);
@@ -182,10 +183,10 @@ public class NetworkCommand {
     }
 
     private static int listNetworkMembers(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
-        DMXNetwork dmxNetwork = getDMXNetwork(context);
+        AVNetwork AVNetwork = getDMXNetwork(context);
         GameProfileCache profileCache = context.getSource().getServer().getProfileCache();
-        List<String> list = dmxNetwork.members()
-                .stream().map(DMXNetworkMember::playerId)
+        List<String> list = AVNetwork.members()
+                .stream().map(AVNetworkMember::playerId)
                 .map((playerUUID) -> new Tuple<>(playerUUID, profileCache.get(playerUUID)))
                 .map(uuidOptionalTuple -> uuidOptionalTuple.getB().isPresent() ? uuidOptionalTuple.getB().get().getName() : uuidOptionalTuple.getA().toString())
                 .toList();
@@ -194,33 +195,33 @@ public class NetworkCommand {
     }
 
     private static int getNetwork(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
-        DMXNetwork dmxNetwork = getDMXNetwork(context);
+        AVNetwork AVNetwork = getDMXNetwork(context);
         if (!isSourceOperator(context)) {
-            if (context.getSource().isPlayer() && !dmxNetwork.isAdmin(context.getSource().getPlayer().getUUID())) {
+            if (context.getSource().isPlayer() && !AVNetwork.isAdmin(context.getSource().getPlayer().getUUID())) {
                 throw ERROR_NETWORK_DOES_NOT_EXIST.create();
             }
         }
         int i = 0;
-        context.getSource().sendSuccess(() -> Component.translatable("commands.network", Component.literal(dmxNetwork.name()), dmxNetwork.id().toString(), dmxNetwork.members().size()), false);
+        context.getSource().sendSuccess(() -> Component.translatable("commands.network", Component.literal(AVNetwork.name()), AVNetwork.id().toString(), AVNetwork.members().size()), false);
         return i;
     }
 
     private static int addPlayer(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
-        DMXNetwork dmxNetwork = getDMXNetwork(context);
+        AVNetwork AVNetwork = getDMXNetwork(context);
         if (!isSourceOperator(context)) {
-            if (context.getSource().isPlayer() && !dmxNetwork.isAdmin(context.getSource().getPlayer().getUUID())) {
+            if (context.getSource().isPlayer() && !AVNetwork.isAdmin(context.getSource().getPlayer().getUUID())) {
                 throw ERROR_NETWORK_DOES_NOT_EXIST.create();
             }
         }
         int i = 0;
         Collection<GameProfile> players = GameProfileArgument.getGameProfiles(context, "targets");
         for (GameProfile player : players) {
-            if (!dmxNetwork.isMember(player.getId())) {
-                dmxNetwork.addMember(player.getId(), DMXNetworkMemberRole.NONE);
+            if (!AVNetwork.isMember(player.getId())) {
+                AVNetwork.addMember(player.getId(), AVNetworkMemberRole.NONE);
                 context.getSource().sendSuccess(() -> Component.translatable("commands.network.members.add.success", Component.literal(player.getName())), false);
                 ServerPlayer serverPlayer = context.getSource().getServer().getPlayerList().getPlayer(player.getId());
                 if (serverPlayer != null) {
-                    DMXNetworkData.getInstance(context.getSource().getLevel()).notifyNetworks(serverPlayer);
+                    AVNetworkData.getInstance(context.getSource().getLevel()).notifyNetworks(serverPlayer);
                 }
                 i++;
             }
@@ -229,26 +230,26 @@ public class NetworkCommand {
     }
 
     private static int renameNetwork(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
-        DMXNetwork dmxNetwork = getDMXNetwork(context);
+        AVNetwork AVNetwork = getDMXNetwork(context);
         if (!isSourceOperator(context)) {
-            if (context.getSource().isPlayer() && !dmxNetwork.isAdmin(context.getSource().getPlayer().getUUID())) {
+            if (context.getSource().isPlayer() && !AVNetwork.isAdmin(context.getSource().getPlayer().getUUID())) {
                 throw ERROR_NETWORK_DOES_NOT_EXIST.create();
             }
         }
         String newName = StringArgumentType.getString(context, "name");
-        dmxNetwork.setName(newName);
+        AVNetwork.setName(newName);
         List<UUID> members = new ArrayList<>();
-        for (DMXNetworkMember member : dmxNetwork.members()) {
+        for (AVNetworkMember member : AVNetwork.members()) {
             ServerPlayer player = context.getSource().getServer().getPlayerList().getPlayer(member.playerId());
             if (player != null) {
-                DMXNetworkData.getInstance(context.getSource().getLevel()).notifyNetworks(player);
+                AVNetworkData.getInstance(context.getSource().getLevel()).notifyNetworks(player);
                 members.add(player.getUUID());
             }
         }
-        if (dmxNetwork.mode() == DMXNetworkMode.PUBLIC) {
+        if (AVNetwork.mode() == AVNetworkMode.PUBLIC) {
             for (ServerPlayer player : context.getSource().getServer().getPlayerList().getPlayers()) {
                 if (!members.contains(player.getUUID())) {
-                    DMXNetworkData.getInstance(context.getSource().getServer().overworld()).notifyNetworks(player);
+                    AVNetworkData.getInstance(context.getSource().getServer().overworld()).notifyNetworks(player);
                 }
             }
         }
@@ -256,26 +257,26 @@ public class NetworkCommand {
     }
 
     private static int deleteNetwork(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
-        DMXNetwork dmxNetwork = getDMXNetwork(context);
+        AVNetwork AVNetwork = getDMXNetwork(context);
         if (!isSourceOperator(context)) {
-            if (context.getSource().isPlayer() && !dmxNetwork.isAdmin(context.getSource().getPlayer().getUUID())) {
+            if (context.getSource().isPlayer() && !AVNetwork.isAdmin(context.getSource().getPlayer().getUUID())) {
                 throw ERROR_NETWORK_DOES_NOT_EXIST.create();
             }
         }
 
-        DMXNetworkData.getInstance(context.getSource().getLevel()).deleteNetwork(dmxNetwork);
+        AVNetworkData.getInstance(context.getSource().getLevel()).deleteNetwork(AVNetwork);
         List<UUID> members = new ArrayList<>();
-        for (DMXNetworkMember member : dmxNetwork.members()) {
+        for (AVNetworkMember member : AVNetwork.members()) {
             ServerPlayer player = context.getSource().getServer().getPlayerList().getPlayer(member.playerId());
             if (player != null) {
-                DMXNetworkData.getInstance(context.getSource().getLevel()).notifyNetworks(player);
+                AVNetworkData.getInstance(context.getSource().getLevel()).notifyNetworks(player);
                 members.add(player.getUUID());
             }
         }
-        if (dmxNetwork.mode() == DMXNetworkMode.PUBLIC) {
+        if (AVNetwork.mode() == AVNetworkMode.PUBLIC) {
             for (ServerPlayer player : context.getSource().getServer().getPlayerList().getPlayers()) {
                 if (!members.contains(player.getUUID())) {
-                    DMXNetworkData.getInstance(context.getSource().getServer().overworld()).notifyNetworks(player);
+                    AVNetworkData.getInstance(context.getSource().getServer().overworld()).notifyNetworks(player);
                 }
             }
         }
@@ -284,19 +285,19 @@ public class NetworkCommand {
     }
 
     private static int removePlayer(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
-        DMXNetwork dmxNetwork = getDMXNetwork(context);
+        AVNetwork AVNetwork = getDMXNetwork(context);
         if (!isSourceOperator(context)) {
-            if (context.getSource().isPlayer() && !dmxNetwork.isAdmin(context.getSource().getPlayer().getUUID())) {
+            if (context.getSource().isPlayer() && !AVNetwork.isAdmin(context.getSource().getPlayer().getUUID())) {
                 throw ERROR_NETWORK_DOES_NOT_EXIST.create();
             }
         }
         Collection<GameProfile> players = GameProfileArgument.getGameProfiles(context, "targets");
         for (GameProfile player : players) {
-            if (dmxNetwork.isMember(player.getId())) {
-                dmxNetwork.removeMember(player.getId());
+            if (AVNetwork.isMember(player.getId())) {
+                AVNetwork.removeMember(player.getId());
                 ServerPlayer serverPlayer = context.getSource().getServer().getPlayerList().getPlayer(player.getId());
                 if (serverPlayer != null) {
-                    DMXNetworkData.getInstance(context.getSource().getLevel()).notifyNetworks(serverPlayer);
+                    AVNetworkData.getInstance(context.getSource().getLevel()).notifyNetworks(serverPlayer);
                 }
                 context.getSource().sendSuccess(() -> Component.translatable("commands.network.members.remove.success", Component.literal(player.getName())), false);
             }
@@ -304,8 +305,8 @@ public class NetworkCommand {
         return 0;
     }
 
-    private static Collection<DMXNetwork> getNetworksForPlayer(CommandContext<CommandSourceStack> context) {
-        DMXNetworkData instance = DMXNetworkData.
+    private static Collection<AVNetwork> getNetworksForPlayer(CommandContext<CommandSourceStack> context) {
+        AVNetworkData instance = AVNetworkData.
                 getInstance(context.getSource().getServer().overworld());
         if (isSourceOperator(context)) {
             return instance.getAllNetworks();
@@ -315,15 +316,15 @@ public class NetworkCommand {
     }
 
     private static int listNetworks(CommandContext<CommandSourceStack> context) {
-        DMXNetworkData instance = DMXNetworkData.
+        AVNetworkData instance = AVNetworkData.
                 getInstance(context.getSource().getServer().overworld());
         List<String> networks;
         if (isSourceOperator(context)) {
             networks = instance.getAllNetworks().stream()
-                    .map(DMXNetwork::name).collect(Collectors.toList());
+                    .map(AVNetwork::name).collect(Collectors.toList());
         } else {
             networks = instance.getNetworksForPlayer(context.getSource().getPlayer().getUUID()).stream()
-                    .map(DMXNetwork::name).collect(Collectors.toList());
+                    .map(AVNetwork::name).collect(Collectors.toList());
         }
         context.getSource().sendSuccess(() -> Component.translatable("commands.networks",
                 networks.size(), String.join(", ", networks)), false);
@@ -334,13 +335,13 @@ public class NetworkCommand {
         return context.getSource().hasPermission(context.getSource().getServer().getOperatorUserPermissionLevel());
     }
 
-    private static DMXNetwork getDMXNetwork(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
-        DMXNetworkData instance = DMXNetworkData.
+    private static AVNetwork getDMXNetwork(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+        AVNetworkData instance = AVNetworkData.
                 getInstance(context.getSource().getServer().overworld());
         try {
             String id = context.getArgument("id", String.class);
             UUID uuid = UUID.fromString(id);
-            DMXNetwork network = instance.getNetwork(uuid);
+            AVNetwork network = instance.getNetwork(uuid);
             if (network != null) {
                 return network;
             }

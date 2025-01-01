@@ -3,9 +3,9 @@ package dev.imabad.theatrical.blocks.light;
 import dev.imabad.theatrical.blockentities.light.BaseDMXConsumerLightBlockEntity;
 import dev.imabad.theatrical.blockentities.light.LightCollisionContext;
 import dev.imabad.theatrical.blocks.HangableBlock;
-import dev.imabad.theatrical.dmx.DMXNetwork;
-import dev.imabad.theatrical.dmx.DMXNetworkData;
+import dev.imabad.theatrical.networks.AVNetwork;
 import dev.imabad.theatrical.items.Items;
+import dev.imabad.theatrical.networks.AVNetworkData;
 import dev.imabad.theatrical.util.UUIDUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -65,7 +65,7 @@ public abstract class BaseLightBlock extends HangableBlock implements EntityBloc
         if(!level.isClientSide){
             BlockEntity be = level.getBlockEntity(pos);
             if(be instanceof BaseDMXConsumerLightBlockEntity consumerLightBlockEntity && placer instanceof ServerPlayer player){
-                consumerLightBlockEntity.setNetworkId(DMXNetworkData.getInstance(level.getServer().overworld()).getDefaultNetworkForPlayer(player).id());
+                consumerLightBlockEntity.setNetworkId(AVNetworkData.getInstance(level.getServer().overworld()).getDefaultNetworkForPlayer(player).id());
             }
         }
     }
@@ -75,7 +75,7 @@ public abstract class BaseLightBlock extends HangableBlock implements EntityBloc
         if(!level.isClientSide()) {
             if (be instanceof BaseDMXConsumerLightBlockEntity consumerLightBlockEntity) {
                 if (!consumerLightBlockEntity.getNetworkId().equals(UUIDUtil.NULL)) {
-                    DMXNetwork network = DMXNetworkData.getInstance(level.getServer().overworld()).getNetwork(consumerLightBlockEntity.getNetworkId());
+                    AVNetwork network = AVNetworkData.getInstance(level.getServer().overworld()).getNetwork(consumerLightBlockEntity.getNetworkId());
                     if (network != null && !network.isMember(player.getUUID())) {
                         return InteractionResult.FAIL;
                     }
@@ -94,7 +94,7 @@ public abstract class BaseLightBlock extends HangableBlock implements EntityBloc
                         tagData.putInt("dmxAddress", tagData.getInt("dmxAddress") + consumerLightBlockEntity.getChannelCount());
                     }
                     itemInHand.save(tagData);
-                    DMXNetworkData instance = DMXNetworkData.getInstance(level.getServer().overworld());
+                    AVNetworkData instance = AVNetworkData.getInstance(level.getServer().overworld());
                     player.sendSystemMessage(Component.translatable("item.configurationcard.success", instance.getNetwork(consumerLightBlockEntity.getNetworkId()).name(), Integer.toString(consumerLightBlockEntity.getUniverse()), Integer.toString(consumerLightBlockEntity.getChannelStart()), Integer.toString(tagData.getInt("dmxAddress"))));
                     return InteractionResult.SUCCESS;
                 }

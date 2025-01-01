@@ -2,7 +2,7 @@ package dev.imabad.theatrical.fixtures;
 
 import ch.bildspur.artnet.rdm.RDMSlotID;
 import ch.bildspur.artnet.rdm.RDMSlotType;
-import dev.imabad.theatrical.api.dmx.DMXSlot;
+import dev.imabad.theatrical.api.network.dmx.DMXSlot;
 
 public class SharedSlots {
 

@@ -15,13 +15,13 @@ import dev.imabad.theatrical.commands.NetworkCommand;
 import dev.imabad.theatrical.config.ConfigHandler;
 import dev.imabad.theatrical.config.TheatricalConfig;
 import dev.imabad.theatrical.dmx.DMXDevice;
-import dev.imabad.theatrical.dmx.DMXNetwork;
-import dev.imabad.theatrical.dmx.DMXNetworkData;
+import dev.imabad.theatrical.networks.AVNetwork;
 import dev.imabad.theatrical.fixtures.Fixtures;
 import dev.imabad.theatrical.items.Items;
 import dev.imabad.theatrical.mixin.ArgumentTypeInfosAccessor;
 import dev.imabad.theatrical.net.TheatricalNet;
 import dev.imabad.theatrical.net.artnet.ListConsumers;
+import dev.imabad.theatrical.networks.AVNetworkData;
 import net.minecraft.commands.synchronization.ArgumentTypeInfo;
 import net.minecraft.commands.synchronization.SingletonArgumentInfo;
 import net.minecraft.core.registries.Registries;
@@ -29,7 +29,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
@@ -70,11 +69,11 @@ public class Theatrical {
         argTypes.register();
         dev.imabad.theatrical.items.Items.ITEMS.register();
         PlayerEvent.PLAYER_JOIN.register((event) -> {
-            DMXNetworkData instance = DMXNetworkData.getInstance(event.server.overworld());
-            for (DMXNetwork network : instance.getNetworksForPlayer(event.connection.player.getUUID())) {
-                for (Integer universe : network.getUniverses()) {
+            AVNetworkData instance = AVNetworkData.getInstance(event.server.overworld());
+            for (AVNetwork network : instance.getNetworksForPlayer(event.connection.player.getUUID())) {
+                for (Integer universe : network.getDmxHandler().getUniverses()) {
                     List<DMXDevice> devices = new ArrayList<>();
-                    network.getConsumers(universe).forEach(consumer -> {
+                    network.getDmxHandler().getConsumers(universe).forEach(consumer -> {
                         devices.add(new DMXDevice(consumer.getDeviceId(), consumer.getChannelStart(),
                                 consumer.getChannelCount(), consumer.getDeviceTypeId(), consumer.getActivePersonality(), consumer.getModelName(),
                                 consumer.getFixtureId()));
@@ -85,7 +84,8 @@ public class Theatrical {
         });
         LifecycleEvent.SERVER_LEVEL_UNLOAD.register(world -> {
             if(world.dimension().equals(Level.OVERWORLD)){
-                DMXNetworkData.unloadLevel();
+                AVNetworkData.unloadLevel();
+                AVNetworkData.unloadLevel();
             }
         });
         CommandRegistrationEvent.EVENT.register((dispatcher, registry, selection) -> {

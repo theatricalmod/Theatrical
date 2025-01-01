@@ -4,9 +4,9 @@ import dev.imabad.theatrical.TheatricalScreen;
 import dev.imabad.theatrical.blockentities.BlockEntities;
 import dev.imabad.theatrical.blockentities.control.BasicLightingDeskBlockEntity;
 import dev.imabad.theatrical.blocks.Blocks;
-import dev.imabad.theatrical.dmx.DMXNetwork;
-import dev.imabad.theatrical.dmx.DMXNetworkData;
+import dev.imabad.theatrical.networks.AVNetwork;
 import dev.imabad.theatrical.net.OpenScreen;
+import dev.imabad.theatrical.networks.AVNetworkData;
 import dev.imabad.theatrical.util.UUIDUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -98,7 +98,7 @@ public class BasicLightingDeskBlock extends Block implements EntityBlock {
         if(!level.isClientSide){
             BasicLightingDeskBlockEntity be = (BasicLightingDeskBlockEntity) level.getBlockEntity(pos);
             if(be.getNetworkId() != UUIDUtil.NULL){
-                DMXNetwork network = DMXNetworkData.getInstance(level.getServer().overworld()).getNetwork(be.getNetworkId());
+                AVNetwork network = AVNetworkData.getInstance(level.getServer().overworld()).getNetwork(be.getNetworkId());
                 if(network != null && !network.isMember(player.getUUID())) {
                     return InteractionResult.FAIL;
                 }

@@ -3,7 +3,7 @@ package dev.imabad.theatrical.blockentities.interfaces;
 import dev.imabad.theatrical.blockentities.BlockEntities;
 import dev.imabad.theatrical.blockentities.ClientSyncBlockEntity;
 import dev.imabad.theatrical.config.TheatricalConfig;
-import dev.imabad.theatrical.dmx.DMXNetworkData;
+import dev.imabad.theatrical.networks.AVNetworkData;
 import dev.imabad.theatrical.util.UUIDUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -59,9 +59,9 @@ public class ArtNetInterfaceBlockEntity extends ClientSyncBlockEntity {
 
     public void update(byte[] data) {
         if(level != null && level.getServer() != null) {
-            var dmxData = DMXNetworkData.getInstance(level.getServer().overworld()).getNetwork(networkId);
+            var dmxData = AVNetworkData.getInstance(level.getServer().overworld()).getNetwork(networkId);
             if(dmxData != null) {
-                dmxData.getConsumersInRange(universe, getBlockPos(), TheatricalConfig.INSTANCE.COMMON.wirelessDMXRadius).forEach(dmxConsumer -> dmxConsumer.consume(data));
+                dmxData.getDmxHandler().getConsumersInRange(universe, getBlockPos(), TheatricalConfig.INSTANCE.COMMON.wirelessDMXRadius).forEach(dmxConsumer -> dmxConsumer.consume(data));
             }
         }
     }

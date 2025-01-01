@@ -1,6 +1,7 @@
 package dev.imabad.theatrical.client.sound.mic;
 
 import dev.imabad.theatrical.Theatrical;
+import dev.imabad.theatrical.audio.AudioEngine;
 import net.minecraft.core.BlockPos;
 import org.lwjgl.openal.ALC11;
 import org.lwjgl.openal.ALUtil;
@@ -28,9 +29,6 @@ public class MicrophoneManager {
             microphoneThread = null;
         }
     }
-
-    public static final int SAMPLE_RATE = 48000;
-    public static final int FRAME_SIZE = (SAMPLE_RATE / 1000) * 20;
 
     public static boolean canEnumerateALC(){
         return ALC11.alcIsExtensionPresent(0L, "ALC_ENUMERATE_ALL_EXT");
@@ -64,7 +62,7 @@ public class MicrophoneManager {
     }
 
     public static Microphone createMicrophone() {
-        Microphone microphone = new Microphone(48000, FRAME_SIZE, null);
+        Microphone microphone = new Microphone(AudioEngine.SAMPLE_RATE, AudioEngine.FRAME_SIZE, null);
         microphone.open();
         return microphone;
     }

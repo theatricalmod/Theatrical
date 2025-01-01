@@ -3,7 +3,7 @@ package dev.imabad.theatrical.client.gui.screen;
 import dev.imabad.theatrical.Theatrical;
 import dev.imabad.theatrical.TheatricalClient;
 import dev.imabad.theatrical.blockentities.control.BasicLightingDeskBlockEntity;
-import dev.imabad.theatrical.client.gui.widgets.FaderWidget;
+import dev.imabad.theatrical.client.gui.widgets.SliderWidget;
 import dev.imabad.theatrical.net.*;
 import dev.imabad.theatrical.util.UUIDUtil;
 import net.minecraft.client.gui.GuiGraphics;
@@ -84,9 +84,9 @@ public class BasicLightingDeskScreen extends Screen {
                 baseY += (i / 6) * 61;
             }
             int faderNumber = i - ((i / 6) * 6);
-            this.addRenderableWidget(new FaderWidget(xCenter + 7 + (faderNumber * 20), baseY, i, Byte.toUnsignedInt(faders[i])));
+            this.addRenderableWidget(new SliderWidget(xCenter + 7 + (faderNumber * 20), baseY, i, Byte.toUnsignedInt(faders[i])));
         }
-        this.addRenderableWidget(new FaderWidget(xCenter + 184, yCenter + 7, -1, Byte.toUnsignedInt(be.getGrandMaster())));
+        this.addRenderableWidget(new SliderWidget(xCenter + 184, yCenter + 7, -1, Byte.toUnsignedInt(be.getGrandMaster())));
         this.addRenderableWidget(new Button.Builder(Component.literal("<-"), button -> this.moveStep(false))
                 .pos(xCenter + 155, yCenter + 67)
                 .size(15, 20)
@@ -141,9 +141,9 @@ public class BasicLightingDeskScreen extends Screen {
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
         this.children().forEach(widget -> {
-            if(widget instanceof FaderWidget fader) {
+            if(widget instanceof SliderWidget fader) {
                 if (fader.isMouseOver(mouseX, mouseY) && fader.isDragging()) {
-                    int newVal = fader.updateValue(mouseY);
+                    float newVal = fader.updateValue(mouseY);
                     new ControlUpdateFader(be.getBlockPos(), fader.getChannel(), newVal).sendToServer();
                 }
             }

@@ -1,4 +1,4 @@
-package dev.imabad.theatrical.api.dmx;
+package dev.imabad.theatrical.api.network.dmx;
 
 import ch.bildspur.artnet.rdm.RDMSlotID;
 import ch.bildspur.artnet.rdm.RDMSlotType;

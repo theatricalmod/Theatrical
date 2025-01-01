@@ -8,20 +8,23 @@ import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
-public class FaderWidget extends AbstractWidget {
+public class SliderWidget extends AbstractWidget {
     private static final ResourceLocation background = new ResourceLocation(Theatrical.MOD_ID,
-            "textures/gui/lighting_console.png");
+            "textures/gui/slider.png");
 
     private final int channel;
-    private int value;
+    private float value;
+    private final float maxValue;
 
     private boolean dragging = false;
-
-//    public final IDraggable onDrag;
-    public FaderWidget(int x, int y, int channel, int value) {
+    public SliderWidget(int x, int y, int channel, float value, float maxValue) {
         super(x, y, 10, 51, Component.empty());
         this.channel = channel;
         this.value = value;
+        this.maxValue = maxValue;
+    }
+    public SliderWidget(int x, int y, int channel, int value) {
+        this(x, y, channel, value, 255);
     }
 
     public int getChannel() {
@@ -32,8 +35,8 @@ public class FaderWidget extends AbstractWidget {
     protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         isHovered = mouseX >= getX() && mouseY >= getY() && mouseX < getX() + width && mouseY < getY() + height;
         RenderSystem.disableDepthTest();
-        guiGraphics.blit(background, getX(), getY(), getWidth(), getHeight(), 0, 126, 10, 51, 256, 256);
-        guiGraphics.blit(background, getX() + 1, (getY() + (height - 7)) - (int) ((this.value / 255f) * 50), 8, 11, 10, 126, 8, 11, 256, 256);
+        guiGraphics.blit(background, getX(), getY(), getWidth(), getHeight(), 0, 0, 10, 51, 64, 64);
+        guiGraphics.blit(background, getX() + 1, (getY() + (height - 7)) - (int) ((this.value / maxValue) * 50), 8, 11, 10, 0, 8, 11, 64, 64);
         RenderSystem.enableDepthTest();
     }
 
@@ -56,11 +59,12 @@ public class FaderWidget extends AbstractWidget {
     public boolean isDragging() {
         return dragging;
     }
-    public int calculateNewValue(double mouseY){
-        return (int) (((this.height - (mouseY - this.getY())) / this.height) * 255f);
+
+    public float calculateNewValue(double mouseY){
+        return (float) (((this.height - (mouseY - this.getY())) / this.height) * maxValue);
     }
 
-    public int updateValue(double mouseY){
+    public float updateValue(double mouseY){
         this.value = calculateNewValue(mouseY);
         return value;
     }

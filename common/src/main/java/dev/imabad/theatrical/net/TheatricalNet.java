@@ -4,9 +4,7 @@ import dev.architectury.networking.simple.MessageType;
 import dev.architectury.networking.simple.SimpleNetworkManager;
 import dev.imabad.theatrical.Theatrical;
 import dev.imabad.theatrical.net.artnet.*;
-import dev.imabad.theatrical.net.sound.MicrophoneAudioPacket;
-import dev.imabad.theatrical.net.sound.SpeakerAudioClient;
-import dev.imabad.theatrical.net.sound.StartMicrophone;
+import dev.imabad.theatrical.net.sound.*;
 
 public interface TheatricalNet {
     SimpleNetworkManager MAIN = SimpleNetworkManager.create(Theatrical.MOD_ID);
@@ -34,5 +32,7 @@ public interface TheatricalNet {
     MessageType SPEAKER_AUDIO = MAIN.registerS2C("speaker_audio_client", SpeakerAudioClient::new);
     MessageType START_MIC = MAIN.registerS2C("start_mic", StartMicrophone::new);
     MessageType PLAYER_AUDIO = MAIN.registerC2S("player_audio", MicrophoneAudioPacket::new);
+    MessageType CONFIGURE_MIXER = MAIN.registerC2S("configure_mixer", ConfigureMixerPacket::new);
+    MessageType SET_MIXER_VOLUME = MAIN.registerC2S("set_mixer_volume", SetMixerVolumePacket::new);
     static void init(){}
 }

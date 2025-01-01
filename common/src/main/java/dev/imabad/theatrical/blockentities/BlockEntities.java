@@ -9,6 +9,8 @@ import dev.imabad.theatrical.blockentities.interfaces.RedstoneInterfaceBlockEnti
 import dev.imabad.theatrical.blockentities.light.FresnelBlockEntity;
 import dev.imabad.theatrical.blockentities.light.LEDPanelBlockEntity;
 import dev.imabad.theatrical.blockentities.light.MovingLightBlockEntity;
+import dev.imabad.theatrical.blockentities.sound.MixerBlockEntity;
+import dev.imabad.theatrical.blockentities.sound.MusicPlayerBlockEntity;
 import dev.imabad.theatrical.blockentities.sound.SpeakerBlockEntity;
 import dev.imabad.theatrical.blocks.Blocks;
 import net.minecraft.core.registries.Registries;
@@ -23,4 +25,6 @@ public class BlockEntities {
     public static final RegistrySupplier<BlockEntityType<LEDPanelBlockEntity>> LED_PANEL = BLOCK_ENTITIES.register("led_panel", () -> BlockEntityType.Builder.of(LEDPanelBlockEntity::new, Blocks.LED_PANEL.get()).build(null));
     public static final RegistrySupplier<BlockEntityType<BasicLightingDeskBlockEntity>> BASIC_LIGHTING_DESK = BLOCK_ENTITIES.register("basic_lighting_desk", () -> BlockEntityType.Builder.of(BasicLightingDeskBlockEntity::new, Blocks.BASIC_LIGHTING_DESK.get()).build(null));
     public static final RegistrySupplier<BlockEntityType<SpeakerBlockEntity>> SPEAKER = BLOCK_ENTITIES.register("speaker", () -> BlockEntityType.Builder.of(SpeakerBlockEntity::new, Blocks.SPEAKER.get()).build(null));
+    public static final RegistrySupplier<BlockEntityType<MixerBlockEntity>> MIXER = BLOCK_ENTITIES.register("mixer", () -> BlockEntityType.Builder.of(MixerBlockEntity::new, Blocks.MIXER.get()).build(null));
+    public static final RegistrySupplier<BlockEntityType<MusicPlayerBlockEntity>> MUSIC_PLAYER = BLOCK_ENTITIES.register("music_player", () -> BlockEntityType.Builder.of(MusicPlayerBlockEntity::new, Blocks.MUSIC_PLAYER.get()).build(null));
 }

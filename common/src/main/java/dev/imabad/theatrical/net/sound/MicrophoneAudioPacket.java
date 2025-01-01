@@ -49,8 +49,8 @@ public class MicrophoneAudioPacket extends BaseC2SMessage {
     @Override
     public void handle(NetworkManager.PacketContext context) {
         context.queue(() -> {
-            new SpeakerAudioClient(playerId, speakerPos, data).sendToChunkListeners(
-                    context.getPlayer().level().getChunkAt(speakerPos));
+//            new SpeakerAudioClient(playerId, speakerPos, data).sendToChunkListeners(
+//                    context.getPlayer().level().getChunkAt(speakerPos));
         });
     }
 }

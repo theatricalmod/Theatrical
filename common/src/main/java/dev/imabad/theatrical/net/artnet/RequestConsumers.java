@@ -4,11 +4,11 @@ import dev.architectury.networking.NetworkManager;
 import dev.architectury.networking.simple.BaseC2SMessage;
 import dev.architectury.networking.simple.MessageType;
 import dev.imabad.theatrical.Theatrical;
-import dev.imabad.theatrical.api.dmx.DMXConsumer;
+import dev.imabad.theatrical.api.network.dmx.DMXConsumer;
 import dev.imabad.theatrical.dmx.DMXDevice;
-import dev.imabad.theatrical.dmx.DMXNetwork;
-import dev.imabad.theatrical.dmx.DMXNetworkData;
+import dev.imabad.theatrical.networks.AVNetwork;
 import dev.imabad.theatrical.net.TheatricalNet;
+import dev.imabad.theatrical.networks.AVNetworkData;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
@@ -48,10 +48,10 @@ public class RequestConsumers extends BaseC2SMessage {
     public void handle(NetworkManager.PacketContext context) {
         Level level = context.getPlayer().level();
         if(level.getServer() != null ) {
-            DMXNetwork network = DMXNetworkData.getInstance(level.getServer().overworld()).getNetwork(networkId);
+            AVNetwork network = AVNetworkData.getInstance(level.getServer().overworld()).getNetwork(networkId);
             if(network != null && network.isMember(context.getPlayer().getUUID())){
                 List<DMXDevice> devices = new ArrayList<>();
-                Collection<DMXConsumer> consumers = network.getConsumers(universe);
+                Collection<DMXConsumer> consumers = network.getDmxHandler().getConsumers(universe);
                 if(consumers == null){
                     return;
                 }

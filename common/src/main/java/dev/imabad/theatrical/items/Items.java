@@ -61,4 +61,14 @@ public class Items {
             "microphone_pack",
             MicrophonePack::new
     );
+
+    public static final RegistrySupplier<Item> MIXER = ITEMS.register(
+            "mixer",
+            () -> new BlockItem(Blocks.MIXER.get(), new Item.Properties().arch$tab(Theatrical.TAB))
+    );
+
+    public static final RegistrySupplier<Item> MUSIC_PLAYER = ITEMS.register(
+            "music_player",
+            () -> new BlockItem(Blocks.MUSIC_PLAYER.get(), new Item.Properties().arch$tab(Theatrical.TAB))
+    );
 }

@@ -24,7 +24,7 @@ loom {
     runs {
         client {
             client()
-            vmArgs "-Dlava.native.connector.dir=C:\\Users\\stuar\\Documents\\MCModding\\lava-natives"
+            vmArgs "-Dlava.native.dir=C:\\Users\\stuar\\Documents\\MCModding\\lava-natives"
         }
         data {
             data()
@@ -70,6 +70,11 @@ dependencies {
     implementation rootProject.files("libs/opus-jni-java-1.0.3.jar")
     shadowCommon rootProject.files("libs/opus-jni-java-1.0.3.jar")
     forgeRuntimeLibrary rootProject.files("libs/opus-jni-java-1.0.3.jar")
+
+    //Lava Player
+    implementation 'com.sedmelluq:lavaplayer:1.3.77'
+    shadowCommon 'com.sedmelluq:lavaplayer:1.3.77'
+    forgeRuntimeLibrary 'com.sedmelluq:lavaplayer:1.3.77'
 }
 
 processResources {

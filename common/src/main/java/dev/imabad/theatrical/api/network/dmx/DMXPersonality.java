@@ -1,4 +1,4 @@
-package dev.imabad.theatrical.api.dmx;
+package dev.imabad.theatrical.api.network.dmx;
 
 import java.util.ArrayList;
 import java.util.List;
