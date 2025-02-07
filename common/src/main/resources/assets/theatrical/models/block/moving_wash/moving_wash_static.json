@@ -1,0 +1,22 @@
+{
+	"credit": "Made with Blockbench",
+	"textures": {
+		"1": "theatrical:block/moving_head_body",
+		"2": "theatrical:block/light_side",
+		"particle": "theatrical:block/moving_head_whole"
+	},
+	"elements": [
+		{
+			"from": [0, 0, 0],
+			"to": [16, 2, 16],
+			"faces": {
+				"north": {"uv": [0, 13, 16, 16], "texture": "#1"},
+				"east": {"uv": [0, 13, 16, 16], "texture": "#1"},
+				"south": {"uv": [0, 13, 16, 16], "texture": "#1"},
+				"west": {"uv": [0, 13, 16, 16], "texture": "#1"},
+				"up": {"uv": [0, 0, 16, 16], "texture": "#2"},
+				"down": {"uv": [0, 0, 16, 16], "texture": "#2"}
+			}
+		}
+	]
+}

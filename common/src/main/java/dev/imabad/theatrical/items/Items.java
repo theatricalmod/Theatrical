@@ -51,4 +51,8 @@ public class Items {
             "configuration_card",
             ConfigurationCard::new
     );
+    public static final RegistrySupplier<Item> MOVING_WASH = ITEMS.register(
+        "moving_wash",
+        () -> new BlockItem(Blocks.MOVING_WASH_BLOCK.get(), new Item.Properties().arch$tab(Theatrical.TAB))
+    );
 }
