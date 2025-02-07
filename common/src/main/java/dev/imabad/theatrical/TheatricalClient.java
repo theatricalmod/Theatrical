@@ -12,11 +12,13 @@ import dev.imabad.theatrical.blockentities.control.BasicLightingDeskBlockEntity;
 import dev.imabad.theatrical.blockentities.light.BaseLightBlockEntity;
 import dev.imabad.theatrical.blockentities.light.FresnelBlockEntity;
 import dev.imabad.theatrical.blocks.light.MovingLightBlock;
+import dev.imabad.theatrical.blocks.light.MovingWashBlock;
 import dev.imabad.theatrical.client.LazyRenderers;
 import dev.imabad.theatrical.client.blockentities.BasicLightingConsoleRenderer;
 import dev.imabad.theatrical.client.blockentities.FresnelRenderer;
 import dev.imabad.theatrical.client.blockentities.LEDPanelRenderer;
 import dev.imabad.theatrical.client.blockentities.MovingLightRenderer;
+import dev.imabad.theatrical.client.blockentities.MovingWashRenderer;
 import dev.imabad.theatrical.client.dmx.ArtNetManager;
 import dev.imabad.theatrical.client.dmx.ArtNetToNetworkClientData;
 import dev.imabad.theatrical.client.dmx.TheatricalArtNetClient;
@@ -57,6 +59,7 @@ public class TheatricalClient {
     private static ArtNetManager artNetManager;
     public static void init() {
         BlockEntityRendererRegistry.register(BlockEntities.MOVING_LIGHT.get(), MovingLightRenderer::new);
+        BlockEntityRendererRegistry.register(BlockEntities.MOVING_WASH.get(), MovingWashRenderer::new);
         BlockEntityRendererRegistry.register(BlockEntities.LED_FRESNEL.get(), FresnelRenderer::new);
         BlockEntityRendererRegistry.register(BlockEntities.LED_PANEL.get(), LEDPanelRenderer::new);
         BlockEntityRendererRegistry.register(BlockEntities.BASIC_LIGHTING_DESK.get(), BasicLightingConsoleRenderer::new);

@@ -14,6 +14,9 @@ public class Fixtures {
 	public static final RegistrySupplier<Fixture> MOVING_LIGHT =
 		FIXTURES.register(new ResourceLocation(Theatrical.MOD_ID, "moving_light"), MovingLightFixture::new);
 
+	public static final RegistrySupplier<Fixture> MOVING_WASH =
+		FIXTURES.register(new ResourceLocation(Theatrical.MOD_ID, "moving_wash"), MovingWashFixture::new);
+
 	public static final RegistrySupplier<Fixture> LED_FRESNEL =
 			FIXTURES.register(new ResourceLocation(Theatrical.MOD_ID, "fresnel"), LEDFresnelFixture::new);
 
