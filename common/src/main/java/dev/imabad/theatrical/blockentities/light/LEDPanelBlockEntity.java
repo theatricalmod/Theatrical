@@ -32,12 +32,31 @@ public class LEDPanelBlockEntity extends BaseDMXConsumerLightBlockEntity{
         if(this.storePrev()){
             level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
         }
-        intensity = convertByteToInt(ourValues[0]);
-        red = convertByteToInt(ourValues[1]);
-        green = convertByteToInt(ourValues[2]);
-        blue = convertByteToInt(ourValues[3]);
-        setChanged();
-        level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
+        boolean hasUpdated = false;
+        int newIntensity = convertByteToInt(ourValues[0]);
+        if(intensity != newIntensity){
+            intensity = newIntensity;
+            hasUpdated = true;
+        }
+        int newRed = convertByteToInt(ourValues[1]);
+        if(red != newRed) {
+            red = newRed;
+            hasUpdated = true;
+        }
+        int newGreen = convertByteToInt(ourValues[2]);
+        if(green != newGreen){
+            green = newGreen;
+            hasUpdated = true;
+        }
+        int newBlue = convertByteToInt(ourValues[3]);
+        if(blue != newBlue){
+            blue = newBlue;
+            hasUpdated = true;
+        }
+        if(hasUpdated) {
+            level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
+            setChanged();
+        }
     }
 
     @Override
