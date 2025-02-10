@@ -69,7 +69,7 @@ public class MovingLightBlockEntity extends BaseDMXConsumerLightBlockEntity {
             pan = newPan;
             hasUpdated = true;
         }
-        int newTilt = (int) ((convertByteToInt(ourValues[6]) * 180) / 255F) - 180;
+        int newTilt = (int) ((convertByteToInt(ourValues[6]) * 270) / 255F) - 225;
         if(tilt != newTilt){
             tilt = newTilt;
             hasUpdated = true;
