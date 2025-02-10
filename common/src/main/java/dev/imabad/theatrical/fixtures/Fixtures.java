@@ -16,10 +16,22 @@ public class Fixtures {
 
 	public static final RegistrySupplier<Fixture> MOVING_WASH =
 		FIXTURES.register(new ResourceLocation(Theatrical.MOD_ID, "moving_wash"), MovingWashFixture::new);
+	
+	public static final RegistrySupplier<Fixture> MOVING_BEAM =
+		FIXTURES.register(new ResourceLocation(Theatrical.MOD_ID, "moving_beam"), MovingBeamFixture::new);
 
 	public static final RegistrySupplier<Fixture> LED_FRESNEL =
 			FIXTURES.register(new ResourceLocation(Theatrical.MOD_ID, "fresnel"), LEDFresnelFixture::new);
 
+	public static final RegistrySupplier<Fixture> RGB_BAR =
+			FIXTURES.register(new ResourceLocation(Theatrical.MOD_ID, "rgb_bar"), RGBbarFixture::new);
+
+	public static final RegistrySupplier<Fixture> MOVING_VL2C =
+			FIXTURES.register(new ResourceLocation(Theatrical.MOD_ID, "moving_vl2c"), MovingVL2CFixture::new);
+
+	public static final RegistrySupplier<Fixture> MOVING_SCAN =
+			FIXTURES.register(new ResourceLocation(Theatrical.MOD_ID, "moving_scan"), MovingScanFixture::new);
+			
 
 	public static final RegistrySupplier<Fixture> LED_PANEL =
 			FIXTURES.register(new ResourceLocation(Theatrical.MOD_ID, "led_panel"), LEDPanelFixture::new);

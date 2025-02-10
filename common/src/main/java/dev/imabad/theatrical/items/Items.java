@@ -55,4 +55,20 @@ public class Items {
         "moving_wash",
         () -> new BlockItem(Blocks.MOVING_WASH_BLOCK.get(), new Item.Properties().arch$tab(Theatrical.TAB))
     );
+    public static final RegistrySupplier<Item> MOVING_VL2C = ITEMS.register(
+        "moving_vl2c",
+        () -> new BlockItem(Blocks.MOVING_VL2C_BLOCK.get(), new Item.Properties().arch$tab(Theatrical.TAB))
+    );
+    public static final RegistrySupplier<Item> MOVING_SCAN = ITEMS.register(
+        "moving_scan",
+        () -> new BlockItem(Blocks.MOVING_SCAN_BLOCK.get(), new Item.Properties().arch$tab(Theatrical.TAB))
+    );
+    public static final RegistrySupplier<Item> RGB_BAR = ITEMS.register(
+            "rgb_bar",
+            () -> new BlockItem(Blocks.RGB_BAR.get(), new Item.Properties().arch$tab(Theatrical.TAB))
+    );
+    public static final RegistrySupplier<Item> MOVING_BEAM = ITEMS.register(
+        "moving_beam",
+        () -> new BlockItem(Blocks.MOVING_BEAM_BLOCK.get(), new Item.Properties().arch$tab(Theatrical.TAB))
+    );
 }
