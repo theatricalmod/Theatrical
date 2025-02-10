@@ -38,15 +38,46 @@ public class MovingLightBlockEntity extends BaseDMXConsumerLightBlockEntity {
         if(this.storePrev()){
             level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
         }
-        intensity = convertByteToInt(ourValues[0]);
-        red = convertByteToInt(ourValues[1]);
-        green = convertByteToInt(ourValues[2]);
-        blue = convertByteToInt(ourValues[3]);
-        focus = convertByteToInt(ourValues[4]);
-        pan = (int) ((convertByteToInt(ourValues[5]) * 360) / 255f) - 180;
-        tilt = (int) ((convertByteToInt(ourValues[6]) * 180) / 255F) - 180;
-        level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
-        setChanged();
+        boolean hasUpdated = false;
+        int newIntensity = convertByteToInt(ourValues[0]);
+        if(intensity != newIntensity){
+            intensity = newIntensity;
+            hasUpdated = true;
+        }
+        int newRed = convertByteToInt(ourValues[1]);
+        if(red != newRed) {
+            red = newRed;
+            hasUpdated = true;
+        }
+        int newGreen = convertByteToInt(ourValues[2]);
+        if(green != newGreen){
+            green = newGreen;
+            hasUpdated = true;
+        }
+        int newBlue = convertByteToInt(ourValues[3]);
+        if(blue != newBlue){
+            blue = newBlue;
+            hasUpdated = true;
+        }
+        int newFocus = convertByteToInt(ourValues[4]);
+        if(focus != newFocus){
+            focus = newFocus;
+            hasUpdated = true;
+        }
+        int newPan = (int) ((convertByteToInt(ourValues[5]) * 360) / 255f) - 180;
+        if(pan != newPan){
+            pan = newPan;
+            hasUpdated = true;
+        }
+        int newTilt = (int) ((convertByteToInt(ourValues[6]) * 180) / 255F) - 180;
+        if(tilt != newTilt){
+            tilt = newTilt;
+            hasUpdated = true;
+        }
+        if(hasUpdated) {
+            level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
+            setChanged();
+        }
     }
 
     @Override
