@@ -65,6 +65,7 @@ public class DataEvent {
             withExistingParent(Blocks.PIPE_BLOCK.getId().getPath(), new ResourceLocation(Theatrical.MOD_ID, "block/vertical_pipe"));
             withExistingParent(Blocks.TRUSS_BLOCK.getId().getPath(), new ResourceLocation(Theatrical.MOD_ID, "block/truss"));
             withExistingParent(Blocks.MOVING_LIGHT_BLOCK.getId().getPath(), new ResourceLocation(Theatrical.MOD_ID, "block/moving_light/moving_head_whole"));
+            withExistingParent(Blocks.MOVING_WASH_BLOCK.getId().getPath(), new ResourceLocation(Theatrical.MOD_ID, "block/moving_wash/moving_wash_whole"));
             withExistingParent(Blocks.LED_FRESNEL.getId().getPath(), new ResourceLocation(Theatrical.MOD_ID, "block/fresnel/fresnel_whole"));
             withExistingParent(Blocks.TANK_TRAP.getId().getPath(), new ResourceLocation(Theatrical.MOD_ID, "block/tank_trap"));
             withExistingParent(Blocks.LED_PANEL.getId().getPath(), new ResourceLocation(Theatrical.MOD_ID, "block/led_panel"));
@@ -84,6 +85,7 @@ public class DataEvent {
         protected void addTranslations() {
             addBlock(Blocks.ART_NET_INTERFACE, "ArtNet Interface");
             addBlock(Blocks.MOVING_LIGHT_BLOCK, "Moving Light");
+            addBlock(Blocks.MOVING_WASH_BLOCK, "Moving Wash");
             addBlock(Blocks.PIPE_BLOCK, "Rigging Pipe");
             addBlock(Blocks.LED_FRESNEL, "LED Fresnel");
             addBlock(Blocks.TRUSS_BLOCK, "MT100 Truss");
