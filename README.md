@@ -15,3 +15,4 @@ Pull Requests are welcome and will be reviewed by Rushmead.
 * Rushmead
 * bright_spark
 * FreneticScribbler
+* Dumaan089
