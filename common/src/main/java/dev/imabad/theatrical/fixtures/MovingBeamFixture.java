@@ -29,8 +29,8 @@ public class MovingBeamFixture extends Fixture {
     private static final ResourceLocation PAN_MODEL = new ResourceLocation(Theatrical.MOD_ID, "block/moving_beam/moving_beam_pan");
     private static final ResourceLocation STATIC_MODEL = new ResourceLocation(Theatrical.MOD_ID, "block/moving_beam/moving_beam_static");
 
-    private final float[] tiltRotation = new float[]{0.5F, 1F, .5F};
-    private final float[] panRotation = new float[]{0.5F, .5F, .5F};
+    private final float[] tiltRotation = new float[]{0.5F, 0.78125F, .5F};
+    private final float[] panRotation = new float[]{0.5F, 0.75F, .5F};
 //    private final float[] beamStartPosition = new float[]{0.5F, 1.875F, 0.4375F};
 
 
@@ -61,7 +61,7 @@ public class MovingBeamFixture extends Fixture {
 
     @Override
     public float[] getBeamStartPosition() {
-        return new float[]{0.5F, 1F, 0.02F};
+        return new float[]{0.5F, 0.78125F, 0.132F};
     }
 
     @Override
@@ -71,7 +71,7 @@ public class MovingBeamFixture extends Fixture {
 
     @Override
     public float getBeamWidth() {
-        return 0.20f;
+        return 0.17f;
     }
 
     @Override

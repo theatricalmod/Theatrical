@@ -12,6 +12,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import java.util.Collections;
 import java.util.List;
 
+
 public class MovingVL2CFixture extends Fixture {
 
     private static final List<DMXPersonality> PERSONALITIES = Collections.singletonList(
@@ -29,8 +30,8 @@ public class MovingVL2CFixture extends Fixture {
     private static final ResourceLocation PAN_MODEL = new ResourceLocation(Theatrical.MOD_ID, "block/moving_vl2c/moving_vl2c_pan");
     private static final ResourceLocation STATIC_MODEL = new ResourceLocation(Theatrical.MOD_ID, "block/moving_vl2c/moving_vl2c_static");
 
-    private final float[] tiltRotation = new float[]{0.5F, 1F, .5F};
-    private final float[] panRotation = new float[]{0.5F, .5F, .5F};
+    private final float[] tiltRotation = new float[]{0.5F, 0.78125F, .5F};
+    private final float[] panRotation = new float[]{0.5F, 0.75F, .5F};
 //    private final float[] beamStartPosition = new float[]{0.5F, 1.875F, 0.4375F};
 
 
@@ -61,7 +62,7 @@ public class MovingVL2CFixture extends Fixture {
 
     @Override
     public float[] getBeamStartPosition() {
-        return new float[]{0.5F, 1F, 0.25F};
+        return new float[]{0.5F, 0.78125F, 0.132F};
     }
 
     @Override
@@ -71,7 +72,7 @@ public class MovingVL2CFixture extends Fixture {
 
     @Override
     public float getBeamWidth() {
-        return 0.125f;
+        return 0.08f;
     }
 
     @Override

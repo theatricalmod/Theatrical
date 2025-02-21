@@ -71,4 +71,29 @@ public class Items {
         "moving_beam",
         () -> new BlockItem(Blocks.MOVING_BEAM_BLOCK.get(), new Item.Properties().arch$tab(Theatrical.TAB))
     );
+    public static final RegistrySupplier<Item> LED_FOUNTAIN = ITEMS.register(
+            "led_fountain",
+            () -> new BlockItem(Blocks.LED_FOUNTAIN.get(), new Item.Properties().arch$tab(Theatrical.TAB))
+    );
+    public static final RegistrySupplier<Item> LED_PANEL_2 = ITEMS.register(
+            "led_panel_2",
+            () -> new BlockItem(Blocks.LED_PANEL_2.get(), new Item.Properties().arch$tab(Theatrical.TAB))
+    );
+    public static final RegistrySupplier<Item> BIG_PANEL = ITEMS.register(
+            "big_panel",
+            () -> new BlockItem(Blocks.BIG_PANEL.get(), new Item.Properties().arch$tab(Theatrical.TAB))
+    );
+    public static final RegistrySupplier<Item> BIG_PANEL2 = ITEMS.register(
+            "big_panel2",
+            () -> new BlockItem(Blocks.BIG_PANEL2.get(), new Item.Properties().arch$tab(Theatrical.TAB))
+    );
+    public static final RegistrySupplier<Item> MOVING_VL6 = ITEMS.register(
+        "moving_vl6",
+        () -> new BlockItem(Blocks.MOVING_VL6_BLOCK.get(), new Item.Properties().arch$tab(Theatrical.TAB))
+    );
+    public static final RegistrySupplier<Item> PAR_LED = ITEMS.register(
+        "par_led",
+        () -> new BlockItem(Blocks.PAR_LED.get(), new Item.Properties().arch$tab(Theatrical.TAB))
+);
+    
 }

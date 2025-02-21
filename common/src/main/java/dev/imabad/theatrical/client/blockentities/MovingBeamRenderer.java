@@ -128,7 +128,7 @@ public class MovingBeamRenderer extends FixtureRenderer<MovingBeamBlockEntity> {
                     int g = (color >> 8) & 0xFF;
                     int b = color & 0xFF;
                     int a = (int) (((float) ((intensity * 1) / 255f)) * 255);
-                    poseStack.translate(0.5F, 1F, 0.07F);
+                    poseStack.translate(0.5F, 0.78125F, 0.2F);
                     Matrix4f m = poseStack.last().pose();
                     Matrix3f normal = poseStack.last().normal();
                     addVertex(beamConsumer, m, normal, r, g, b, a, -0.1875f, 0.1875f , 0f);

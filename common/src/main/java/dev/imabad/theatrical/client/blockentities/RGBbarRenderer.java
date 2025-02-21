@@ -47,21 +47,27 @@ public class RGBbarRenderer extends FixtureRenderer<RGBbarBlockEntity> {
             if(hangDirection.getAxis() != Direction.Axis.Y){
                 if(hangDirection.getAxis() == Direction.Axis.Z){
                     if(hangDirection == Direction.SOUTH) {
-                        poseStack.mulPose(Axis.XP.rotationDegrees(90));
+                        poseStack.mulPose(Axis.XP.rotationDegrees(-90));
                     } else {
-                        poseStack.mulPose(Axis.XN.rotationDegrees(90));
+                        poseStack.mulPose(Axis.XN.rotationDegrees(-90));
                     }
                 } else {
                     if(hangDirection == Direction.EAST) {
-                        poseStack.mulPose(Axis.ZN.rotationDegrees(90));
-                    } else {
                         poseStack.mulPose(Axis.ZN.rotationDegrees(-90));
+                    } else {
+                        poseStack.mulPose(Axis.ZN.rotationDegrees(90));
                     }
                 }
             } else {
-                //TODO: Handle hanging up
+                // UP-DOWN
+                if (hangDirection == Direction.UP) {
+                    poseStack.mulPose(Axis.XP.rotationDegrees(180));
+                } else if (hangDirection == Direction.DOWN) {
+                    poseStack.mulPose(Axis.XP.rotationDegrees(180));
+                }
             }
-            poseStack.translate(0, -0.5, 0F);
+        
+            poseStack.translate(0, -1.45, 0F);
         }
         //#endregion
         if(facing.getAxis() == Direction.Axis.X){
@@ -147,21 +153,27 @@ public class RGBbarRenderer extends FixtureRenderer<RGBbarBlockEntity> {
             if(hangDirection.getAxis() != Direction.Axis.Y){
                 if(hangDirection.getAxis() == Direction.Axis.Z){
                     if(hangDirection == Direction.SOUTH) {
-                        poseStack.mulPose(Axis.XP.rotationDegrees(90));
+                        poseStack.mulPose(Axis.XP.rotationDegrees(-90));
                     } else {
-                        poseStack.mulPose(Axis.XN.rotationDegrees(90));
+                        poseStack.mulPose(Axis.XN.rotationDegrees(-90));
                     }
                 } else {
                     if(hangDirection == Direction.EAST) {
-                        poseStack.mulPose(Axis.ZN.rotationDegrees(90));
-                    } else {
                         poseStack.mulPose(Axis.ZN.rotationDegrees(-90));
+                    } else {
+                        poseStack.mulPose(Axis.ZN.rotationDegrees(90));
                     }
                 }
             } else {
-                //TODO: Handle hanging up
+               // UP-DOWN
+                if (hangDirection == Direction.UP) {
+                    poseStack.mulPose(Axis.XP.rotationDegrees(180));
+                } else if (hangDirection == Direction.DOWN) {
+                    poseStack.mulPose(Axis.XP.rotationDegrees(180));
+                }
             }
-            poseStack.translate(0, -0.5, 0F);
+        
+            poseStack.translate(0, -1.45, 0F); 
         }
         //#endregion
         if(facing.getAxis() == Direction.Axis.X){

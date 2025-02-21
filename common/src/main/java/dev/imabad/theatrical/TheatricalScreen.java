@@ -6,4 +6,9 @@ public enum TheatricalScreen {
     BASIC_LIGHTING_DESK,
     FRESNEL,
     RGB_BAR,
+    LED_FOUNTAIN,
+    LED_PANEL_2,
+    BIG_PANEL,
+    BIG_PANEL2,
+    PAR_LED,
 }
