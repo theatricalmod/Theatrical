@@ -1,14 +1,12 @@
 package dev.imabad.theatrical.blockentities.light;
 
 import dev.imabad.theatrical.api.DynamicLightProvider;
-import dev.imabad.theatrical.api.Fixture;
 import dev.imabad.theatrical.api.FixtureProvider;
 import dev.imabad.theatrical.api.Support;
 import dev.imabad.theatrical.blockentities.ClientSyncBlockEntity;
 import dev.imabad.theatrical.blocks.HangableBlock;
 import dev.imabad.theatrical.blocks.light.BaseLightBlock;
 import dev.imabad.theatrical.config.TheatricalConfig;
-import dev.imabad.theatrical.lighting.LambDynamicLightUtil;
 import dev.imabad.theatrical.lighting.LightManager;
 import dev.imabad.theatrical.mixin.ClipContextAccessor;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
@@ -19,7 +17,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Mth;
-import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;

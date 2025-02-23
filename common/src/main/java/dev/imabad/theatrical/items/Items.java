@@ -55,4 +55,5 @@ public class Items {
         "moving_wash",
         () -> new BlockItem(Blocks.MOVING_WASH_BLOCK.get(), new Item.Properties().arch$tab(Theatrical.TAB))
     );
+    
 }

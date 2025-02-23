@@ -26,8 +26,10 @@ jobs:
           SNAPSHOT: false
           MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
           CURSEFORGE_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
+          NEXUS_USERNAME: ${{secrets.NEXUS_USERNAME }}
+          NEXUS_PASSWORD: ${{secrets.NEXUS_PASSWORD }}
         with:
-          arguments: "build publishMods"
+          arguments: "build publishMods publishAllPublicationsToRushMavenRepository"
       - name: Store artifacts
         uses: actions/upload-artifact@v4
         with:

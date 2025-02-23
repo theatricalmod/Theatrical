@@ -1,6 +1,6 @@
 package dev.imabad.theatrical.client.gui.screen;
 
-import dev.imabad.theatrical.blockentities.light.FresnelBlockEntity;
+import dev.imabad.theatrical.blockentities.light.BaseDMXConsumerLightBlockEntity;
 import dev.imabad.theatrical.client.gui.widgets.BasicSlider;
 import dev.imabad.theatrical.net.UpdateFixturePosition;
 import net.minecraft.client.gui.GuiGraphics;
@@ -8,12 +8,12 @@ import net.minecraft.client.gui.components.StringWidget;
 import net.minecraft.client.gui.layouts.LayoutSettings;
 import net.minecraft.network.chat.Component;
 
-public class FresnelScreen extends GenericDMXConfigurationScreen<FresnelBlockEntity> {
+public class GenericManualPanTiltScreen extends GenericDMXConfigurationScreen<BaseDMXConsumerLightBlockEntity> {
     private BasicSlider tiltSlider, panSlider;
-    private final FresnelBlockEntity be;
+    private final BaseDMXConsumerLightBlockEntity be;
 
-    public FresnelScreen(FresnelBlockEntity be) {
-        super(be, be.getBlockPos(), "block.theatrical.led_fresnel");
+    public GenericManualPanTiltScreen(BaseDMXConsumerLightBlockEntity be, String translationKey) {
+        super(be, be.getBlockPos(), translationKey);
         this.be = be;
     }
 
@@ -41,7 +41,5 @@ public class FresnelScreen extends GenericDMXConfigurationScreen<FresnelBlockEnt
     @Override
     protected void renderLabels(GuiGraphics guiGraphics) {
         super.renderLabels(guiGraphics);
-//        renderLabel(guiGraphics, "fixture.tilt", 0, 36);
-//        renderLabel(guiGraphics, "fixture.pan", 0, 66);
     }
 }

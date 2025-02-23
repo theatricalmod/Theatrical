@@ -9,10 +9,10 @@ import dev.architectury.registry.client.rendering.BlockEntityRendererRegistry;
 import dev.imabad.theatrical.api.dmx.DMXConsumer;
 import dev.imabad.theatrical.blockentities.BlockEntities;
 import dev.imabad.theatrical.blockentities.control.BasicLightingDeskBlockEntity;
+import dev.imabad.theatrical.blockentities.light.BaseDMXConsumerLightBlockEntity;
 import dev.imabad.theatrical.blockentities.light.BaseLightBlockEntity;
 import dev.imabad.theatrical.blockentities.light.FresnelBlockEntity;
 import dev.imabad.theatrical.blocks.light.MovingLightBlock;
-import dev.imabad.theatrical.blocks.light.MovingWashBlock;
 import dev.imabad.theatrical.client.LazyRenderers;
 import dev.imabad.theatrical.client.blockentities.BasicLightingConsoleRenderer;
 import dev.imabad.theatrical.client.blockentities.FresnelRenderer;
@@ -23,7 +23,8 @@ import dev.imabad.theatrical.client.dmx.ArtNetManager;
 import dev.imabad.theatrical.client.dmx.ArtNetToNetworkClientData;
 import dev.imabad.theatrical.client.dmx.TheatricalArtNetClient;
 import dev.imabad.theatrical.client.gui.screen.BasicLightingDeskScreen;
-import dev.imabad.theatrical.client.gui.screen.FresnelScreen;
+import dev.imabad.theatrical.client.gui.screen.GenericManualPanTiltScreen;
+import dev.imabad.theatrical.client.gui.screen.fixtures.FresnelScreen;
 import dev.imabad.theatrical.client.gui.screen.GenericDMXConfigurationScreen;
 import dev.imabad.theatrical.config.TheatricalConfig;
 import dev.imabad.theatrical.config.UniverseConfig;
@@ -218,9 +219,9 @@ public class TheatricalClient {
                     Minecraft.getInstance().setScreen(new GenericDMXConfigurationScreen<>(dmxConsumer, openScreen.getPos(), "block.theatrical.moving_light"));
                 }
             }
-            case FRESNEL -> {
-                if(Minecraft.getInstance().level.getBlockEntity(openScreen.getPos()) instanceof FresnelBlockEntity fresnelBlockEntity) {
-                    Minecraft.getInstance().setScreen(new FresnelScreen(fresnelBlockEntity));
+            case GENERIC_PAN_TILT -> {
+                if(Minecraft.getInstance().level.getBlockEntity(openScreen.getPos()) instanceof BaseDMXConsumerLightBlockEntity be) {
+                    Minecraft.getInstance().setScreen(new GenericManualPanTiltScreen(be, be.getBlockState().getBlock().getDescriptionId()));
                 }
             }
             case BASIC_LIGHTING_DESK -> {
@@ -231,3 +232,4 @@ public class TheatricalClient {
         }
     }
 }
+

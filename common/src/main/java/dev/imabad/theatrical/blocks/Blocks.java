@@ -26,8 +26,8 @@ public class Blocks {
     public static final RegistrySupplier<Block> MOVING_LIGHT_BLOCK = BLOCKS.register("moving_light", MovingLightBlock::new);
     public static final RegistrySupplier<Block> MOVING_WASH_BLOCK = BLOCKS.register("moving_wash", MovingWashBlock::new);
     public static final RegistrySupplier<Block> PIPE_BLOCK = BLOCKS.register("pipe", dev.imabad.theatrical.blocks.rigging.PipeBlock::new);
-    public static final RegistrySupplier<Block> ART_NET_INTERFACE = BLOCKS.register("artnet_interface", ArtNetInterfaceBlock::new);
     public static final RegistrySupplier<Block> LED_FRESNEL = BLOCKS.register("led_fresnel", FresnelBlock::new);
+    public static final RegistrySupplier<Block> ART_NET_INTERFACE = BLOCKS.register("artnet_interface", ArtNetInterfaceBlock::new);
     public static final RegistrySupplier<RotatedPillarBlock> TRUSS_BLOCK = BLOCKS.register("truss", TrussBlock::new);
     public static final RegistrySupplier<Block> REDSTONE_INTERFACE = BLOCKS.register("redstone_interface", RedstoneInterfaceBlock::new);
     public static final RegistrySupplier<Block> TANK_TRAP = BLOCKS.register("tank_trap", TankTrapBlock::new);

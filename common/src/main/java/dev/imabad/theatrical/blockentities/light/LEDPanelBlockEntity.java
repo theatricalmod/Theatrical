@@ -10,7 +10,7 @@ import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.Arrays;
 
-public class LEDPanelBlockEntity extends BaseDMXConsumerLightBlockEntity{
+public class LEDPanelBlockEntity extends BaseDMXConsumerLightBlockEntity {
     public LEDPanelBlockEntity(BlockPos blockPos, BlockState blockState) {
         super(BlockEntities.LED_PANEL.get(), blockPos, blockState);
         setChannelCount(4);

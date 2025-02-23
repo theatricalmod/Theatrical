@@ -4,6 +4,6 @@ public enum TheatricalScreen {
 
     GENERIC_DMX,
     BASIC_LIGHTING_DESK,
-    FRESNEL
-
+    FRESNEL,
+    GENERIC_PAN_TILT
 }
