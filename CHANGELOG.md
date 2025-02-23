@@ -1,5 +1,3 @@
-# 1.20.1-alpha.23
+# 1.20.1-alpha.24
 
-* Let lights tilt further down, thanks dumaan089
-* Add extra texturing to lights, thanks dumaan089
-* Add moving head wash, thanks dumaan089
+* Minor changes to support addons
