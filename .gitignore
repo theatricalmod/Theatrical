@@ -18,3 +18,5 @@ classes/
 .settings
 *.launch
 !gradle/wrapper/gradle-wrapper.jar
+.architectury-transformer
+**/.architectury-transformer
