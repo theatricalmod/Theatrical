@@ -20,8 +20,12 @@ public class BlockEntities {
     public static final RegistrySupplier<BlockEntityType<ArtNetInterfaceBlockEntity>> ART_NET_INTERFACE = BLOCK_ENTITIES.register("artnet_interface", () -> BlockEntityType.Builder.of(ArtNetInterfaceBlockEntity::new, Blocks.ART_NET_INTERFACE.get()).build(null));
     public static final RegistrySupplier<BlockEntityType<FresnelBlockEntity>> LED_FRESNEL = BLOCK_ENTITIES.register("led_fresnel", () -> BlockEntityType.Builder.of(FresnelBlockEntity::new, Blocks.LED_FRESNEL.get()).build(null));
 
+
+
     public static final RegistrySupplier<BlockEntityType<RedstoneInterfaceBlockEntity>> REDSTONE_INTERFACE = BLOCK_ENTITIES.register("redstone_interface", () -> BlockEntityType.Builder.of(RedstoneInterfaceBlockEntity::new, Blocks.REDSTONE_INTERFACE.get()).build(null));
     public static final RegistrySupplier<BlockEntityType<LEDPanelBlockEntity>> LED_PANEL = BLOCK_ENTITIES.register("led_panel", () -> BlockEntityType.Builder.of(LEDPanelBlockEntity::new, Blocks.LED_PANEL.get()).build(null));
     public static final RegistrySupplier<BlockEntityType<BasicLightingDeskBlockEntity>> BASIC_LIGHTING_DESK = BLOCK_ENTITIES.register("basic_lighting_desk", () -> BlockEntityType.Builder.of(BasicLightingDeskBlockEntity::new, Blocks.BASIC_LIGHTING_DESK.get()).build(null));
     public static final RegistrySupplier<BlockEntityType<MovingWashBlockEntity>> MOVING_WASH = BLOCK_ENTITIES.register("moving_wash", () -> BlockEntityType.Builder.of(MovingWashBlockEntity::new, Blocks.MOVING_WASH_BLOCK.get()).build(null));
+
+
 }

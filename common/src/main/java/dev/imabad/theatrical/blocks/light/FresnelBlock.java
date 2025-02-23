@@ -119,7 +119,7 @@ public class FresnelBlock extends BaseLightBlock{
                     }
                     return InteractionResult.SUCCESS;
                 }
-                new OpenScreen(pos, TheatricalScreen.FRESNEL).sendTo((ServerPlayer) player);
+                new OpenScreen(pos, TheatricalScreen.GENERIC_PAN_TILT).sendTo((ServerPlayer) player);
             }
         }
         return InteractionResult.SUCCESS;

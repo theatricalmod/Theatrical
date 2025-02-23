@@ -113,7 +113,14 @@ publishing {
 
     // See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
     repositories {
-        // Add repositories to publish to here.
+        maven {
+            name = "RushMaven"
+            url = uri("https://mvn.imabad.dev/repository/maven-releases/")
+            credentials {
+                username = project.findProperty("nexusUsername") ?: System.getenv("NEXUS_USERNAME")
+                password = project.findProperty("nexusPassword") ?: System.getenv("NEXUS_PASSWORD")
+            }
+        }
     }
 }
 
