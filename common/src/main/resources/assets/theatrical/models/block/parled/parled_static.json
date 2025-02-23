@@ -1,0 +1,14 @@
+{
+	"credit": "Made with Blockbench",
+	"textures": {
+		"particle": "theatrical:block/light_fresnel_active_full"
+	},
+	"display": {
+		"firstperson_righthand": {
+			"scale": [0.4, 0.4, 0.4]
+		},
+		"gui": {
+			"rotation": [0, 180, 0]
+		}
+	}
+}

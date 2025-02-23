@@ -11,19 +11,41 @@ import dev.imabad.theatrical.blockentities.BlockEntities;
 import dev.imabad.theatrical.blockentities.control.BasicLightingDeskBlockEntity;
 import dev.imabad.theatrical.blockentities.light.BaseLightBlockEntity;
 import dev.imabad.theatrical.blockentities.light.FresnelBlockEntity;
+import dev.imabad.theatrical.blockentities.light.RGBbarBlockEntity;
+import dev.imabad.theatrical.blockentities.light.LEDfountainBlockEntity;
+import dev.imabad.theatrical.blockentities.light.LEDPanel2BlockEntity;
+import dev.imabad.theatrical.blockentities.light.ParLedBlockEntity;
+import dev.imabad.theatrical.blockentities.light.BigPanelBlockEntity;
+import dev.imabad.theatrical.blockentities.light.BigPanel2BlockEntity;
 import dev.imabad.theatrical.blocks.light.MovingLightBlock;
 import dev.imabad.theatrical.blocks.light.MovingWashBlock;
 import dev.imabad.theatrical.client.LazyRenderers;
 import dev.imabad.theatrical.client.blockentities.BasicLightingConsoleRenderer;
 import dev.imabad.theatrical.client.blockentities.FresnelRenderer;
+import dev.imabad.theatrical.client.blockentities.LEDfountainRenderer;
+import dev.imabad.theatrical.client.blockentities.BigPanelRenderer;
+import dev.imabad.theatrical.client.blockentities.BigPanel2Renderer;
 import dev.imabad.theatrical.client.blockentities.LEDPanelRenderer;
+import dev.imabad.theatrical.client.blockentities.LEDPanel2Renderer;
 import dev.imabad.theatrical.client.blockentities.MovingLightRenderer;
+import dev.imabad.theatrical.client.blockentities.MovingScanRenderer;
 import dev.imabad.theatrical.client.blockentities.MovingWashRenderer;
+import dev.imabad.theatrical.client.blockentities.RGBbarRenderer;
+import dev.imabad.theatrical.client.blockentities.ParLedRenderer;
+import dev.imabad.theatrical.client.blockentities.MovingVL2CRenderer;
+import dev.imabad.theatrical.client.blockentities.MovingVL6Renderer;
+import dev.imabad.theatrical.client.blockentities.MovingBeamRenderer;
 import dev.imabad.theatrical.client.dmx.ArtNetManager;
 import dev.imabad.theatrical.client.dmx.ArtNetToNetworkClientData;
 import dev.imabad.theatrical.client.dmx.TheatricalArtNetClient;
 import dev.imabad.theatrical.client.gui.screen.BasicLightingDeskScreen;
 import dev.imabad.theatrical.client.gui.screen.FresnelScreen;
+import dev.imabad.theatrical.client.gui.screen.LEDfountainScreen;
+import dev.imabad.theatrical.client.gui.screen.BigPanelScreen;
+import dev.imabad.theatrical.client.gui.screen.ParLedScreen;
+import dev.imabad.theatrical.client.gui.screen.BigPanel2Screen;
+import dev.imabad.theatrical.client.gui.screen.RGBbarScreen;
+import dev.imabad.theatrical.client.gui.screen.LEDPanel2Screen;
 import dev.imabad.theatrical.client.gui.screen.GenericDMXConfigurationScreen;
 import dev.imabad.theatrical.config.TheatricalConfig;
 import dev.imabad.theatrical.config.UniverseConfig;
@@ -60,8 +82,18 @@ public class TheatricalClient {
     public static void init() {
         BlockEntityRendererRegistry.register(BlockEntities.MOVING_LIGHT.get(), MovingLightRenderer::new);
         BlockEntityRendererRegistry.register(BlockEntities.MOVING_WASH.get(), MovingWashRenderer::new);
+        BlockEntityRendererRegistry.register(BlockEntities.MOVING_SCAN.get(), MovingScanRenderer::new);
+        BlockEntityRendererRegistry.register(BlockEntities.MOVING_VL2C.get(), MovingVL2CRenderer::new);
+        BlockEntityRendererRegistry.register(BlockEntities.MOVING_VL6.get(), MovingVL6Renderer::new);
+        BlockEntityRendererRegistry.register(BlockEntities.MOVING_BEAM.get(), MovingBeamRenderer::new);
         BlockEntityRendererRegistry.register(BlockEntities.LED_FRESNEL.get(), FresnelRenderer::new);
+        BlockEntityRendererRegistry.register(BlockEntities.LED_FOUNTAIN.get(), LEDfountainRenderer::new);
+        BlockEntityRendererRegistry.register(BlockEntities.PAR_LED.get(), ParLedRenderer::new);
+        BlockEntityRendererRegistry.register(BlockEntities.BIG_PANEL.get(), BigPanelRenderer::new);
+        BlockEntityRendererRegistry.register(BlockEntities.BIG_PANEL2.get(), BigPanel2Renderer::new);
+        BlockEntityRendererRegistry.register(BlockEntities.RGB_BAR.get(), RGBbarRenderer::new);
         BlockEntityRendererRegistry.register(BlockEntities.LED_PANEL.get(), LEDPanelRenderer::new);
+        BlockEntityRendererRegistry.register(BlockEntities.LED_PANEL_2.get(), LEDPanel2Renderer::new);
         BlockEntityRendererRegistry.register(BlockEntities.BASIC_LIGHTING_DESK.get(), BasicLightingConsoleRenderer::new);
 //        BlockEntityRendererRegistry.register(BlockEntities.CABLE.get(), CableRenderer::new);
         artNetManager = new ArtNetManager();
@@ -223,11 +255,42 @@ public class TheatricalClient {
                     Minecraft.getInstance().setScreen(new FresnelScreen(fresnelBlockEntity));
                 }
             }
+            case LED_PANEL_2 -> {
+                if(Minecraft.getInstance().level.getBlockEntity(openScreen.getPos()) instanceof LEDPanel2BlockEntity LEDPanel2BlockEntity) {
+                    Minecraft.getInstance().setScreen(new LEDPanel2Screen(LEDPanel2BlockEntity));
+                }
+            }
+            case LED_FOUNTAIN -> {
+                if(Minecraft.getInstance().level.getBlockEntity(openScreen.getPos()) instanceof LEDfountainBlockEntity LEDfountainBlockEntity) {
+                    Minecraft.getInstance().setScreen(new LEDfountainScreen(LEDfountainBlockEntity));
+                }
+            }
+            case RGB_BAR -> {
+                if(Minecraft.getInstance().level.getBlockEntity(openScreen.getPos()) instanceof RGBbarBlockEntity RGBbarBlockEntity) {
+                    Minecraft.getInstance().setScreen(new RGBbarScreen(RGBbarBlockEntity));
+                }
+            }
             case BASIC_LIGHTING_DESK -> {
                 if(Minecraft.getInstance().level.getBlockEntity(openScreen.getPos()) instanceof BasicLightingDeskBlockEntity bse) {
                     Minecraft.getInstance().setScreen(new BasicLightingDeskScreen(bse));
                 }
             }
+            case BIG_PANEL -> {
+                if(Minecraft.getInstance().level.getBlockEntity(openScreen.getPos()) instanceof BigPanelBlockEntity BigPanelBlockEntity) {
+                    Minecraft.getInstance().setScreen(new BigPanelScreen(BigPanelBlockEntity));
+                }
+            }
+            case BIG_PANEL2 -> {
+                if(Minecraft.getInstance().level.getBlockEntity(openScreen.getPos()) instanceof BigPanel2BlockEntity BigPanel2BlockEntity) {
+                    Minecraft.getInstance().setScreen(new BigPanel2Screen(BigPanel2BlockEntity));
+                }
+            }
+            case PAR_LED -> {
+                if(Minecraft.getInstance().level.getBlockEntity(openScreen.getPos()) instanceof ParLedBlockEntity ParLedBlockEntity) {
+                    Minecraft.getInstance().setScreen(new ParLedScreen(ParLedBlockEntity));
+                }
+            }
         }
     }
 }
+
