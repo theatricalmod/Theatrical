@@ -332,7 +332,7 @@ public abstract class BaseLightBlockEntity extends ClientSyncBlockEntity impleme
         // TODO: Come back and try make this use the same code for both.
         if(!isHangingNonVertically) {
             float tilt = be.getTilt();
-            if (be.isUpsideDown() || be instanceof FresnelBlockEntity) {
+            if (be.isUpsideDown() || be.getFixture().invertTilt()) {
                 tilt = -tilt;
             }
             if(be instanceof LEDPanelBlockEntity){
@@ -346,7 +346,7 @@ public abstract class BaseLightBlockEntity extends ClientSyncBlockEntity impleme
             if(direction.getAxis() == Direction.WEST.getAxis()){
                 pan -= 180;
             }
-            if(be instanceof FresnelBlockEntity){
+            if(be.getFixture().invertPan()){
                 pan *= -1;
             }
             if (be.isUpsideDown()) {
