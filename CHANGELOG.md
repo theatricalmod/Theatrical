@@ -1,3 +1,4 @@
-# 1.20.2-alpha.24
+# 1.20.2-alpha.25
 
-* Minor changes to support addons
+* Another minor change to support addons
+  *  Add API to fixture for inverting pan / tilt
