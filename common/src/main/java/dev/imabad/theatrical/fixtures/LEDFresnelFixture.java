@@ -92,4 +92,14 @@ public class LEDFresnelFixture extends Fixture {
     public List<DMXPersonality> getDMXPersonalities() {
         return PERSONALITIES;
     }
+
+    @Override
+    public boolean invertTilt() {
+        return true;
+    }
+
+    @Override
+    public boolean invertPan() {
+        return true;
+    }
 }

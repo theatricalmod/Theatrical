@@ -38,4 +38,7 @@ public abstract class Fixture {
     }
     public abstract float[] getTransforms(BlockState fixtureBlockState, BlockState supportBlockState);
     public abstract List<DMXPersonality> getDMXPersonalities();
+
+    public boolean invertTilt() { return false; }
+    public boolean invertPan() { return false; }
 }
