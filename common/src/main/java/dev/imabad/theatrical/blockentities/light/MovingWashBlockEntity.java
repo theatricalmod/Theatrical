@@ -19,6 +19,8 @@ public class MovingWashBlockEntity extends BaseDMXConsumerLightBlockEntity {
         setChannelCount(7);
     }
 
+    private final double lightRadius = 13.0;
+
     public MovingWashBlockEntity(BlockPos pos, BlockState state) {
         this(BlockEntities.MOVING_WASH.get(), pos, state);
     }
@@ -80,5 +82,10 @@ public class MovingWashBlockEntity extends BaseDMXConsumerLightBlockEntity {
     @Override
     public int getBasePan() {
         return 0;
+    }
+
+    @Override
+    public double getLightRadius() {
+        return lightRadius;
     }
 }

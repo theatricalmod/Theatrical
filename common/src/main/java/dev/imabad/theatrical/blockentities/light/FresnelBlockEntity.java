@@ -12,6 +12,9 @@ import java.util.Arrays;
 
 public class FresnelBlockEntity extends BaseDMXConsumerLightBlockEntity {
 
+    private final double lightRadius = 2.0;
+
+
     public FresnelBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntities.LED_FRESNEL.get(), pos, state);
         setChannelCount(4);
@@ -88,4 +91,8 @@ public class FresnelBlockEntity extends BaseDMXConsumerLightBlockEntity {
         return Byte.toUnsignedInt(val);
     }
 
+    @Override
+    public double getLightRadius() {
+        return lightRadius;
+    }
 }

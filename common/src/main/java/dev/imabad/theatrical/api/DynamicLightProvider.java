@@ -14,6 +14,9 @@ public interface DynamicLightProvider {
     default boolean isLightEnabled() {
         return LightManager.containsLightSource(this);
     }
+    default double getLightRadius() {
+        return 8.5;
+    }
     default void setLightEnabled(boolean enabled) {
         resetLight();
         if(enabled){
