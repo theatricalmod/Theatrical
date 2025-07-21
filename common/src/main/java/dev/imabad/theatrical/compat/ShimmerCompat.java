@@ -5,10 +5,8 @@ import com.lowdragmc.shimmer.client.light.LightManager;
 import dev.imabad.theatrical.api.DynamicLightProvider;
 import dev.imabad.theatrical.blockentities.light.BaseLightBlockEntity;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3f;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -23,7 +21,11 @@ public class ShimmerCompat {
     public static void addLight(DynamicLightProvider dynamicLightProvider){
         if(!ModCompat.SHIMMER) return;
         lightSourcesLock.writeLock().lock();
-        ColorPointLight light = LightManager.INSTANCE.addLight(dynamicLightProvider.getLightPos(), dynamicLightProvider.getLightColour(), 8);
+        ColorPointLight light = LightManager.INSTANCE.addLight(
+                dynamicLightProvider.getLightPos(),
+                dynamicLightProvider.getLightColour(),
+                (float) dynamicLightProvider.getLightRadius()
+        );
 
         if(light != null){
             pos2PointLight.put(dynamicLightProvider.getOwnerPos(), light);
@@ -44,20 +46,26 @@ public class ShimmerCompat {
     public static void worldClose(){
         if(!ModCompat.SHIMMER) return;
         lightSourcesLock.writeLock().lock();
-        pos2PointLight.forEach((blockPos, colorPointLight) -> {
-            colorPointLight.remove();
-        });
+        pos2PointLight.forEach((blockPos, colorPointLight) -> colorPointLight.remove());
         pos2PointLight.clear();
         lightSourcesLock.writeLock().unlock();
     }
 
     public static void handleLightUpdate(BaseLightBlockEntity light){
         if(!pos2PointLight.containsKey(light.getBlockPos())) return;
-        ColorPointLight colorPointLight = pos2PointLight.get(light.getBlockPos());
-        Vector3f lightPos = light.getLightPos();
-        colorPointLight.setPos(lightPos.x, lightPos.y, lightPos.z);
-        colorPointLight.setColor(light.getLightColour());
-        colorPointLight.setEnable(light.isLightEnabled());
-        colorPointLight.update();
+
+        ColorPointLight oldLight = pos2PointLight.get(light.getBlockPos());
+        oldLight.remove();
+        pos2PointLight.remove(light.getBlockPos());
+
+        ColorPointLight newLight = LightManager.INSTANCE.addLight(
+                light.getLightPos(),
+                light.getLightColour(),
+                (float) light.getLightRadius()
+        );
+
+        if(newLight != null){
+            pos2PointLight.put(light.getBlockPos(), newLight);
+        }
     }
 }
