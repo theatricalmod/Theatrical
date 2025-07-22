@@ -54,7 +54,7 @@ public class GenericDMXConfigurationScreen<T extends DMXConsumer> extends Screen
         super.init();
         layout = new LinearLayout(imageWidth, 176, LinearLayout.Orientation.VERTICAL);
         layout.defaultCellSetting().alignHorizontallyCenter().padding(10);
-        layout.addChild(new StringWidget(Component.translatable(titleTranslationKey), this.font));
+//        layout.addChild(new StringWidget(Component.translatable(titleTranslationKey), this.font));
         this.dmxAddress = new LabeledEditBox(this.font, xCenter, yCenter, 50, 10, Component.translatable("fixture.dmxStart"));
         this.dmxAddress.setValue(Integer.toString(this.be.getChannelStart()));
         layout.addChild(dmxAddress);

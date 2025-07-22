@@ -1,4 +1,3 @@
-# 1.20.2-alpha.26
+# 1.20.2-alpha.27
 
-* Fixture focus now changes the light emission radius
-* Added support for Fixtures to have different emission radius'
+* Allow redstone interface to be configured by configuration card
