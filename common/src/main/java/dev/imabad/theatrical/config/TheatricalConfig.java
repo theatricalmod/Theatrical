@@ -44,6 +44,18 @@ public class TheatricalConfig {
         public int wirelessDMXRadius = 40;
         @TheatricalConfigItem(minValue = "25")
         public int defaultMaxLightDist = 25;
+        @TheatricalConfigItem(minValue = "0")
+        public double maxLightDistance = 7.75;
+
+        private double maxLightDistanceSquared = -1;
+
+
+        public double getMaxLightDistanceSquared() {
+            if(maxLightDistanceSquared == -1){
+                maxLightDistanceSquared = maxLightDistance * maxLightDistance;
+            }
+            return maxLightDistanceSquared;
+        }
     }
 
 }
