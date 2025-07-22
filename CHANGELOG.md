@@ -1,4 +1,4 @@
-# 1.20.1-alpha.25
+# 1.20.1-alpha.26
 
-* Another minor change to support addons
-  *  Add API to fixture for inverting pan / tilt
+* Fixture focus now changes the light emission radius
+* Added support for Fixtures to have different emission radius'
