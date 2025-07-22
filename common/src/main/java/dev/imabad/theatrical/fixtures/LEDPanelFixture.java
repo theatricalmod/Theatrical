@@ -91,4 +91,9 @@ public class LEDPanelFixture extends Fixture {
         return PERSONALITIES;
     }
 
+    @Override
+    public double getLightRadius() {
+        return 8.5;
+    }
+
 }

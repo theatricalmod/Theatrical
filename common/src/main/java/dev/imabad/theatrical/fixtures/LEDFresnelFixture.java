@@ -102,4 +102,9 @@ public class LEDFresnelFixture extends Fixture {
     public boolean invertPan() {
         return true;
     }
+
+    @Override
+    public double getLightRadius() {
+        return 2.0;
+    }
 }

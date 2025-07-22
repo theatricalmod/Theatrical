@@ -29,5 +29,5 @@ public interface DynamicLightProvider {
     boolean updateDynamicLight(LevelRenderer renderer);
     void scheduleTrackedChunksRebuild(LevelRenderer renderer);
     int getLightColour();
-    int getLightSpread();
+    float getLightSpread();
 }

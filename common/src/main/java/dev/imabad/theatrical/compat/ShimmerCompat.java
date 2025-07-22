@@ -23,7 +23,8 @@ public class ShimmerCompat {
     public static void addLight(DynamicLightProvider dynamicLightProvider){
         if(!ModCompat.SHIMMER) return;
         lightSourcesLock.writeLock().lock();
-        ColorPointLight light = LightManager.INSTANCE.addLight(dynamicLightProvider.getLightPos(), dynamicLightProvider.getLightColour(), 8);
+        ColorPointLight light = LightManager.INSTANCE.addLight(dynamicLightProvider.getLightPos(),
+                dynamicLightProvider.getLightColour(), dynamicLightProvider.getLightSpread());
 
         if(light != null){
             pos2PointLight.put(dynamicLightProvider.getOwnerPos(), light);
@@ -56,6 +57,7 @@ public class ShimmerCompat {
         ColorPointLight colorPointLight = pos2PointLight.get(light.getBlockPos());
         Vector3f lightPos = light.getLightPos();
         colorPointLight.setPos(lightPos.x, lightPos.y, lightPos.z);
+        colorPointLight.radius = light.getLightSpread();
         colorPointLight.setColor(light.getLightColour());
         colorPointLight.setEnable(light.isLightEnabled());
         colorPointLight.update();

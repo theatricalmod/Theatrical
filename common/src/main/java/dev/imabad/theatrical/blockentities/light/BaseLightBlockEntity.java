@@ -34,7 +34,8 @@ public abstract class BaseLightBlockEntity extends ClientSyncBlockEntity impleme
     AABB INFINITE_EXTENT_AABB = new AABB(Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
     private double distance = 0;
     protected int pan, tilt, focus, intensity, red, green, blue = 0;
-    protected int prevTilt, prevPan, prevFocus, prevIntensity, prevRed, prevGreen, prevBlue, prevColour, prevSpread = 0;
+    protected int prevTilt, prevPan, prevFocus, prevIntensity, prevRed, prevGreen, prevBlue, prevColour = 0;
+    protected float prevSpread = 0;
     private long tickTimer = 0;
     private BlockPos emissionBlock, prevEmissionBlock;
     private int prevLuminance;
@@ -474,17 +475,21 @@ public abstract class BaseLightBlockEntity extends ClientSyncBlockEntity impleme
         return ((int)getIntensity() << 24) | getColour();
     }
 
-    public int getPrevSpread() {
+    public float getPrevSpread() {
         return prevSpread;
     }
 
-    public void setPrevSpread(int prevSpread) {
+    public void setPrevSpread(float prevSpread) {
         this.prevSpread = prevSpread;
     }
 
     @Override
-    public int getLightSpread() {
-        return (getFocus() / 255) * 8;
+    public float getLightSpread() {
+        float focus = (getFocus() / 255f);
+        float minRadius = 1;
+        float maxRadius = (float) getFixture().getLightRadius();
+        float clampedSpread = Mth.clamp(focus, 0.05f, 1.0f);
+        return Mth.lerp(clampedSpread, minRadius, maxRadius);
     }
 
     @Override

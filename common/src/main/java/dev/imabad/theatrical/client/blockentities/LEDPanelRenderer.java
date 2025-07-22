@@ -188,4 +188,5 @@ public class LEDPanelRenderer extends FixtureRenderer<LEDPanelBlockEntity> {
             }
         }
     }
+
 }
