@@ -204,4 +204,10 @@ public class RedstoneInterfaceBlockEntity extends ClientSyncBlockEntity implemen
         }
         super.setRemoved();
     }
+
+    @Override
+    public String getTranslationKey() {
+        return "block.theatrical.redstone_interface";
+    }
+
 }

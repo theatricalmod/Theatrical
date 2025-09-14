@@ -3,6 +3,7 @@ package dev.imabad.theatrical.client.gui.screen;
 import dev.imabad.theatrical.Theatrical;
 import dev.imabad.theatrical.TheatricalClient;
 import dev.imabad.theatrical.api.dmx.DMXConsumer;
+import dev.imabad.theatrical.client.gui.widgets.BetterStringWidget;
 import dev.imabad.theatrical.client.gui.widgets.LabeledEditBox;
 import dev.imabad.theatrical.net.UpdateDMXFixture;
 import dev.imabad.theatrical.net.UpdateNetworkId;
@@ -52,11 +53,12 @@ public class GenericDMXConfigurationScreen<T extends DMXConsumer> extends Screen
     @Override
     protected void init() {
         super.init();
-        layout = new LinearLayout(imageWidth, 176, LinearLayout.Orientation.VERTICAL);
-        layout.defaultCellSetting().alignHorizontallyCenter().padding(10);
-//        layout.addChild(new StringWidget(Component.translatable(titleTranslationKey), this.font));
+        layout = new LinearLayout(imageWidth, 156, LinearLayout.Orientation.VERTICAL);
+        layout.defaultCellSetting().alignHorizontallyCenter().alignVerticallyMiddle().padding(10);
+        layout.addChild(new BetterStringWidget(Component.translatable(titleTranslationKey), this.font).setColor(4210752).setShadow(false));
         this.dmxAddress = new LabeledEditBox(this.font, xCenter, yCenter, 50, 10, Component.translatable("fixture.dmxStart"));
         this.dmxAddress.setValue(Integer.toString(this.be.getChannelStart()));
+        this.setFocused(this.dmxAddress);
         layout.addChild(dmxAddress);
         this.dmxUniverse = new LabeledEditBox(this.font, xCenter, yCenter, 50, 10, Component.translatable("artneti.dmxUniverse"));
         this.dmxUniverse.setValue(Integer.toString(this.be.getUniverse()));
@@ -84,7 +86,6 @@ public class GenericDMXConfigurationScreen<T extends DMXConsumer> extends Screen
         );
         refreshLayout();
         this.repositionElements();
-
     }
     protected void refreshLayout(){
         if(layout == null)

@@ -84,6 +84,11 @@ public class FresnelBlockEntity extends BaseDMXConsumerLightBlockEntity {
         return 0;
     }
 
+    @Override
+    public String getTranslationKey() {
+        return "block.theatrical.fresnel";
+    }
+
     public int convertByteToInt(byte val) {
         return Byte.toUnsignedInt(val);
     }

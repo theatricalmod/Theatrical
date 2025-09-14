@@ -95,13 +95,13 @@ public class DataEvent {
             addBlock(Blocks.BASIC_LIGHTING_DESK, "Basic Lighting Desk");
             addItem(Items.CONFIGURATION_CARD, "Configuration Card");
             add("itemGroup.theatrical", "Theatrical");
-            add("artneti.dmxUniverse", "DMX Universe");
+            add("artneti.dmxUniverse", "Network Universe");
             add("artneti.ipAddress", "IP Address");
             add("artneti.save", "Save");
             add("artneti.notConnected", "No data received");
             add("artneti.notAuthorized", "You're not authorized!");
             add("artneti.lastReceived", "Data received %d second(s) ago");
-            add("fixture.dmxStart", "DMX Address");
+            add("fixture.dmxStart", "Start address");
             add("fixture.pan", "Pan");
             add("fixture.tilt", "Tilt");
             add("screen.movinglight", "Moving Light");
@@ -133,9 +133,12 @@ public class DataEvent {
             add("item.configurationcard.success", "Configured device to %s network, universe %s and address %s - next address is %s.");
             add("screen.artnetconfig.entry.subnet", "Subnet: %s");
             add("screen.artnetconfig.entry.universe", "Universe: %s");
-            add("screen.artnetconfig.subnet", "DMX Subnet");
+            add("screen.artnetconfig.subnet", "Art-Net Subnet");
+            add("screen.artnetconfig.universe", "Art-Net Universe");
             add("screen.artnetconfig.networkUniverse", "Network Universe");
             add("screen.artnetconfig.networkEnabled", "Enabled");
+            add("item.configurationcard.description.1", "Shift + Right Click for settings");
+            add("item.configurationcard.description.2", "Right click on fixture to apply");
         }
     }
 
