@@ -24,7 +24,6 @@ import dev.imabad.theatrical.client.dmx.ArtNetToNetworkClientData;
 import dev.imabad.theatrical.client.dmx.TheatricalArtNetClient;
 import dev.imabad.theatrical.client.gui.screen.BasicLightingDeskScreen;
 import dev.imabad.theatrical.client.gui.screen.GenericManualPanTiltScreen;
-import dev.imabad.theatrical.client.gui.screen.fixtures.FresnelScreen;
 import dev.imabad.theatrical.client.gui.screen.GenericDMXConfigurationScreen;
 import dev.imabad.theatrical.config.TheatricalConfig;
 import dev.imabad.theatrical.config.UniverseConfig;
@@ -215,7 +214,7 @@ public class TheatricalClient {
         switch (openScreen.getScreen()){
             case GENERIC_DMX -> {
                 if(Minecraft.getInstance().level.getBlockEntity(openScreen.getPos()) instanceof DMXConsumer dmxConsumer){
-                    Minecraft.getInstance().setScreen(new GenericDMXConfigurationScreen<>(dmxConsumer, openScreen.getPos(), "block.theatrical.moving_light"));
+                    Minecraft.getInstance().setScreen(new GenericDMXConfigurationScreen<>(dmxConsumer, openScreen.getPos(), dmxConsumer.getTranslationKey()));
                 }
             }
             case GENERIC_PAN_TILT -> {

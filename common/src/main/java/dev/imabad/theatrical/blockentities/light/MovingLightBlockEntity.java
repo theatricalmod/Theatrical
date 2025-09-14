@@ -112,4 +112,9 @@ public class MovingLightBlockEntity extends BaseDMXConsumerLightBlockEntity {
     public int getBasePan() {
         return 0;
     }
+
+    @Override
+    public String getTranslationKey() {
+        return "block.theatrical.moving_light";
+    }
 }

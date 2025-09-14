@@ -94,7 +94,7 @@ public class ArtNetConfigurationScreen extends Screen {
         subnet.visible = false;
         subnet.active = false;
         layout.addChild(subnet, 3, 2);
-        universe = new LabeledEditBox(this.font, xCenter, yCenter, 100, 20, Component.translatable("artneti.dmxUniverse")).color(0xffffff).textOffsetY(-5).shadow(true);
+        universe = new LabeledEditBox(this.font, xCenter, yCenter, 100, 20, Component.translatable("screen.artnetconfig.universe")).color(0xffffff).textOffsetY(-5).shadow(true);
         universe.visible = false;
         universe.active = false;
         layout.addChild(universe, 3, 3);
