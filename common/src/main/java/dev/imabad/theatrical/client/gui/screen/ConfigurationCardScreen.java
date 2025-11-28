@@ -125,7 +125,7 @@ public class ConfigurationCardScreen extends Screen {
                 return;
             }
             int universe = Integer.parseInt(this.dmxUniverse.getValue());
-            if (universe > 16 || universe < 0) {
+            if (universe < 0) {
                 return;
             }
             new ConfigureConfigurationCard(networkId, dmx, universe, autoIncrement.selected(), enableUniverse.selected(), enableAddress.selected()).sendToServer();
