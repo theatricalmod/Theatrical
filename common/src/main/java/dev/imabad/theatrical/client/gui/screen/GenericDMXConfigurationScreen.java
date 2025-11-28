@@ -107,7 +107,7 @@ public class GenericDMXConfigurationScreen<T extends DMXConsumer> extends Screen
             }
 
             int universe = Integer.parseInt(this.dmxUniverse.getValue());
-            if (universe > 16 || universe < 0) {
+            if (universe < 0) {
                 return;
             }
             new UpdateDMXFixture(blockPos, dmx, universe).sendToServer();
