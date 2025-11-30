@@ -297,6 +297,14 @@ public class LightManager {
     }
 
     public static boolean shouldUpdateDynamicLight() {
+        return shouldUpdateDynamicLight(false);
+    }
+
+
+    public static boolean shouldUpdateDynamicLight(boolean checkShimmer) {
+        if(checkShimmer && ModCompat.SHIMMER){
+            return false;
+        }
         return TheatricalConfig.INSTANCE.COMMON.shouldEmitLight;
     }
 
