@@ -1,0 +1,30 @@
+name: Maven Release
+
+on: workflow_dispatch
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone project
+        uses: actions/checkout@v3
+      - name: Set up JDK
+        uses: actions/setup-java@v2
+        with:
+          distribution: "temurin"
+          java-version: 17
+      - name: Fix borked permissions
+        run: chmod +x ./gradlew
+      - name: Run gradle tasks [build publish]
+        uses: gradle/gradle-build-action@v2
+        env:
+          SNAPSHOT: false
+          NEXUS_USERNAME: ${{secrets.NEXUS_USERNAME }}
+          NEXUS_PASSWORD: ${{secrets.NEXUS_PASSWORD }}
+        with:
+          arguments: "build publishAllPublicationsToRushMavenRepository"
+      - name: Store artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: gradle-build-output
+          path: ./**/libs/*.jar
