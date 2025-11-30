@@ -23,7 +23,7 @@ public abstract class LevelRendererMixin {
             cancellable = true
     )
     private static void onGetLightmapCoordinates(BlockAndTintGetter world, BlockState state, BlockPos pos, CallbackInfoReturnable<Integer> cir) {
-        if (!LightManager.shouldUpdateDynamicLight())
+        if (!LightManager.shouldUpdateDynamicLight(true))
             return; // Do not touch to the value.
         if (!world.getBlockState(pos).isSolidRender(world, pos))
             cir.setReturnValue(LightManager.getLightmapWithDynamicLight(pos, cir.getReturnValue()));
