@@ -1,6 +1,4 @@
-# 1.20.2-alpha.27
+# 1.20.2-alpha.28
 
-* Allow redstone interface to be configured by configuration card
-* Fix a strange lighting update when using Shimmer
-* Fix some UI's having the wrong titles etc
-* Remove the arbitrary 16 universe limit in config card
+* Fix some UI's having the wrong titles etc (for real)
+* Fix a bug where sometimes models for fixtures wouldn't load properly when other mods were installed.
