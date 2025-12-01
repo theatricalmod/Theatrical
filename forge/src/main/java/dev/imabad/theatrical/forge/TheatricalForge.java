@@ -17,34 +17,7 @@ public class TheatricalForge {
     public TheatricalForge() {
         // Submit our event bus to let architectury register our content on the right time
         EventBuses.registerModEventBus(Theatrical.MOD_ID, FMLJavaModLoadingContext.get().getModEventBus());
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onClient);
         Theatrical.init();
     }
 
-    public void onClient(FMLClientSetupEvent event){
-        TheatricalClient.init();
-        FMLJavaModLoadingContext.get().getModEventBus().addListener((ModelEvent.RegisterAdditional additionalEvent) -> {
-            for(Fixture fixture : Fixtures.FIXTURES){
-                if(fixture.getStaticModel() != null) {
-                    additionalEvent.register(fixture.getStaticModel());
-                }
-                if(fixture.hasPanModel() && fixture.getPanModel() != null) {
-                    additionalEvent.register(fixture.getPanModel());
-                }
-                if(fixture.hasTiltModel() && fixture.getTiltModel() != null) {
-                    additionalEvent.register(fixture.getTiltModel());
-                }
-            }
-        });
-        MinecraftForge.EVENT_BUS.addListener((RenderLevelStageEvent renderLevelStageEvent) -> {
-            if (renderLevelStageEvent.getStage() == RenderLevelStageEvent.Stage.AFTER_TRIPWIRE_BLOCKS) {
-                TheatricalClient.renderWorldLastAfterTripwire(renderLevelStageEvent.getLevelRenderer());
-            }
-//            if(Platform.isDevelopmentEnvironment()) {
-            if (renderLevelStageEvent.getStage() == RenderLevelStageEvent.Stage.AFTER_PARTICLES) {
-                TheatricalClient.renderWorldLast(renderLevelStageEvent.getPoseStack(), renderLevelStageEvent.getProjectionMatrix(), renderLevelStageEvent.getCamera(), renderLevelStageEvent.getPartialTick());
-            }
-//            }
-        });
-    }
 }
