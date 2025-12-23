@@ -23,8 +23,11 @@ public class BasicLightingDeskScreen extends Screen {
 
     private final ResourceLocation GUI = new ResourceLocation(Theatrical.MOD_ID, "textures/gui/lighting_console.png");
 
-    private int imageWidth, imageHeight, xCenter, yCenter;
-    private BasicLightingDeskBlockEntity be;
+    private final int imageWidth;
+    private final int imageHeight;
+    private int xCenter;
+    private int yCenter;
+    private final BasicLightingDeskBlockEntity be;
     private EditBox fadeInTime, fadeOutTime;
     private UUID networkId;
     public BasicLightingDeskScreen(BasicLightingDeskBlockEntity blockEntity) {

@@ -7,7 +7,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.util.FormattedCharSequence;
 
 public class BetterStringWidget extends StringWidget {
-    private float alignX = 0.5F;
+    private final float alignX = 0.5F;
     private boolean shadow = true;
 
     public BetterStringWidget(Component message, Font font) {

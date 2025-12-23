@@ -1,9 +1,9 @@
-package dev.imabad.theatrical.dmx;
+package dev.imabad.theatrical.networks;
 
 import net.minecraft.util.StringRepresentable;
 import org.jetbrains.annotations.NotNull;
 
-public enum DMXNetworkMode implements StringRepresentable {
+public enum TheatricalNetworkMode implements StringRepresentable {
 
     PUBLIC("PUBLIC"),
     INVITE("INVITE"),
@@ -11,7 +11,7 @@ public enum DMXNetworkMode implements StringRepresentable {
 
     private final String name;
 
-    DMXNetworkMode(String name) {
+    TheatricalNetworkMode(String name) {
         this.name = name;
     }
 
@@ -24,8 +24,8 @@ public enum DMXNetworkMode implements StringRepresentable {
         return name;
     }
 
-    public static DMXNetworkMode byName(String name){
-        for (DMXNetworkMode value : values()) {
+    public static TheatricalNetworkMode byName(String name){
+        for (TheatricalNetworkMode value : values()) {
             if(value.getName().equals(name)){
                 return value;
             }

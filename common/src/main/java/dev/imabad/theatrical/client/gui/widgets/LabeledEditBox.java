@@ -12,7 +12,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class LabeledEditBox extends EditBox {
     private float alignX = 0.5F;
-    private Font font;
+    private final Font font;
 
     private int color = 4210752;
     private boolean shadow = false;

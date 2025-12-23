@@ -1,6 +1,3 @@
 {
-  "parent": "minecraft:block/cube_all",
-  "textures": {
-    "all": "theatrical:block/redstone_interface"
-  }
+  "parent": "theatrical:block/redstone_interface"
 }

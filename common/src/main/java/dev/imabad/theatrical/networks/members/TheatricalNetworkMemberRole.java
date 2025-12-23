@@ -1,16 +1,16 @@
-package dev.imabad.theatrical.dmx;
+package dev.imabad.theatrical.networks.members;
 
 import net.minecraft.util.StringRepresentable;
 import org.jetbrains.annotations.NotNull;
 
-public enum DMXNetworkMemberRole implements StringRepresentable {
+public enum TheatricalNetworkMemberRole implements StringRepresentable {
     NONE("NONE"),
     SEND("SEND"),
     ADMIN("ADMIN");
 
     private final String name;
 
-    DMXNetworkMemberRole(String name) {
+    TheatricalNetworkMemberRole(String name) {
         this.name = name;
     }
 
@@ -23,8 +23,8 @@ public enum DMXNetworkMemberRole implements StringRepresentable {
         return name;
     }
 
-    public static DMXNetworkMemberRole byName(String name){
-        for (DMXNetworkMemberRole value : values()) {
+    public static TheatricalNetworkMemberRole byName(String name){
+        for (TheatricalNetworkMemberRole value : values()) {
             if(value.getName().equals(name)){
                 return value;
             }

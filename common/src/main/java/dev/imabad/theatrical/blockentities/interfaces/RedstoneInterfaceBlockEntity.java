@@ -5,7 +5,7 @@ import dev.imabad.theatrical.Constants;
 import dev.imabad.theatrical.api.dmx.DMXConsumer;
 import dev.imabad.theatrical.blockentities.BlockEntities;
 import dev.imabad.theatrical.blockentities.ClientSyncBlockEntity;
-import dev.imabad.theatrical.dmx.DMXNetworkData;
+import dev.imabad.theatrical.networks.TheatricalNetworkData;
 import dev.imabad.theatrical.fixtures.Fixtures;
 import dev.imabad.theatrical.util.RndUtils;
 import dev.imabad.theatrical.util.UUIDUtil;
@@ -166,26 +166,26 @@ public class RedstoneInterfaceBlockEntity extends ClientSyncBlockEntity implemen
     }
 
     private void updateConsumer(){
-        var dmxData = DMXNetworkData.getInstance(level.getServer().overworld()).getNetwork(networkId);
-        if (dmxData != null) {
-            dmxData.updateConsumer(this);
+        var network = TheatricalNetworkData.getInstance(level.getServer().overworld()).getNetwork(networkId);
+        if (network != null) {
+            network.dmx().updateConsumer(this);
         }
     }
 
     private void addConsumer(){
-        var dmxData = DMXNetworkData.getInstance(level.getServer().overworld()).getNetwork(networkId);
-        if (dmxData != null) {
+        var network = TheatricalNetworkData.getInstance(level.getServer().overworld()).getNetwork(networkId);
+        if (network != null) {
             if(deviceId == null){
                 generateDeviceId();
             }
-            dmxData.addConsumer(getBlockPos(), this);
+            network.dmx().addConsumer(getBlockPos(), this);
         }
     }
 
     private void removeConsumer(){
-        var dmxData = DMXNetworkData.getInstance(level.getServer().overworld()).getNetwork(networkId);
-        if (dmxData != null) {
-            dmxData.removeConsumer(this, getBlockPos());
+        var network = TheatricalNetworkData.getInstance(level.getServer().overworld()).getNetwork(networkId);
+        if (network != null) {
+            network.dmx().removeConsumer(this, getBlockPos());
         }
     }
 

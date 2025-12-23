@@ -7,8 +7,8 @@ import dev.architectury.networking.simple.MessageType;
 import dev.imabad.theatrical.Theatrical;
 import dev.imabad.theatrical.blockentities.interfaces.RedstoneInterfaceBlockEntity;
 import dev.imabad.theatrical.blockentities.light.BaseDMXConsumerLightBlockEntity;
-import dev.imabad.theatrical.dmx.DMXNetwork;
-import dev.imabad.theatrical.dmx.DMXNetworkData;
+import dev.imabad.theatrical.networks.TheatricalNetwork;
+import dev.imabad.theatrical.networks.TheatricalNetworkData;
 import dev.imabad.theatrical.net.TheatricalNet;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
@@ -55,12 +55,12 @@ public class RDMUpdateConsumer extends BaseC2SMessage {
     public void handle(NetworkManager.PacketContext context) {
         Level level = context.getPlayer().level();
         if(level.getServer() != null ) {
-            DMXNetwork network = DMXNetworkData.getInstance(level.getServer().overworld()).getNetwork(networkId);
-            if(network == null || !network.canSendDMX(context.getPlayer().getUUID())) {
+            TheatricalNetwork network = TheatricalNetworkData.getInstance(level.getServer().overworld()).getNetwork(networkId);
+            if(network == null || !network.members().canSendDMX(context.getPlayer().getUUID())) {
                 Theatrical.LOGGER.info("{} tried to send an RDM update for a network that doesn't exist or isn't part of", context.getPlayer().getName().getString());
                 return;
             }
-            BlockPos consumerPos = network.getConsumerPos(universe, dmxDevice);
+            BlockPos consumerPos = network.dmx().getConsumerPos(universe, dmxDevice);
             if(consumerPos != null){
                 BlockEntity be = context.getPlayer().level().getBlockEntity(consumerPos);
                 if(be instanceof BaseDMXConsumerLightBlockEntity dmxConsumerLightBlock){

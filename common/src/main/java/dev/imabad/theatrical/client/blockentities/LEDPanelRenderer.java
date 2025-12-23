@@ -109,7 +109,7 @@ public class LEDPanelRenderer extends FixtureRenderer<LEDPanelBlockEntity> {
                     int r = (color >> 16) & 0xFF;
                     int g = (color >> 8) & 0xFF;
                     int b = color & 0xFF;
-                    int a = (int) (((float) ((intensity * 1) / 255f)) * 255);
+                    int a = (int) (((intensity * 1) / 255f) * 255);
                     poseStack.translate(0, 0f, -0.01f);
                     Matrix4f m = poseStack.last().pose();
                     Matrix3f normal = poseStack.last().normal();

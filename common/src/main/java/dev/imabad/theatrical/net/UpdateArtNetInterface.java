@@ -10,9 +10,9 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 
 public class UpdateArtNetInterface extends BaseC2SMessage {
 
-    private BlockPos pos;
-    private String ipAddress;
-    private int dmxUniverse;
+    private final BlockPos pos;
+    private final String ipAddress;
+    private final int dmxUniverse;
 
     public UpdateArtNetInterface(BlockPos blockPos, String ipAddress, int dmxUniverse){
         this.pos = blockPos;

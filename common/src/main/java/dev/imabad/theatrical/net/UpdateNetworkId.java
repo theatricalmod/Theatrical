@@ -12,8 +12,8 @@ import java.util.UUID;
 
 public class UpdateNetworkId extends BaseC2SMessage {
 
-    private BlockPos blockPos;
-    private UUID networkId;
+    private final BlockPos blockPos;
+    private final UUID networkId;
 
     public UpdateNetworkId(BlockPos blockPos, UUID networkId) {
         this.blockPos = blockPos;

@@ -2,17 +2,12 @@ package dev.imabad.theatrical.blocks.interfaces;
 
 import dev.imabad.theatrical.TheatricalScreen;
 import dev.imabad.theatrical.blockentities.interfaces.RedstoneInterfaceBlockEntity;
-import dev.imabad.theatrical.blockentities.light.BaseDMXConsumerLightBlockEntity;
 import dev.imabad.theatrical.blocks.Blocks;
-import dev.imabad.theatrical.client.gui.screen.GenericDMXConfigurationScreen;
-import dev.imabad.theatrical.dmx.DMXNetwork;
-import dev.imabad.theatrical.dmx.DMXNetworkData;
+import dev.imabad.theatrical.networks.TheatricalNetwork;
+import dev.imabad.theatrical.networks.TheatricalNetworkData;
 import dev.imabad.theatrical.items.Items;
 import dev.imabad.theatrical.net.OpenScreen;
 import dev.imabad.theatrical.util.UUIDUtil;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -56,8 +51,8 @@ public class RedstoneInterfaceBlock  extends Block implements EntityBlock {
             BlockEntity be = level.getBlockEntity(pos);
             if (be instanceof RedstoneInterfaceBlockEntity redstoneInterfaceBlockEntity) {
                 if (!redstoneInterfaceBlockEntity.getNetworkId().equals(UUIDUtil.NULL)) {
-                    DMXNetwork network = DMXNetworkData.getInstance(level.getServer().overworld()).getNetwork(redstoneInterfaceBlockEntity.getNetworkId());
-                    if (network != null && !network.isMember(player.getUUID())) {
+                    TheatricalNetwork network = TheatricalNetworkData.getInstance(level.getServer().overworld()).getNetwork(redstoneInterfaceBlockEntity.getNetworkId());
+                    if (network != null && !network.members().isMember(player.getUUID())) {
                         return InteractionResult.FAIL;
                     }
                 }
@@ -75,7 +70,7 @@ public class RedstoneInterfaceBlock  extends Block implements EntityBlock {
                         tagData.putInt("dmxAddress", tagData.getInt("dmxAddress") + redstoneInterfaceBlockEntity.getChannelCount());
                     }
                     itemInHand.save(tagData);
-                    DMXNetworkData instance = DMXNetworkData.getInstance(level.getServer().overworld());
+                    TheatricalNetworkData instance = TheatricalNetworkData.getInstance(level.getServer().overworld());
                     player.sendSystemMessage(Component.translatable("item.configurationcard.success", instance.getNetwork(redstoneInterfaceBlockEntity.getNetworkId()).name(), Integer.toString(redstoneInterfaceBlockEntity.getUniverse()), Integer.toString(redstoneInterfaceBlockEntity.getChannelStart()), Integer.toString(tagData.getInt("dmxAddress"))));
                     return InteractionResult.SUCCESS;
                 }

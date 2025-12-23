@@ -4,7 +4,7 @@ import dev.imabad.theatrical.api.dmx.BelongsToNetwork;
 import dev.imabad.theatrical.api.dmx.DMXConsumer;
 import dev.imabad.theatrical.blockentities.BlockEntities;
 import dev.imabad.theatrical.blockentities.ClientSyncBlockEntity;
-import dev.imabad.theatrical.dmx.DMXNetworkData;
+import dev.imabad.theatrical.networks.TheatricalNetworkData;
 import dev.imabad.theatrical.util.UUIDUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -118,9 +118,9 @@ public class BasicLightingDeskBlockEntity extends ClientSyncBlockEntity implemen
 
     public void update(byte[] data) {
         if(level != null && level.getServer() != null) {
-            var dmxData = DMXNetworkData.getInstance(level.getServer().overworld()).getNetwork(networkId);
-            if(dmxData != null) {
-                Collection<DMXConsumer> consumers = dmxData.getConsumers(universe);
+            var network = TheatricalNetworkData.getInstance(level.getServer().overworld()).getNetwork(networkId);
+            if(network != null) {
+                Collection<DMXConsumer> consumers = network.dmx().getConsumers(universe);
                 if(consumers != null)
                     consumers.forEach(consumer -> consumer.consume(data));
             }

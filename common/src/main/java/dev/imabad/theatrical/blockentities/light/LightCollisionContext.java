@@ -8,7 +8,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class LightCollisionContext implements CollisionContext {
 
-    private BlockPos fromPos;
+    private final BlockPos fromPos;
 
     public LightCollisionContext(BlockPos fromPos) {
         this.fromPos = fromPos;

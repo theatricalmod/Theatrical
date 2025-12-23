@@ -35,10 +35,10 @@ public class ArtNetConfigurationScreen extends Screen {
     private Checkbox universeEnabled;
     private Button deleteConfig;
     private IntObjectMap<UniverseConfig> universeConfigs = new IntObjectHashMap<>();
-    private String ipAddress;
+    private final String ipAddress;
     private boolean enabled;
     private UUID networkId;
-    private Screen lastScreen;
+    private final Screen lastScreen;
     private GridLayout layout;
     private ArtNetUniverseConfigurationList configList;
 
@@ -226,10 +226,7 @@ public class ArtNetConfigurationScreen extends Screen {
 //                universe[i] = val;
 //                setValueFor(i + 1, val);
 //            }
-            boolean hasChangedIP = false;
-            if(!Objects.equals(TheatricalConfig.INSTANCE.CLIENT.artNetIP, ipAddressBox.getValue()) && TheatricalConfig.INSTANCE.CLIENT.artNetIP != null){
-                hasChangedIP = true;
-            }
+            boolean hasChangedIP = !Objects.equals(TheatricalConfig.INSTANCE.CLIENT.artNetIP, ipAddressBox.getValue()) && TheatricalConfig.INSTANCE.CLIENT.artNetIP != null;
             TheatricalConfig.INSTANCE.CLIENT.artNetIP = ipAddressBox.getValue();
             TheatricalConfig.INSTANCE.CLIENT.artnetEnabled = enabled;
             if(networkId != TheatricalClient.getArtNetManager().getNetworkId()) {

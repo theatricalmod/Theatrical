@@ -8,5 +8,5 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 @Mixin(ClipContext.class)
 public interface ClipContextAccessor {
     @Accessor("collisionContext")
-    public void setCollisionContext(CollisionContext context);
+    void setCollisionContext(CollisionContext context);
 }

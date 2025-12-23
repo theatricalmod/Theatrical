@@ -35,7 +35,7 @@ public class ConfigurationCardScreen extends Screen {
     private Checkbox autoIncrement;
     private BetterCheckbox enableUniverse, enableAddress;
     private UUID networkId = UUIDUtil.NULL;
-    private CompoundTag itemData;
+    private final CompoundTag itemData;
     public ConfigurationCardScreen(CompoundTag itemData) {
         super(Component.translatable("screen.configurationcard"));
         this.imageWidth = 176;

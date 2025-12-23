@@ -1,13 +1,13 @@
-package dev.imabad.theatrical.dmx;
+package dev.imabad.theatrical.networks.members;
 
 import java.util.Objects;
 import java.util.UUID;
 
-public final class DMXNetworkMember {
+public final class TheatricalNetworkMember {
     private final UUID playerId;
-    private DMXNetworkMemberRole role;
+    private TheatricalNetworkMemberRole role;
 
-    public DMXNetworkMember(UUID playerId, DMXNetworkMemberRole role) {
+    public TheatricalNetworkMember(UUID playerId, TheatricalNetworkMemberRole role) {
         this.playerId = playerId;
         this.role = role;
     }
@@ -16,11 +16,11 @@ public final class DMXNetworkMember {
         return playerId;
     }
 
-    public DMXNetworkMemberRole role() {
+    public TheatricalNetworkMemberRole role() {
         return role;
     }
 
-    public void setRole(DMXNetworkMemberRole role) {
+    public void setRole(TheatricalNetworkMemberRole role) {
         this.role = role;
     }
 
@@ -28,7 +28,7 @@ public final class DMXNetworkMember {
     public boolean equals(Object obj) {
         if (obj == this) return true;
         if (obj == null || obj.getClass() != this.getClass()) return false;
-        var that = (DMXNetworkMember) obj;
+        var that = (TheatricalNetworkMember) obj;
         return Objects.equals(this.playerId, that.playerId) &&
                 Objects.equals(this.role, that.role);
     }
