@@ -21,6 +21,9 @@
     ],
     "client": [
       "dev.imabad.theatrical.fabric.TheatricalClientFabric"
+    ],
+    "fabric-datagen": [
+      "dev.imabad.theatrical.fabric.TheatricalDatagenFabric"
     ]
   },
   "mixins": [

@@ -8,8 +8,9 @@ import java.util.function.Consumer;
 
 public class BasicSlider extends AbstractSliderButton {
 
-    private Component initialMessage;
-    private double minValue, maxValue;
+    private final Component initialMessage;
+    private final double minValue;
+    private final double maxValue;
     private final Consumer<Double> applyValue;
     public BasicSlider(int x, int y, int width, int height, Component message, double value, double minValue, double maxValue, Consumer<Double> applyValue) {
         super(x, y, width, height, message, value);

@@ -1,18 +1,18 @@
 {
   "variants": {
     "facing=east": {
-      "model": "theatrical:block/lighting_console",
+      "model": "theatrical:block/basic_lighting_desk",
       "y": 90
     },
     "facing=north": {
-      "model": "theatrical:block/lighting_console"
+      "model": "theatrical:block/basic_lighting_desk"
     },
     "facing=south": {
-      "model": "theatrical:block/lighting_console",
+      "model": "theatrical:block/basic_lighting_desk",
       "y": 180
     },
     "facing=west": {
-      "model": "theatrical:block/lighting_console",
+      "model": "theatrical:block/basic_lighting_desk",
       "y": 270
     }
   }

@@ -22,11 +22,8 @@ public class TheatricalMixinPlugin implements IMixinConfigPlugin {
 
     @Override
     public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
-        if(mixinClassName.contains("LevelRendererMixin") && ModCompat.SHIMMER){
-            // Shimmer is installed we won't do any of our fancy lighting things.
-            return false;
-        }
-        return true;
+        // Shimmer is installed we won't do any of our fancy lighting things.
+        return !mixinClassName.contains("LevelRendererMixin") || !ModCompat.SHIMMER;
     }
 
     @Override

@@ -10,8 +10,8 @@ import net.minecraft.network.FriendlyByteBuf;
 
 public class OpenScreen extends BaseS2CMessage {
 
-    private BlockPos pos;
-    private TheatricalScreen screen;
+    private final BlockPos pos;
+    private final TheatricalScreen screen;
 
     public OpenScreen(BlockPos pos, TheatricalScreen screen) {
         this.pos = pos;

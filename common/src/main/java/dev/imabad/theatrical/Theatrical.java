@@ -15,8 +15,8 @@ import dev.imabad.theatrical.commands.NetworkCommand;
 import dev.imabad.theatrical.config.ConfigHandler;
 import dev.imabad.theatrical.config.TheatricalConfig;
 import dev.imabad.theatrical.dmx.DMXDevice;
-import dev.imabad.theatrical.dmx.DMXNetwork;
-import dev.imabad.theatrical.dmx.DMXNetworkData;
+import dev.imabad.theatrical.networks.TheatricalNetwork;
+import dev.imabad.theatrical.networks.TheatricalNetworkData;
 import dev.imabad.theatrical.fixtures.Fixtures;
 import dev.imabad.theatrical.items.Items;
 import dev.imabad.theatrical.mixin.ArgumentTypeInfosAccessor;
@@ -66,11 +66,11 @@ public class Theatrical {
         argTypes.register();
         dev.imabad.theatrical.items.Items.ITEMS.register();
         PlayerEvent.PLAYER_JOIN.register((event) -> {
-            DMXNetworkData instance = DMXNetworkData.getInstance(event.server.overworld());
-            for (DMXNetwork network : instance.getNetworksForPlayer(event.connection.player.getUUID())) {
-                for (Integer universe : network.getUniverses()) {
+            TheatricalNetworkData instance = TheatricalNetworkData.getInstance(event.server.overworld());
+            for (TheatricalNetwork network : instance.getNetworksForPlayer(event.connection.player.getUUID())) {
+                for (Integer universe : network.dmx().getUniverses()) {
                     List<DMXDevice> devices = new ArrayList<>();
-                    network.getConsumers(universe).forEach(consumer -> {
+                    network.dmx().getConsumers(universe).forEach(consumer -> {
                         devices.add(new DMXDevice(consumer.getDeviceId(), consumer.getChannelStart(),
                                 consumer.getChannelCount(), consumer.getDeviceTypeId(), consumer.getActivePersonality(), consumer.getModelName(),
                                 consumer.getFixtureId()));
@@ -82,6 +82,7 @@ public class Theatrical {
         LifecycleEvent.SERVER_LEVEL_UNLOAD.register(world -> {
             if(world.dimension().equals(Level.OVERWORLD)){
                 DMXNetworkData.unloadLevel();
+                TheatricalNetworkData.unloadLevel();
             }
         });
         CommandRegistrationEvent.EVENT.register((dispatcher, registry, selection) -> {

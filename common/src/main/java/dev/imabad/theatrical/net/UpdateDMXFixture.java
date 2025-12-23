@@ -11,8 +11,9 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 
 public class UpdateDMXFixture extends BaseC2SMessage {
 
-    private BlockPos pos;
-    private int dmxAddress, dmxUniverse;
+    private final BlockPos pos;
+    private final int dmxAddress;
+    private final int dmxUniverse;
 
     public UpdateDMXFixture(BlockPos blockPos, int dmxAddress, int dmxUniverse){
         this.pos = blockPos;

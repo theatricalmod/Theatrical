@@ -17,7 +17,7 @@ import java.util.function.Consumer;
 
 public class ArtNetUniverseConfigurationList extends ObjectSelectionList<ArtNetUniverseConfigurationList.Entry> implements LayoutElement {
 
-    private ArtNetConfigurationScreen parent;
+    private final ArtNetConfigurationScreen parent;
     public ArtNetUniverseConfigurationList(Minecraft minecraft, ArtNetConfigurationScreen screen, int width, int height, Component title) {
         super(minecraft, width, height, 32, height - 55 + 4, 30);
         this.parent = screen;
@@ -80,8 +80,8 @@ public class ArtNetUniverseConfigurationList extends ObjectSelectionList<ArtNetU
     public static class Entry extends ObjectSelectionList.Entry<Entry> implements AutoCloseable {
 
         private final ArtNetConfigurationScreen parent;
-        private UniverseConfig config;
-        private int networkUniverse;
+        private final UniverseConfig config;
+        private final int networkUniverse;
         public Entry(ArtNetConfigurationScreen parent, int networkUniverse, UniverseConfig config) {
             this.parent = parent;
             this.config = config;

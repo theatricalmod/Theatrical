@@ -127,7 +127,7 @@ public class MovingWashRenderer extends FixtureRenderer<MovingWashBlockEntity> {
                     int r = (color >> 16) & 0xFF;
                     int g = (color >> 8) & 0xFF;
                     int b = color & 0xFF;
-                    int a = (int) (((float) ((intensity * 1) / 255f)) * 255);
+                    int a = (int) (((intensity * 1) / 255f) * 255);
                     poseStack.translate(0.5, 0.87f, 0.29f);
                     Matrix4f m = poseStack.last().pose();
                     Matrix3f normal = poseStack.last().normal();

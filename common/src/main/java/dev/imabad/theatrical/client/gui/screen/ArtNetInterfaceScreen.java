@@ -13,9 +13,12 @@ import net.minecraft.resources.ResourceLocation;
 public class ArtNetInterfaceScreen extends Screen {
     private final ResourceLocation GUI = new ResourceLocation(Theatrical.MOD_ID, "textures/gui/blank.png");
 
-    private int imageWidth, imageHeight, xCenter, yCenter;
+    private final int imageWidth;
+    private final int imageHeight;
+    private int xCenter;
+    private int yCenter;
     private EditBox dmxUniverse, ipAddress;
-    private ArtNetInterfaceBlockEntity be;
+    private final ArtNetInterfaceBlockEntity be;
 
     public ArtNetInterfaceScreen(ArtNetInterfaceBlockEntity be) {
         super(Component.translatable("screen.artnetinterface"));
@@ -29,11 +32,11 @@ public class ArtNetInterfaceScreen extends Screen {
         super.init();
         xCenter = (this.width - this.imageWidth) / 2;
         yCenter = (this.height - this.imageHeight) / 2;
-        this.dmxUniverse = new EditBox(this.font, xCenter + 62, yCenter + 25, 50, 10, (Component)Component.translatable("artneti.dmxUniverse"));
+        this.dmxUniverse = new EditBox(this.font, xCenter + 62, yCenter + 25, 50, 10, Component.translatable("artneti.dmxUniverse"));
         this.dmxUniverse.setValue(Integer.toString(this.be.getUniverse()));
 //        this.dmxUniverse.setEditable(be.isOwnedByCurrentClient());
         this.addWidget(this.dmxUniverse);
-        this.ipAddress = new EditBox(this.font, xCenter + 40, yCenter + 50, 100, 20, (Component)Component.translatable("artneti.ipAddress"));
+        this.ipAddress = new EditBox(this.font, xCenter + 40, yCenter + 50, 100, 20, Component.translatable("artneti.ipAddress"));
         this.ipAddress.setValue(this.be.getIp());
 //        this.ipAddress.setEditable(be.isOwnedByCurrentClient());
         this.addWidget(this.ipAddress);

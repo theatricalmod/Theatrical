@@ -10,8 +10,9 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 
 public class UpdateFixturePosition extends BaseC2SMessage {
 
-    private BlockPos pos;
-    private int tilt,pan;
+    private final BlockPos pos;
+    private final int tilt;
+    private final int pan;
 
     public UpdateFixturePosition(BlockPos blockPos, int tilt, int pan){
         this.pos = blockPos;

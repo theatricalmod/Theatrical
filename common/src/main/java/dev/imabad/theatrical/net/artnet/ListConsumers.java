@@ -15,8 +15,8 @@ import java.util.List;
 
 public class ListConsumers extends BaseS2CMessage {
 
-    private int universe;
-    private List<DMXDevice> dmxDevices;
+    private final int universe;
+    private final List<DMXDevice> dmxDevices;
 
     public ListConsumers(int universe, List<DMXDevice> dmxDevices){
         this.universe = universe;

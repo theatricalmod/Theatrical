@@ -14,9 +14,12 @@ import java.util.UUID;
 
 public class ConfigureConfigurationCard extends BaseC2SMessage {
 
-    private UUID network;
-    private int dmxAddress, dmxUniverse;
-    private boolean autoIncrement, universeEnabled, addressEnabled;
+    private final UUID network;
+    private final int dmxAddress;
+    private final int dmxUniverse;
+    private final boolean autoIncrement;
+    private final boolean universeEnabled;
+    private final boolean addressEnabled;
 
     public ConfigureConfigurationCard(UUID network, int dmxAddress, int dmxUniverse, boolean autoIncrement,  boolean universeEnabled, boolean addressEnabled) {
         this.network = network;

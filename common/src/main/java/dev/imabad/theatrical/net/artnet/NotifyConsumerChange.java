@@ -15,11 +15,11 @@ public class NotifyConsumerChange extends BaseS2CMessage {
     public enum ChangeType{
         ADD,
         UPDATE,
-        REMOVE;
+        REMOVE
     }
 
-    private int universe;
-    private ChangeType changeType;
+    private final int universe;
+    private final ChangeType changeType;
     private DMXDevice dmxDevice;
 
     public NotifyConsumerChange(int universe, ChangeType changeType, DMXDevice dmxDevice){

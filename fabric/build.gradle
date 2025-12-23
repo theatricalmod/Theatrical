@@ -9,6 +9,12 @@ architectury {
     fabric()
 }
 
+fabricApi {
+    configureDataGeneration() {
+        outputDirectory = project(':common').file('src/generated/resources')
+    }
+}
+
 loom {
     accessWidenerPath = project(":common").loom.accessWidenerPath
 }

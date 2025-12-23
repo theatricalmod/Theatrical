@@ -4,6 +4,7 @@ import dev.imabad.theatrical.api.DynamicLightProvider;
 import dev.imabad.theatrical.api.FixtureProvider;
 import dev.imabad.theatrical.api.Support;
 import dev.imabad.theatrical.blockentities.ClientSyncBlockEntity;
+import dev.imabad.theatrical.blockentities.SupportedBlockEntity;
 import dev.imabad.theatrical.blocks.HangableBlock;
 import dev.imabad.theatrical.blocks.light.BaseLightBlock;
 import dev.imabad.theatrical.config.TheatricalConfig;
@@ -30,7 +31,7 @@ import org.joml.Vector3f;
 
 import java.util.Optional;
 
-public abstract class BaseLightBlockEntity extends ClientSyncBlockEntity implements FixtureProvider, DynamicLightProvider {
+public abstract class BaseLightBlockEntity extends ClientSyncBlockEntity implements FixtureProvider, DynamicLightProvider, SupportedBlockEntity {
     AABB INFINITE_EXTENT_AABB = new AABB(Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
     private double distance = 0;
     protected int pan, tilt, focus, intensity, red, green, blue = 0;
@@ -314,7 +315,7 @@ public abstract class BaseLightBlockEntity extends ClientSyncBlockEntity impleme
         float i = Mth.sin(g);
         float j = Mth.cos(f);
         float k = Mth.sin(f);
-        return new Vec3((double)(i * j), (double)(-k), (double)(h * j));
+        return new Vec3(i * j, -k, h * j);
     }
 
     public static boolean isHangingNonVertically(BlockState blockState){

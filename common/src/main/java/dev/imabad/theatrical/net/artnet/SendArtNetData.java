@@ -5,8 +5,8 @@ import dev.architectury.networking.simple.BaseC2SMessage;
 import dev.architectury.networking.simple.MessageType;
 import dev.imabad.theatrical.Theatrical;
 import dev.imabad.theatrical.api.dmx.DMXConsumer;
-import dev.imabad.theatrical.dmx.DMXNetwork;
-import dev.imabad.theatrical.dmx.DMXNetworkData;
+import dev.imabad.theatrical.networks.TheatricalNetwork;
+import dev.imabad.theatrical.networks.TheatricalNetworkData;
 import dev.imabad.theatrical.net.TheatricalNet;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.level.Level;
@@ -48,11 +48,11 @@ public class SendArtNetData extends BaseC2SMessage {
     public void handle(NetworkManager.PacketContext context) {
         Level level = context.getPlayer().level();
         if(level.getServer() != null) {
-            DMXNetwork network = DMXNetworkData.getInstance(level.getServer().overworld()).getNetwork(networkId);
+            TheatricalNetwork network = TheatricalNetworkData.getInstance(level.getServer().overworld()).getNetwork(networkId);
             UUID uuid = context.getPlayer().getUUID();
             if(network != null) {
-                if (network.isMember(uuid) && network.canSendDMX(uuid)) {
-                    Collection<DMXConsumer> consumers = network.getConsumers(universe);
+                if (network.members().isMember(uuid) && network.members().canSendDMX(uuid)) {
+                    Collection<DMXConsumer> consumers = network.dmx().getConsumers(universe);
                     if(consumers != null) {
                         consumers.forEach(consumer -> {
                             consumer.consume(artNetData);
