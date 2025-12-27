@@ -26,6 +26,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.phys.BlockHitResult;
@@ -38,6 +39,8 @@ public class BasicLightingDeskBlock extends Block implements EntityBlock {
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
     private static final VoxelShape SHAPE = Shapes.create(0, 0, 0, 16 / 16D, 3 / 16D, 16 / 16D);
 
+    public static final BooleanProperty LIT = BlockStateProperties.LIT;
+
     public BasicLightingDeskBlock() {
         super(Properties.of()
                 .requiresCorrectToolForDrops()
@@ -46,18 +49,20 @@ public class BasicLightingDeskBlock extends Block implements EntityBlock {
                 .isValidSpawn(Blocks::neverAllowSpawn)
                 .mapColor(MapColor.METAL)
                 .sound(SoundType.METAL));
-        this.registerDefaultState(this.getStateDefinition().any().setValue(FACING, Direction.NORTH));
+
+        this.registerDefaultState(this.getStateDefinition().any().setValue(FACING, Direction.NORTH).setValue(LIT, false));
     }
 
     @Nullable
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
-        return this.defaultBlockState().setValue(FACING, context.getHorizontalDirection().getOpposite());
+        return this.defaultBlockState().setValue(FACING, context.getHorizontalDirection().getOpposite()).setValue(LIT, context.getLevel().hasNeighborSignal(context.getClickedPos()));
     }
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(FACING);
+        builder.add(LIT);
     }
 
 
@@ -107,4 +112,19 @@ public class BasicLightingDeskBlock extends Block implements EntityBlock {
         }
         return InteractionResult.SUCCESS;
     }
+    public void neighborChanged(BlockState state, Level level, BlockPos pos, Block neighborBlock, BlockPos neighborPos, boolean movedByPiston) {
+        if (!level.isClientSide) {
+            boolean powered=level.hasNeighborSignal(pos);
+            BasicLightingDeskBlockEntity be = (BasicLightingDeskBlockEntity) level.getBlockEntity(pos);
+            if(powered && !state.getValue(LIT)){
+                if(be.isRunMode()){
+                    be.clickButton();
+                }
+                level.setBlock(pos, state.setValue(LIT, true), 3);
+            }else if(!powered && state.getValue(LIT)){
+                level.setBlock(pos, state.setValue(LIT, false), 3);
+            }
+        }
+    }
+
 }
