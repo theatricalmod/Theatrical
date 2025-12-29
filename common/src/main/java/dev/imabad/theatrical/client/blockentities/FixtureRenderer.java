@@ -88,28 +88,28 @@ public abstract class FixtureRenderer<T extends BaseLightBlockEntity> implements
         Matrix4f m = stack.last().pose();
         Matrix3f normal = stack.last().normal();
         length += 0.5f;
-        float endMultiplier = 1 + tileEntityFixture.getFocus()*length*0.05f;
+        float endMultiplier = 1 + tileEntityFixture.getFocus()*length*0.03f;
 
-        int endalpha = 0;
-        addVertex(builder, m, normal, r, g, b, endalpha, beamSize * endMultiplier, beamSize * endMultiplier, -length);
+
+        addVertex(builder, m, normal, r, g, b, 0, beamSize * endMultiplier, beamSize * endMultiplier, -length);
         addVertex(builder, m, normal, r, g, b, a,  beamSize, beamSize, 0);
         addVertex(builder, m, normal, r, g, b, a, beamSize, -beamSize, 0);
-        addVertex(builder, m, normal, r, g, b, endalpha,beamSize * endMultiplier, -beamSize * endMultiplier, -length);
+        addVertex(builder, m, normal, r, g, b, 0,beamSize * endMultiplier, -beamSize * endMultiplier, -length);
 
-        addVertex(builder, m, normal, r, g, b, endalpha, -beamSize * endMultiplier, -beamSize * endMultiplier, -length);
+        addVertex(builder, m, normal, r, g, b, 0, -beamSize * endMultiplier, -beamSize * endMultiplier, -length);
         addVertex(builder, m, normal, r, g, b, a, -beamSize, -beamSize, 0);
         addVertex(builder, m, normal, r, g, b, a, -beamSize, beamSize, 0);
-        addVertex(builder, m, normal, r, g, b, endalpha, -beamSize * endMultiplier, beamSize * endMultiplier, -length);
+        addVertex(builder, m, normal, r, g, b, 0, -beamSize * endMultiplier, beamSize * endMultiplier, -length);
 
-        addVertex(builder, m, normal, r, g, b, endalpha, -beamSize * endMultiplier, beamSize * endMultiplier, -length);
+        addVertex(builder, m, normal, r, g, b, 0, -beamSize * endMultiplier, beamSize * endMultiplier, -length);
         addVertex(builder, m, normal, r, g, b, a, -beamSize, beamSize, 0);
         addVertex(builder, m, normal, r, g, b, a, beamSize, beamSize, 0);
-        addVertex(builder, m, normal, r, g, b, endalpha, beamSize * endMultiplier, beamSize * endMultiplier, -length);
+        addVertex(builder, m, normal, r, g, b, 0, beamSize * endMultiplier, beamSize * endMultiplier, -length);
 
-        addVertex(builder, m, normal, r, g, b, endalpha, beamSize * endMultiplier, -beamSize * endMultiplier, -length);
+        addVertex(builder, m, normal, r, g, b, 0, beamSize * endMultiplier, -beamSize * endMultiplier, -length);
         addVertex(builder, m, normal, r, g, b, a, beamSize, -beamSize, 0);
         addVertex(builder, m, normal, r, g, b, a, -beamSize, -beamSize, 0);
-        addVertex(builder, m, normal, r, g, b, endalpha, -beamSize * endMultiplier, -beamSize * endMultiplier, -length);
+        addVertex(builder, m, normal, r, g, b, 0, -beamSize * endMultiplier, -beamSize * endMultiplier, -length);
 
 
 
