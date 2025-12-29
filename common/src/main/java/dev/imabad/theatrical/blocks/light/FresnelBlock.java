@@ -1,5 +1,6 @@
 package dev.imabad.theatrical.blocks.light;
 
+import com.mojang.serialization.MapCodec;
 import dev.imabad.theatrical.TheatricalClient;
 import dev.imabad.theatrical.TheatricalScreen;
 import dev.imabad.theatrical.blockentities.BlockEntities;
@@ -22,6 +23,7 @@ import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.material.MapColor;
@@ -33,18 +35,26 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
-public class FresnelBlock extends BaseLightBlock{
+public class FresnelBlock extends BaseLightBlock {
 
-    public FresnelBlock() {
-        super(Properties.of()
+    private static final MapCodec<FresnelBlock> CODEC = simpleCodec(FresnelBlock::new);
+
+    public FresnelBlock(BlockBehaviour.Properties properties) {
+        super(properties
                 .requiresCorrectToolForDrops()
                 .strength(3, 3)
                 .noOcclusion()
                 .isValidSpawn(Blocks::neverAllowSpawn)
                 .mapColor(MapColor.METAL)
                 .sound(SoundType.METAL)
-                .pushReaction(PushReaction.DESTROY));
+                .pushReaction(PushReaction.DESTROY), CODEC);
     }
+
+    public FresnelBlock(){
+        this(Properties.of());
+    }
+
+
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos blockPos, BlockState blockState) {

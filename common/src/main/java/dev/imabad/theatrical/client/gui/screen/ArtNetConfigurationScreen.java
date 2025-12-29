@@ -86,10 +86,12 @@ public class ArtNetConfigurationScreen extends Screen {
         networkUniverse.visible = false;
         networkUniverse.active = false;
         layout.addChild(networkUniverse, 2, 2);
-        universeEnabled = new Checkbox(xCenter, yCenter, 150, 20, Component.translatable("screen.artnetconfig.networkEnabled"), false);
+        universeEnabled = Checkbox.builder(Component.translatable("screen.artnetconfig.networkEnabled"), font)
+                .pos(xCenter, yCenter)
+                .build();
         universeEnabled.visible = false;
         universeEnabled.active = false;
-        layout.addChild(universeEnabled, 2, 3);
+        layout.addChild(this.universeEnabled, 2, 3);
         subnet = new LabeledEditBox(this.font, xCenter, yCenter, 100, 20, Component.translatable("screen.artnetconfig.subnet")).color(0xffffff).textOffsetY(-5).shadow(true);
         subnet.visible = false;
         subnet.active = false;

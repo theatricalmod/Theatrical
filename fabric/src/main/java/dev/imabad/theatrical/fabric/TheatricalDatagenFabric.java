@@ -69,7 +69,6 @@ public class TheatricalDatagenFabric implements DataGeneratorEntrypoint {
             parent(itemModelGenerators, Blocks.MOVING_LIGHT_BLOCK.get(),  new ResourceLocation(Theatrical.MOD_ID, "block/moving_light/moving_head_whole"));
             parent(itemModelGenerators, Blocks.MOVING_WASH_BLOCK.get(),  new ResourceLocation(Theatrical.MOD_ID, "block/moving_wash/moving_wash_whole"));
             parent(itemModelGenerators, Blocks.LED_PANEL.get(),  new ResourceLocation(Theatrical.MOD_ID, "block/led_panel"));
-            parent(itemModelGenerators, Blocks.VIDEO_PANEL.get(),  new ResourceLocation(Theatrical.MOD_ID, "block/led_panel"));
         }
 
         private static void parent(ItemModelGenerators itemModelGenerators, Block block) {
@@ -114,7 +113,6 @@ public class TheatricalDatagenFabric implements DataGeneratorEntrypoint {
             translationBuilder.add(Blocks.REDSTONE_INTERFACE.get(), "Redstone Interface");
             translationBuilder.add(Blocks.TANK_TRAP.get(), "Tank Trap");
             translationBuilder.add(Blocks.LED_PANEL.get(), "LED Panel");
-            translationBuilder.add(Blocks.VIDEO_PANEL.get(), "Video Panel");
             translationBuilder.add(Blocks.BASIC_LIGHTING_DESK.get(), "Basic Lighting Desk");
             translationBuilder.add(Items.CONFIGURATION_CARD.get(), "Configuration Card");
             translationBuilder.add("itemGroup.theatrical", "Theatrical");

@@ -1,11 +1,13 @@
 package dev.imabad.theatrical.blocks.rigging;
 
+import com.mojang.serialization.MapCodec;
 import dev.imabad.theatrical.api.FixtureProvider;
 import dev.imabad.theatrical.api.HangType;
 import dev.imabad.theatrical.api.Support;
 import dev.imabad.theatrical.blocks.Blocks;
 import dev.imabad.theatrical.blocks.HangableBlock;
 import dev.imabad.theatrical.blocks.light.BaseLightBlock;
+import dev.imabad.theatrical.blocks.light.FresnelBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
@@ -22,6 +24,7 @@ import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.DirectionalBlock;
 import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
@@ -38,6 +41,8 @@ import java.util.List;
 
 public class PipeBlock extends DirectionalBlock implements Support {
 
+    private static final MapCodec<PipeBlock> CODEC = simpleCodec(PipeBlock::new);
+
     public static final DirectionProperty FACING = DirectionalBlock.FACING;
     private final VoxelShape Z_BOX = Shapes.create(new AABB(0.35, 0.4, 0, 0.65, 0.6, 1));
     private final VoxelShape Z_BOX_DOWN = Shapes.create(new AABB(0, 0, 0, 1, 0.6, 1));
@@ -51,8 +56,8 @@ public class PipeBlock extends DirectionalBlock implements Support {
     private final VoxelShape Y_BOX_EAST = Shapes.create(new AABB(0.4, 0, 0, 1, 1, 1));
     private final VoxelShape Y_BOX_WEST = Shapes.create(new AABB(0, 0, 0, 0.6, 1, 1));
 
-    public PipeBlock() {
-        super(Properties.of()
+    public PipeBlock(BlockBehaviour.Properties properties) {
+        super(properties
             .requiresCorrectToolForDrops()
             .strength(3, 3)
             .noOcclusion()
@@ -60,6 +65,16 @@ public class PipeBlock extends DirectionalBlock implements Support {
             .mapColor(MapColor.METAL)
             .sound(SoundType.METAL));
         this.registerDefaultState(this.getStateDefinition().any().setValue(FACING, Direction.NORTH));
+    }
+
+
+    public PipeBlock() {
+        this(Properties.of());
+    }
+
+    @Override
+    protected MapCodec<? extends DirectionalBlock> codec() {
+        return CODEC;
     }
 
     @Override

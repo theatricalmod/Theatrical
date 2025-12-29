@@ -1,5 +1,6 @@
 package dev.imabad.theatrical.blocks.light;
 
+import com.mojang.serialization.MapCodec;
 import dev.imabad.theatrical.blockentities.light.BaseDMXConsumerLightBlockEntity;
 import dev.imabad.theatrical.blockentities.light.LightCollisionContext;
 import dev.imabad.theatrical.blocks.HangableBlock;
@@ -19,6 +20,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.HorizontalDirectionalBlock;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -30,8 +32,16 @@ import org.jetbrains.annotations.Nullable;
 
 public abstract class BaseLightBlock extends HangableBlock implements EntityBlock {
 
-    protected BaseLightBlock(Properties properties) {
+    private final MapCodec<? extends HorizontalDirectionalBlock> CODEC;
+
+    protected BaseLightBlock(Properties properties, MapCodec<? extends HorizontalDirectionalBlock> codec) {
         super(properties);
+        CODEC = codec;
+    }
+
+    @Override
+    protected MapCodec<? extends HorizontalDirectionalBlock> codec() {
+        return CODEC;
     }
 
     @Override

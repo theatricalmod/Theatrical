@@ -8,8 +8,7 @@
     "maxShiftBy": 5
   },
   "mixins": [
-    "ArgumentTypeInfosAccessor",
-    "ClipContextAccessor"
+    "ArgumentTypeInfosAccessor"
   ],
   "client": [
     "client.ClientMixin",

@@ -1,5 +1,7 @@
 package dev.imabad.theatrical.blocks.light;
 
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.imabad.theatrical.TheatricalClient;
 import dev.imabad.theatrical.TheatricalScreen;
 import dev.imabad.theatrical.blockentities.BlockEntities;
@@ -22,6 +24,7 @@ import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.material.MapColor;
@@ -33,19 +36,25 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
-public class MovingWashBlock extends BaseLightBlock{
+public class MovingWashBlock extends BaseLightBlock {
 
+    private static final MapCodec<MovingWashBlock> CODEC = simpleCodec(MovingWashBlock::new);
 
-    public MovingWashBlock() {
-        super(Properties.of()
+    public MovingWashBlock(BlockBehaviour.Properties properties) {
+        super(properties
             .requiresCorrectToolForDrops()
             .strength(3, 3)
             .noOcclusion()
             .isValidSpawn(Blocks::neverAllowSpawn)
             .mapColor(MapColor.METAL)
             .sound(SoundType.METAL)
-            .pushReaction(PushReaction.DESTROY));
+            .pushReaction(PushReaction.DESTROY), CODEC);
     }
+
+    public MovingWashBlock() {
+        this(Properties.of());
+    }
+
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos blockPos, BlockState blockState) {

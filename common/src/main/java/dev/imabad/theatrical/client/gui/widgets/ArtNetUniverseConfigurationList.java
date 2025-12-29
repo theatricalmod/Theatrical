@@ -19,7 +19,7 @@ public class ArtNetUniverseConfigurationList extends ObjectSelectionList<ArtNetU
 
     private final ArtNetConfigurationScreen parent;
     public ArtNetUniverseConfigurationList(Minecraft minecraft, ArtNetConfigurationScreen screen, int width, int height, Component title) {
-        super(minecraft, width, height, 32, height - 55 + 4, 30);
+        super(minecraft, width, height, height - 55 + 4, 30);
         this.parent = screen;
         this.setRenderBackground(true);
         this.setRenderHeader(false, 0);
@@ -38,32 +38,6 @@ public class ArtNetUniverseConfigurationList extends ObjectSelectionList<ArtNetU
     @Override
     public int getRowWidth() {
         return width - 10;
-    }
-
-    @Override
-    public void setX(int x) {
-        setLeftPos(x);
-    }
-
-    @Override
-    public void setY(int y) {
-        this.y0 = y;
-        this.y1 = y + height;
-    }
-
-    @Override
-    public int getX() {
-        return x0;
-    }
-
-    @Override
-    public int getY() {
-        return y0;
-    }
-
-    @Override
-    public int getWidth() {
-        return x1 - x0;
     }
 
     @Override

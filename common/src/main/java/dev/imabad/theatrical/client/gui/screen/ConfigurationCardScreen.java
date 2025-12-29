@@ -58,11 +58,11 @@ public class ConfigurationCardScreen extends Screen {
             this.dmxUniverse.setValue("0");
         }
         layout.addChild(dmxUniverse, 2, 1, 1, 4,  LayoutSettings.defaults().alignHorizontallyCenter().alignVerticallyMiddle().padding(10));
-        enableUniverse = new BetterCheckbox(xCenter, yCenter, 10, 10, Component.translatable("artneti.dmxUniverse.enable"), itemData.getBoolean("universeEnabled"));
-        dmxUniverse.active = enableUniverse.selected();
-        enableUniverse.setOnChange(aBoolean -> {
-            dmxUniverse.active = aBoolean;
+        enableUniverse = new BetterCheckbox(xCenter, yCenter, Component.translatable("artneti.dmxUniverse.enable"),
+                font, 10, 10, itemData.getBoolean("universeEnabled"), (aBoolean, value) -> {
+            dmxUniverse.active = value;
         });
+        dmxUniverse.active = enableUniverse.selected();
         layout.addChild(enableUniverse, 2, 2, 1, 1,  LayoutSettings.defaults().alignHorizontallyLeft().alignVerticallyMiddle());
         layout.addChild(new CycleButton.Builder<UUID>((networkId) ->
         {
@@ -87,13 +87,15 @@ public class ConfigurationCardScreen extends Screen {
         }
         layout.addChild(dmxAddress, 4, 1, 1, 4, LayoutSettings.defaults().alignHorizontallyCenter().alignVerticallyMiddle().padding(10));
 
-        enableAddress = new BetterCheckbox(xCenter, yCenter, 10, 10, Component.translatable("artneti.dmxAddress.enable"), itemData.getBoolean("addressEnabled"));
+        enableAddress = new BetterCheckbox(xCenter, yCenter, Component.translatable("artneti.dmxAddress.enable"),
+                font, 10, 10, itemData.getBoolean("addressEnabled"),
+                ((checkbox, bl) -> dmxAddress.active = bl));
         dmxAddress.active = enableAddress.selected();
-        enableAddress.setOnChange(aBoolean -> {
-            dmxAddress.active = aBoolean;
-        });
         layout.addChild(enableAddress, 4, 2, 1, 1,  LayoutSettings.defaults().alignHorizontallyLeft().alignVerticallyMiddle());
-        this.autoIncrement = new Checkbox(xCenter, yCenter, 150, 20, Component.translatable("screen.configurationcard.autoincrement"), itemData.getBoolean("autoIncrement"));
+        this.autoIncrement = Checkbox.builder(Component.translatable("screen.configurationcard.autoincrement"), font)
+                .pos(xCenter, yCenter)
+                .selected(itemData.getBoolean("autoIncrement"))
+                .build();
 
         layout.addChild(autoIncrement, 5, 1, 1, 4);
         layout.addChild(

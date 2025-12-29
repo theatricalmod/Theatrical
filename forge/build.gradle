@@ -2,6 +2,7 @@ import me.modmuss50.mpp.ReleaseType
 
 plugins {
     id "com.github.johnrengelman.shadow" version "7.1.2"
+    id "me.modmuss50.mod-publish-plugin"
 }
 
 architectury {

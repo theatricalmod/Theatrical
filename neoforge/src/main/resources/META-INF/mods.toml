@@ -19,21 +19,21 @@ config = "theatrical-common.mixins.json"
 
 [[dependencies.theatrical]]
 modId = "neoforge"
-mandatory = true
-versionRange = "[20.2.75-beta,)"
+type = "required"
+versionRange = "[20.4.251,)"
 ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.theatrical]]
 modId = "minecraft"
-mandatory = true
-versionRange = "[1.20.2,1.20.3)"
+type = "required"
+versionRange = "[1.20.4,1.20.5)"
 ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.theatrical]]
 modId = "architectury"
-mandatory = true
-versionRange = "[10.0.15,)"
+type = "required"
+versionRange = "[11.1.17,)"
 ordering = "AFTER"
 side = "BOTH"

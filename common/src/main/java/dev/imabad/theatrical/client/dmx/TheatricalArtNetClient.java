@@ -520,9 +520,11 @@ public class TheatricalArtNetClient extends ArtNetClient {
                             }
                         }
                     });
-            getArtNetServer().setBroadcastAddress("127.0.0.255");
             buildAndSetPollReply();
+            getArtNetServer().setBroadcastAddress("127.0.0.255");
             getArtNetServer().start(networkInterfaceAddress);
+            ArtPollPacket poll = new ArtPollPacket();
+            getArtNetServer().broadcastPacket(poll);
 
             isRunning = true;
         } catch (SocketException | ArtNetException e) {

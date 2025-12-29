@@ -1,5 +1,6 @@
 package dev.imabad.theatrical.blocks.light;
 
+import com.mojang.serialization.MapCodec;
 import dev.imabad.theatrical.TheatricalClient;
 import dev.imabad.theatrical.TheatricalScreen;
 import dev.imabad.theatrical.blockentities.BlockEntities;
@@ -17,10 +18,12 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.HorizontalDirectionalBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.material.MapColor;
@@ -34,15 +37,21 @@ import org.jetbrains.annotations.Nullable;
 
 public class LEDPanelBlock extends BaseLightBlock {
 
-    public LEDPanelBlock() {
-        super(Properties.of()
+    private static final MapCodec<LEDPanelBlock> CODEC = simpleCodec(LEDPanelBlock::new);
+
+    public LEDPanelBlock(BlockBehaviour.Properties properties) {
+        super(properties
                 .requiresCorrectToolForDrops()
                 .strength(3, 3)
                 .noOcclusion()
                 .isValidSpawn(Blocks::neverAllowSpawn)
                 .mapColor(MapColor.METAL)
                 .sound(SoundType.METAL)
-                .pushReaction(PushReaction.DESTROY));
+                .pushReaction(PushReaction.DESTROY), CODEC);
+    }
+
+    public LEDPanelBlock() {
+        this(Properties.of());
     }
 
     @Nullable

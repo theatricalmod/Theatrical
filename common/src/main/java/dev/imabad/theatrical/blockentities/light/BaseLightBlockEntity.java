@@ -9,7 +9,6 @@ import dev.imabad.theatrical.blocks.HangableBlock;
 import dev.imabad.theatrical.blocks.light.BaseLightBlock;
 import dev.imabad.theatrical.config.TheatricalConfig;
 import dev.imabad.theatrical.lighting.LightManager;
-import dev.imabad.theatrical.mixin.ClipContextAccessor;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
@@ -385,8 +384,7 @@ public abstract class BaseLightBlockEntity extends ClientSyncBlockEntity impleme
         double distance = getMaxLightDistance();
         Vec3 vec3 = getBlockPos().getCenter();
         Vec3 vec33 = vec3.add(viewVector.x * distance, viewVector.y * distance, viewVector.z * distance);
-        ClipContext context = new ClipContext(vec3, vec33, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, null);
-        ((ClipContextAccessor) context).setCollisionContext(new LightCollisionContext(getBlockPos()));
+        ClipContext context = new ClipContext(vec3, vec33, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, new LightCollisionContext(getBlockPos()));
         BlockHitResult result = this.level.clip(context);
         BlockPos lightPos = result.getBlockPos();
         if (result.getType() != HitResult.Type.MISS && !result.isInside()) {

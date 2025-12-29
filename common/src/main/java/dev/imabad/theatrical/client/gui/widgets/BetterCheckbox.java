@@ -17,21 +17,16 @@ public class BetterCheckbox extends Checkbox {
     private static final ResourceLocation CHECKBOX_SELECTED_SPRITE = new ResourceLocation("widget/checkbox_selected");
     private static final ResourceLocation CHECKBOX_HIGHLIGHTED_SPRITE = new ResourceLocation("widget/checkbox_highlighted");
     private static final ResourceLocation CHECKBOX_SPRITE = new ResourceLocation("widget/checkbox");
-    private Consumer<Boolean> onChange;
-    public BetterCheckbox(int x, int y, int width, int height, Component message, boolean selected) {
-        super(x, y, width, height, message, selected, false);
+    private boolean showLabel = false;
+
+    public BetterCheckbox(int x, int y, Component message, Font font, int width, int height, boolean selected, Checkbox.OnValueChange onValueChange) {
+        super(x, y, message, font, selected, onValueChange);
+        this.width = width;
+        this.height = height;
     }
 
-    public void setOnChange(Consumer<Boolean> onChange) {
-        this.onChange = onChange;
-    }
-
-    @Override
-    public void onPress() {
-        super.onPress();
-        if(onChange != null){
-            onChange.accept(selected());
-        }
+    public void setShowLabel(boolean showLabel) {
+        this.showLabel = showLabel;
     }
 
     @Override
