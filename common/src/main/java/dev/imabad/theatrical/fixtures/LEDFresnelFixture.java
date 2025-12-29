@@ -22,9 +22,9 @@ public class LEDFresnelFixture extends Fixture {
                     .addSlot(SharedSlots.BLUE)
     );
 
-    private static final ResourceLocation TILT_MODEL = new ResourceLocation(Theatrical.MOD_ID, "block/fresnel/fresnel_body_only");
-    private static final ResourceLocation PAN_MODEL = new ResourceLocation(Theatrical.MOD_ID, "block/fresnel/fresnel_handle_only");
-    private static final ResourceLocation STATIC_MODEL = new ResourceLocation(Theatrical.MOD_ID, "block/fresnel/fresnel_hook_bar");
+    private static final ResourceLocation TILT_MODEL = Theatrical.location( "block/fresnel/fresnel_body_only");
+    private static final ResourceLocation PAN_MODEL = Theatrical.location( "block/fresnel/fresnel_handle_only");
+    private static final ResourceLocation STATIC_MODEL = Theatrical.location( "block/fresnel/fresnel_hook_bar");
 
     private final float[] tiltRotation = new float[]{0.5F, .3F, .39F};
     private final float[] panRotation = new float[]{0.5F, 0F, .41F};

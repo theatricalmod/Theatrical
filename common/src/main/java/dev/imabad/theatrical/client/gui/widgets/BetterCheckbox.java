@@ -13,14 +13,14 @@ import java.util.function.Consumer;
 
 public class BetterCheckbox extends Checkbox {
 
-    private static final ResourceLocation CHECKBOX_SELECTED_HIGHLIGHTED_SPRITE = new ResourceLocation("widget/checkbox_selected_highlighted");
-    private static final ResourceLocation CHECKBOX_SELECTED_SPRITE = new ResourceLocation("widget/checkbox_selected");
-    private static final ResourceLocation CHECKBOX_HIGHLIGHTED_SPRITE = new ResourceLocation("widget/checkbox_highlighted");
-    private static final ResourceLocation CHECKBOX_SPRITE = new ResourceLocation("widget/checkbox");
+    private static final ResourceLocation CHECKBOX_SELECTED_HIGHLIGHTED_SPRITE = ResourceLocation.withDefaultNamespace("widget/checkbox_selected_highlighted");
+    private static final ResourceLocation CHECKBOX_SELECTED_SPRITE = ResourceLocation.withDefaultNamespace("widget/checkbox_selected");
+    private static final ResourceLocation CHECKBOX_HIGHLIGHTED_SPRITE = ResourceLocation.withDefaultNamespace("widget/checkbox_highlighted");
+    private static final ResourceLocation CHECKBOX_SPRITE = ResourceLocation.withDefaultNamespace("widget/checkbox");
     private boolean showLabel = false;
 
     public BetterCheckbox(int x, int y, Component message, Font font, int width, int height, boolean selected, Checkbox.OnValueChange onValueChange) {
-        super(x, y, message, font, selected, onValueChange);
+        super(x, y, width, message, font, selected, onValueChange);
         this.width = width;
         this.height = height;
     }

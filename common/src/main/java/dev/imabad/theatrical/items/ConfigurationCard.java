@@ -26,7 +26,13 @@ public class ConfigurationCard extends Item {
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand usedHand) {
         if(player.isCrouching() && level.isClientSide()){
-            CompoundTag cardData = player.getItemInHand(usedHand).getOrCreateTag();
+            ItemStack itemInHand = player.getItemInHand(usedHand);
+            ConfigurationCardData cardData;
+            if(itemInHand.has(DataComponents.CONFIGURATION_CARD_DATA.get())){
+                cardData = itemInHand.get(DataComponents.CONFIGURATION_CARD_DATA.get());
+            } else {
+                cardData = new ConfigurationCardData(null, 0, 0, false, false, false);
+            }
             openUI(cardData);
             return InteractionResultHolder.pass(player.getItemInHand(usedHand));
         }
@@ -34,14 +40,15 @@ public class ConfigurationCard extends Item {
     }
 
     @Environment(EnvType.CLIENT)
-    private static void openUI(CompoundTag data){
+    private static void openUI(ConfigurationCardData data){
         Minecraft.getInstance().setScreen(new ConfigurationCardScreen(data));
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag isAdvanced) {
-        super.appendHoverText(stack, level, tooltipComponents, isAdvanced);
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
+        super.appendHoverText(stack, context, tooltipComponents, tooltipFlag);
         tooltipComponents.add(Component.translatable("item.configurationcard.description.1"));
         tooltipComponents.add(Component.translatable("item.configurationcard.description.2"));
     }
+
 }

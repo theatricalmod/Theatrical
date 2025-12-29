@@ -1,6 +1,7 @@
 package dev.imabad.theatrical.client.dmx;
 
 import dev.imabad.theatrical.util.UUIDUtil;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.SavedData;
@@ -29,7 +30,7 @@ public class ArtNetToNetworkClientData extends SavedData {
         return INSTANCE;
     }
 
-    public static ArtNetToNetworkClientData read(CompoundTag tag) {
+    public static ArtNetToNetworkClientData read(CompoundTag tag, HolderLookup.Provider registries) {
         ArtNetToNetworkClientData data = new ArtNetToNetworkClientData();
         if(tag.contains("networkId")) {
             data.setNetworkId(tag.getUUID("networkId"));
@@ -50,8 +51,8 @@ public class ArtNetToNetworkClientData extends SavedData {
     }
 
     @Override
-    public CompoundTag save(CompoundTag compoundTag) {
-        compoundTag.putUUID("networkId", networkId);
-        return compoundTag;
+    public CompoundTag save(CompoundTag tag, HolderLookup.Provider registries) {
+        tag.putUUID("networkId", networkId);
+        return tag;
     }
 }

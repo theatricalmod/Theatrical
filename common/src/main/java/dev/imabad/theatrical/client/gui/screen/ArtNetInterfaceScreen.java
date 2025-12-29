@@ -2,7 +2,6 @@ package dev.imabad.theatrical.client.gui.screen;
 
 import dev.imabad.theatrical.Theatrical;
 import dev.imabad.theatrical.blockentities.interfaces.ArtNetInterfaceBlockEntity;
-import dev.imabad.theatrical.net.UpdateArtNetInterface;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
@@ -11,7 +10,7 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 
 public class ArtNetInterfaceScreen extends Screen {
-    private final ResourceLocation GUI = new ResourceLocation(Theatrical.MOD_ID, "textures/gui/blank.png");
+    private final ResourceLocation GUI = Theatrical.location( "textures/gui/blank.png");
 
     private final int imageWidth;
     private final int imageHeight;
@@ -56,7 +55,7 @@ public class ArtNetInterfaceScreen extends Screen {
             if (dmx > 512 || dmx < 0) {
                 return;
             }
-            new UpdateArtNetInterface(be.getBlockPos(), ipAddress.getValue(), dmx).sendToServer();
+//            new UpdateArtNetInterface(be.getBlockPos(), ipAddress.getValue(), dmx).sendToServer();
         } catch(NumberFormatException ignored) {
             //We need a nicer way to show that this is invalid?
         }

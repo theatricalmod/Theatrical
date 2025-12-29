@@ -3,6 +3,7 @@ package dev.imabad.theatrical;
 import dev.architectury.event.events.common.CommandRegistrationEvent;
 import dev.architectury.event.events.common.LifecycleEvent;
 import dev.architectury.event.events.common.PlayerEvent;
+import dev.architectury.networking.NetworkManager;
 import dev.architectury.platform.Platform;
 import dev.architectury.registry.CreativeTabRegistry;
 import dev.architectury.registry.registries.DeferredRegister;
@@ -15,6 +16,7 @@ import dev.imabad.theatrical.commands.NetworkCommand;
 import dev.imabad.theatrical.config.ConfigHandler;
 import dev.imabad.theatrical.config.TheatricalConfig;
 import dev.imabad.theatrical.dmx.DMXDevice;
+import dev.imabad.theatrical.items.DataComponents;
 import dev.imabad.theatrical.networks.TheatricalNetwork;
 import dev.imabad.theatrical.networks.TheatricalNetworkData;
 import dev.imabad.theatrical.fixtures.Fixtures;
@@ -65,6 +67,7 @@ public class Theatrical {
         registerArgument(argTypes, SingletonArgumentInfo.contextFree(MemberRoleArgument::memberRole), "member_role", MemberRoleArgument.class);
         argTypes.register();
         dev.imabad.theatrical.items.Items.ITEMS.register();
+        DataComponents.DATA_COMPONENTS.register();
         PlayerEvent.PLAYER_JOIN.register((event) -> {
             TheatricalNetworkData instance = TheatricalNetworkData.getInstance(event.server.overworld());
             for (TheatricalNetwork network : instance.getNetworksForPlayer(event.connection.player.getUUID())) {
@@ -75,7 +78,7 @@ public class Theatrical {
                                 consumer.getChannelCount(), consumer.getDeviceTypeId(), consumer.getActivePersonality(), consumer.getModelName(),
                                 consumer.getFixtureId()));
                     });
-                    new ListConsumers(universe, devices).sendTo(event.connection.player);
+                    NetworkManager.sendToPlayer(event.connection.player, new ListConsumers(universe, devices));
                 }
             }
         });
@@ -91,7 +94,11 @@ public class Theatrical {
 
     private static void registerArgument(DeferredRegister<ArgumentTypeInfo<?, ?>> argTypes,
                                          ArgumentTypeInfo<?, ?> serializer, String id, Class<?> clazz) {
-        argTypes.register(new ResourceLocation(Theatrical.MOD_ID, id), () -> serializer);
+        argTypes.register(Theatrical.location( id), () -> serializer);
         ArgumentTypeInfosAccessor.classMap().put(clazz, serializer);
+    }
+
+    public static ResourceLocation location(String path) {
+        return ResourceLocation.fromNamespaceAndPath(MOD_ID, path);
     }
 }

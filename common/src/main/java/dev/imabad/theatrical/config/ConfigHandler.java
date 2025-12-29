@@ -70,7 +70,7 @@ public class ConfigHandler {
             } else {
                 save(config, sideConfig);
             }
-            ResourceLocation location = new ResourceLocation(modID, side.name().toLowerCase(Locale.ENGLISH));
+            ResourceLocation location = ResourceLocation.fromNamespaceAndPath(modID, side.name().toLowerCase(Locale.ENGLISH));
             registered_configs.put(location, config);
             return config;
         }
@@ -78,7 +78,7 @@ public class ConfigHandler {
     }
 
     public void saveConfig(ConfigSide configSide){
-        ResourceLocation resourceLocation = new ResourceLocation(Theatrical.MOD_ID, configSide.name().toLowerCase(Locale.ENGLISH));
+        ResourceLocation resourceLocation = ResourceLocation.fromNamespaceAndPath(Theatrical.MOD_ID, configSide.name().toLowerCase(Locale.ENGLISH));
         File sideConfig = Paths.get(this.configFolder.toString(), Theatrical.MOD_ID + "-" + configSide.name().toLowerCase(Locale.ENGLISH) + ".yml").toFile();
         save(registered_configs.get(resourceLocation), sideConfig);
     }

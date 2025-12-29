@@ -91,8 +91,8 @@ public class BasicLightingConsoleRenderer implements BlockEntityRenderer<BasicLi
         stack.pushPose();
         Matrix4f m = stack.last().pose();
         stack.translate(x / 16D, 3 / 16D,  y / 16D);
-        vertexBuilder.vertex(m, 0, 0, 0).color(0, 0, 0, 255).normal(0, 0, 0).endVertex();
-        vertexBuilder.vertex(m, 0, 0, -(3 / 16F)).color(0, 0, 0, 255).normal(0, 0, 0).endVertex();
+        vertexBuilder.addVertex(m, 0, 0, 0).setColor(0, 0, 0, 255).setNormal(0, 0, 0);
+        vertexBuilder.addVertex(m, 0, 0, -(3 / 16F)).setColor(0, 0, 0, 255).setNormal(0, 0, 0);
         stack.popPose();
     }
 
@@ -105,40 +105,40 @@ public class BasicLightingConsoleRenderer implements BlockEntityRenderer<BasicLi
         stack.translate((x / 16D) - width / 2, 3 / 16D, (baseY + faderY) / 16D);
 
         //right
-        builder.vertex(m, width, height, 0).color(0, 0, 0,255).endVertex();
-        builder.vertex(m, width, height, width).color(0, 0, 0,255).endVertex();
-        builder.vertex(m, width, 0, width).color(0, 0, 0,255).endVertex();
-        builder.vertex(m, width, 0, 0).color(0, 0, 0,255).endVertex();
+        builder.addVertex(m, width, height, 0).setColor(0, 0, 0,255);
+        builder.addVertex(m, width, height, width).setColor(0, 0, 0,255);
+        builder.addVertex(m, width, 0, width).setColor(0, 0, 0,255);
+        builder.addVertex(m, width, 0, 0).setColor(0, 0, 0,255);
 
         //front
-        builder.vertex(m, 0, 0, width).color(0, 0, 0,255).endVertex();
-        builder.vertex(m, width, 0, width).color(0, 0, 0,255).endVertex();
-        builder.vertex(m, width, height, width).color(0, 0, 0,255).endVertex();
-        builder.vertex(m, 0, height, width).color(0, 0, 0,255).endVertex();
+        builder.addVertex(m, 0, 0, width).setColor(0, 0, 0,255);
+        builder.addVertex(m, width, 0, width).setColor(0, 0, 0,255);
+        builder.addVertex(m, width, height, width).setColor(0, 0, 0,255);
+        builder.addVertex(m, 0, height, width).setColor(0, 0, 0,255);
 
         //left
-        builder.vertex(m, 0, 0, 0).color(0, 0, 0,255).endVertex();
-        builder.vertex(m, 0, 0, width).color(0, 0, 0,255).endVertex();
-        builder.vertex(m, 0, height, width).color(0, 0, 0,255).endVertex();
-        builder.vertex(m, 0, height, 0).color(0, 0, 0,255).endVertex();
+        builder.addVertex(m, 0, 0, 0).setColor(0, 0, 0,255);
+        builder.addVertex(m, 0, 0, width).setColor(0, 0, 0,255);
+        builder.addVertex(m, 0, height, width).setColor(0, 0, 0,255);
+        builder.addVertex(m, 0, height, 0).setColor(0, 0, 0,255);
 
         //back
-        builder.vertex(m, 0, height, 0).color(0, 0, 0,255).endVertex();
-        builder.vertex(m, width, height, 0).color(0, 0, 0,255).endVertex();
-        builder.vertex(m, width, 0, 0).color(0, 0, 0,255).endVertex();
-        builder.vertex(m, 0, 0, 0).color(0, 0, 0,255).endVertex();
+        builder.addVertex(m, 0, height, 0).setColor(0, 0, 0,255);
+        builder.addVertex(m, width, height, 0).setColor(0, 0, 0,255);
+        builder.addVertex(m, width, 0, 0).setColor(0, 0, 0,255);
+        builder.addVertex(m, 0, 0, 0).setColor(0, 0, 0,255);
 
         //bottom
-        builder.vertex(m, width, 0, 0).color(0, 0, 0,255).endVertex();
-        builder.vertex(m, width, 0, width).color(0, 0, 0,255).endVertex();
-        builder.vertex(m, 0, 0, width).color(0, 0, 0,255).endVertex();
-        builder.vertex(m, 0, 0, 0).color(0, 0, 0,255).endVertex();
+        builder.addVertex(m, width, 0, 0).setColor(0, 0, 0,255);
+        builder.addVertex(m, width, 0, width).setColor(0, 0, 0,255);
+        builder.addVertex(m, 0, 0, width).setColor(0, 0, 0,255);
+        builder.addVertex(m, 0, 0, 0).setColor(0, 0, 0,255);
 
         //Top
-        builder.vertex(m, 0, height, 0).color(0, 0, 0,255).endVertex();
-        builder.vertex(m, 0, height, width).color(0, 0, 0,255).endVertex();
-        builder.vertex(m, width, height, width).color(0, 0, 0,255).endVertex();
-        builder.vertex(m, width, height, 0).color(0, 0, 0,255).endVertex();
+        builder.addVertex(m, 0, height, 0).setColor(0, 0, 0,255);
+        builder.addVertex(m, 0, height, width).setColor(0, 0, 0,255);
+        builder.addVertex(m, width, height, width).setColor(0, 0, 0,255);
+        builder.addVertex(m, width, height, 0).setColor(0, 0, 0,255);
 
         stack.popPose();
     }

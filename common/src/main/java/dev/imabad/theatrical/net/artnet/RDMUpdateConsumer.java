@@ -2,56 +2,40 @@ package dev.imabad.theatrical.net.artnet;
 
 import ch.bildspur.artnet.rdm.RDMDeviceId;
 import dev.architectury.networking.NetworkManager;
-import dev.architectury.networking.simple.BaseC2SMessage;
-import dev.architectury.networking.simple.MessageType;
 import dev.imabad.theatrical.Theatrical;
 import dev.imabad.theatrical.blockentities.interfaces.RedstoneInterfaceBlockEntity;
 import dev.imabad.theatrical.blockentities.light.BaseDMXConsumerLightBlockEntity;
+import dev.imabad.theatrical.dmx.DMXDevice;
 import dev.imabad.theatrical.networks.TheatricalNetwork;
 import dev.imabad.theatrical.networks.TheatricalNetworkData;
-import dev.imabad.theatrical.net.TheatricalNet;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.core.UUIDUtil;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
 import java.util.UUID;
 
-public class RDMUpdateConsumer extends BaseC2SMessage {
+public record RDMUpdateConsumer(UUID networkId, int universe, int newAddress, RDMDeviceId dmxDevice) implements CustomPacketPayload {
 
-    private final UUID networkId;
-    private final int universe;
-    private final int newAddress;
-    private final RDMDeviceId dmxDevice;
+    public static final CustomPacketPayload.Type<RDMUpdateConsumer> TYPE =
+            new CustomPacketPayload.Type<>(Theatrical.location("rdm_update_consumer"));
 
-    public RDMUpdateConsumer(UUID networkId, int universe, RDMDeviceId dmxDevice, int newAddress){
-        this.networkId = networkId;
-        this.universe = universe;
-        this.dmxDevice = dmxDevice;
-        this.newAddress = newAddress;
-    }
+    public static final StreamCodec<RegistryFriendlyByteBuf, RDMUpdateConsumer> STREAM_CODEC = StreamCodec.composite(
+            UUIDUtil.STREAM_CODEC,
+            RDMUpdateConsumer::networkId,
+            ByteBufCodecs.INT,
+            RDMUpdateConsumer::universe,
+            ByteBufCodecs.INT,
+            RDMUpdateConsumer::newAddress,
+            DMXDevice.RDM_DEVICE_ID_CODEC,
+            RDMUpdateConsumer::dmxDevice,
+            RDMUpdateConsumer::new
+    );
 
-    public RDMUpdateConsumer(FriendlyByteBuf buf){
-        networkId = buf.readUUID();
-        universe = buf.readInt();
-        dmxDevice = new RDMDeviceId(buf.readByteArray(6));
-        newAddress = buf.readInt();
-    }
-
-    @Override
-    public MessageType getType() {
-        return TheatricalNet.RDM_UPDATE_FIXTURE;
-    }
-
-    @Override
-    public void write(FriendlyByteBuf buf) {
-        buf.writeUUID(networkId);
-        buf.writeInt(universe);
-        buf.writeByteArray(dmxDevice.toBytes());
-        buf.writeInt(newAddress);
-    }
-
-    @Override
     public void handle(NetworkManager.PacketContext context) {
         Level level = context.getPlayer().level();
         if(level.getServer() != null ) {
@@ -72,11 +56,8 @@ public class RDMUpdateConsumer extends BaseC2SMessage {
         }
     }
 
-    public int getUniverse() {
-        return universe;
-    }
-
-    public int getNewAddress() {
-        return newAddress;
+    @Override
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
 }

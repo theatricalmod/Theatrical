@@ -4,6 +4,8 @@ import com.mojang.serialization.MapCodec;
 import dev.imabad.theatrical.blockentities.light.BaseDMXConsumerLightBlockEntity;
 import dev.imabad.theatrical.blockentities.light.LightCollisionContext;
 import dev.imabad.theatrical.blocks.HangableBlock;
+import dev.imabad.theatrical.items.ConfigurationCardData;
+import dev.imabad.theatrical.items.DataComponents;
 import dev.imabad.theatrical.networks.TheatricalNetwork;
 import dev.imabad.theatrical.networks.TheatricalNetworkData;
 import dev.imabad.theatrical.items.Items;
@@ -14,6 +16,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -79,38 +82,46 @@ public abstract class BaseLightBlock extends HangableBlock implements EntityBloc
             }
         }
     }
+
+
     @Override
-    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
-        BlockEntity be = level.getBlockEntity(pos);
+    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
         if(!level.isClientSide()) {
+            BlockEntity be = level.getBlockEntity(pos);
             if (be instanceof BaseDMXConsumerLightBlockEntity consumerLightBlockEntity) {
                 if (!consumerLightBlockEntity.getNetworkId().equals(UUIDUtil.NULL)) {
                     TheatricalNetwork network = TheatricalNetworkData.getInstance(level.getServer().overworld()).getNetwork(consumerLightBlockEntity.getNetworkId());
                     if (network != null && !network.members().isMember(player.getUUID())) {
-                        return InteractionResult.FAIL;
+                        return ItemInteractionResult.FAIL;
                     }
                 }
                 if (player.getItemInHand(hand).getItem() == Items.CONFIGURATION_CARD.get()) {
                     ItemStack itemInHand = player.getItemInHand(hand);
-                    CompoundTag tagData = itemInHand.getOrCreateTag();
-                    consumerLightBlockEntity.setNetworkId(tagData.getUUID("network"));
-                    if (tagData.getBoolean("universeEnabled")) {
-                        consumerLightBlockEntity.setUniverse(tagData.getInt("dmxUniverse"));
+                    if(itemInHand.has(DataComponents.CONFIGURATION_CARD_DATA.get())){
+                        ConfigurationCardData data = itemInHand.get(DataComponents.CONFIGURATION_CARD_DATA.get());
+                        consumerLightBlockEntity.setNetworkId(data.network());
+                        if (data.universeEnabled()) {
+                            consumerLightBlockEntity.setUniverse(data.dmxUniverse());
+                        }
+                        if (data.addressEnabled()) {
+                            consumerLightBlockEntity.setChannelStartPoint(data.dmxAddress());
+                        }
+                        if (data.autoIncrement()) {
+                            data = data.increment(consumerLightBlockEntity.getChannelCount());
+                            itemInHand.set(DataComponents.CONFIGURATION_CARD_DATA.get(), data);
+                        }
+                        TheatricalNetworkData instance = TheatricalNetworkData.getInstance(level.getServer().overworld());
+                        player.sendSystemMessage(Component.translatable("item.configurationcard.success",
+                                instance.getNetwork(consumerLightBlockEntity.getNetworkId()).name(),
+                                Integer.toString(consumerLightBlockEntity.getUniverse()),
+                                Integer.toString(consumerLightBlockEntity.getChannelStart()),
+                                Integer.toString(data.dmxAddress())));
+                        return ItemInteractionResult.SUCCESS;
                     }
-                    if (tagData.getBoolean("addressEnabled")) {
-                        consumerLightBlockEntity.setChannelStartPoint(tagData.getInt("dmxAddress"));
-                    }
-                    if (tagData.getBoolean("autoIncrement")) {
-                        tagData.putInt("dmxAddress", tagData.getInt("dmxAddress") + consumerLightBlockEntity.getChannelCount());
-                    }
-                    itemInHand.save(tagData);
-                    TheatricalNetworkData instance = TheatricalNetworkData.getInstance(level.getServer().overworld());
-                    player.sendSystemMessage(Component.translatable("item.configurationcard.success", instance.getNetwork(consumerLightBlockEntity.getNetworkId()).name(), Integer.toString(consumerLightBlockEntity.getUniverse()), Integer.toString(consumerLightBlockEntity.getChannelStart()), Integer.toString(tagData.getInt("dmxAddress"))));
-                    return InteractionResult.SUCCESS;
                 }
-                return InteractionResult.PASS;
+                return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
             }
         }
-        return super.use(state, level, pos, player, hand, hit);
+        return super.useItemOn(stack, state, level, pos, player, hand, hitResult);
     }
 }

@@ -1,49 +1,40 @@
 package dev.imabad.theatrical.net;
 
 import dev.architectury.networking.NetworkManager;
-import dev.architectury.networking.simple.BaseC2SMessage;
-import dev.architectury.networking.simple.MessageType;
+import dev.imabad.theatrical.Theatrical;
 import dev.imabad.theatrical.blockentities.light.BaseLightBlockEntity;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
-public class UpdateFixturePosition extends BaseC2SMessage {
+public record UpdateFixturePosition(BlockPos pos, int tilt, int pan) implements CustomPacketPayload {
 
-    private final BlockPos pos;
-    private final int tilt;
-    private final int pan;
+    public static final CustomPacketPayload.Type<UpdateFixturePosition> TYPE
+            = new CustomPacketPayload.Type<>(Theatrical.location("update_fixture_position"));
 
-    public UpdateFixturePosition(BlockPos blockPos, int tilt, int pan){
-        this.pos = blockPos;
-        this.tilt = tilt;
-        this.pan = pan;
-    }
+    public static final StreamCodec<RegistryFriendlyByteBuf, UpdateFixturePosition> STREAM_CODEC = StreamCodec.composite(
+            BlockPos.STREAM_CODEC,
+            UpdateFixturePosition::pos,
+            ByteBufCodecs.INT,
+            UpdateFixturePosition::tilt,
+            ByteBufCodecs.INT,
+            UpdateFixturePosition::pan,
+            UpdateFixturePosition::new
+    );
 
-    UpdateFixturePosition(FriendlyByteBuf buf){
-        pos = buf.readBlockPos();
-        tilt = buf.readInt();
-        pan = buf.readInt();
-    }
-
-    @Override
-    public MessageType getType() {
-        return TheatricalNet.UPDATE_FIXTURE_POS;
-    }
-
-    @Override
-    public void write(FriendlyByteBuf buf) {
-        buf.writeBlockPos(pos);
-        buf.writeInt(tilt);
-        buf.writeInt(pan);
-    }
-
-    @Override
     public void handle(NetworkManager.PacketContext context) {
         BlockEntity be = context.getPlayer().level().getBlockEntity(pos);
         if(be instanceof BaseLightBlockEntity baseLightBlockEntity){
             baseLightBlockEntity.setPan(pan);
             baseLightBlockEntity.setTilt(tilt);
         }
+    }
+
+    @Override
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
 }

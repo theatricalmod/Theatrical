@@ -1,6 +1,8 @@
 package dev.imabad.theatrical.networks;
 
 import ch.bildspur.artnet.rdm.RDMDeviceId;
+import dev.architectury.networking.NetworkManager;
+import dev.imabad.theatrical.Theatrical;
 import dev.imabad.theatrical.api.dmx.DMXConsumer;
 import dev.imabad.theatrical.dmx.DMXDevice;
 import dev.imabad.theatrical.net.artnet.NotifyConsumerChange;
@@ -26,20 +28,19 @@ public class NetworkDMXManager {
         Map<BlockPos, DMXConsumer> universe = dmxUniverseToNodeMap.computeIfAbsent(consumer.getUniverse(), (uni) -> new ConcurrentHashMap<>());
         universe.put(pos, consumer);
         dmxUniverseToNodeMap.put(consumer.getUniverse(), universe);
-        new NotifyConsumerChange(consumer.getUniverse(),
-                NotifyConsumerChange.ChangeType.ADD,
-                new DMXDevice(
-                        consumer.getDeviceId(), consumer.getChannelStart(), consumer.getChannelCount(),
-                        consumer.getDeviceTypeId(), consumer.getActivePersonality(), consumer.getModelName(), consumer.getFixtureId()))
-                .sendTo(knownSenders);
+        NetworkManager.sendToPlayers(knownSenders,
+                new NotifyConsumerChange(consumer.getUniverse(),
+                        NotifyConsumerChange.ChangeType.ADD,
+                        new DMXDevice(
+                                consumer.getDeviceId(), consumer.getChannelStart(), consumer.getChannelCount(),
+                                consumer.getDeviceTypeId(), consumer.getActivePersonality(), consumer.getModelName(), consumer.getFixtureId())));
     }
 
     public void updateConsumer(DMXConsumer consumer){
-        new NotifyConsumerChange(consumer.getUniverse(),
+        NetworkManager.sendToPlayers(knownSenders, new NotifyConsumerChange(consumer.getUniverse(),
                 NotifyConsumerChange.ChangeType.UPDATE,
                 new DMXDevice(consumer.getDeviceId(), consumer.getChannelStart(), consumer.getChannelCount(),
-                        consumer.getDeviceTypeId(),consumer.getActivePersonality(), consumer.getModelName(), consumer.getFixtureId()))
-                .sendTo(knownSenders);
+                        consumer.getDeviceTypeId(),consumer.getActivePersonality(), consumer.getModelName(), consumer.getFixtureId())));
     }
 
     public void removeConsumer(DMXConsumer consumer, BlockPos pos){
@@ -48,10 +49,9 @@ public class NetworkDMXManager {
         }
         Map<BlockPos, DMXConsumer> universe = dmxUniverseToNodeMap.get(consumer.getUniverse());
         universe.remove(pos);
-        new NotifyConsumerChange(consumer.getUniverse(), NotifyConsumerChange.ChangeType.REMOVE,
-                new DMXDevice(consumer.getDeviceId(), 0, 0,0,
-                        0, "", new ResourceLocation("")))
-                .sendTo(knownSenders);
+        NetworkManager.sendToPlayers(knownSenders, new NotifyConsumerChange(consumer.getUniverse(), NotifyConsumerChange.ChangeType.REMOVE,
+                        new DMXDevice(consumer.getDeviceId(), 0, 0,0,
+                                0, "", Theatrical.location(""))));
     }
     @Nullable
     public Collection<DMXConsumer> getConsumers(int universe){

@@ -1,11 +1,14 @@
 package dev.imabad.theatrical.client.gui.screen;
 
+import dev.architectury.networking.NetworkManager;
 import dev.imabad.theatrical.Theatrical;
 import dev.imabad.theatrical.TheatricalClient;
 import dev.imabad.theatrical.client.gui.widgets.BetterCheckbox;
 import dev.imabad.theatrical.client.gui.widgets.BetterStringWidget;
 import dev.imabad.theatrical.client.gui.widgets.LabeledEditBox;
+import dev.imabad.theatrical.items.ConfigurationCardData;
 import dev.imabad.theatrical.net.ConfigureConfigurationCard;
+import dev.imabad.theatrical.net.UpdateDMXFixture;
 import dev.imabad.theatrical.util.UUIDUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -25,7 +28,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class ConfigurationCardScreen extends Screen {
-    private final ResourceLocation GUI = new ResourceLocation(Theatrical.MOD_ID, "textures/gui/blank.png");
+    private final ResourceLocation GUI = Theatrical.location( "textures/gui/blank.png");
     protected final int imageWidth;
     protected final int imageHeight;
     protected int xCenter;
@@ -35,14 +38,14 @@ public class ConfigurationCardScreen extends Screen {
     private Checkbox autoIncrement;
     private BetterCheckbox enableUniverse, enableAddress;
     private UUID networkId = UUIDUtil.NULL;
-    private final CompoundTag itemData;
-    public ConfigurationCardScreen(CompoundTag itemData) {
+    private final ConfigurationCardData itemData;
+    public ConfigurationCardScreen(ConfigurationCardData itemData) {
         super(Component.translatable("screen.configurationcard"));
         this.imageWidth = 176;
         this.imageHeight = 126;
         this.itemData = itemData;
-        if(itemData.hasUUID("network")) {
-            this.networkId = itemData.getUUID("network");
+        if(itemData.network() != null) {
+            this.networkId = itemData.network();
         }
     }
     @Override
@@ -52,14 +55,10 @@ public class ConfigurationCardScreen extends Screen {
         layout.defaultCellSetting().alignHorizontallyCenter().padding(10);
         layout.addChild(new BetterStringWidget(Component.translatable("screen.configurationcard"), this.font).setColor(4210752).setShadow(false), 1, 1, 1, 4);
         this.dmxUniverse = new LabeledEditBox(this.font, xCenter, yCenter, 50, 10, Component.translatable("artneti.dmxUniverse"));
-        if(itemData.contains("dmxUniverse")){
-            this.dmxUniverse.setValue(Integer.toString(itemData.getInt("dmxUniverse")));
-        } else {
-            this.dmxUniverse.setValue("0");
-        }
+        this.dmxUniverse.setValue(Integer.toString(itemData.dmxUniverse()));
         layout.addChild(dmxUniverse, 2, 1, 1, 4,  LayoutSettings.defaults().alignHorizontallyCenter().alignVerticallyMiddle().padding(10));
         enableUniverse = new BetterCheckbox(xCenter, yCenter, Component.translatable("artneti.dmxUniverse.enable"),
-                font, 10, 10, itemData.getBoolean("universeEnabled"), (aBoolean, value) -> {
+                font, 10, 10, itemData.universeEnabled(), (aBoolean, value) -> {
             dmxUniverse.active = value;
         });
         dmxUniverse.active = enableUniverse.selected();
@@ -80,21 +79,17 @@ public class ConfigurationCardScreen extends Screen {
                         }), 3, 1, 1, 4);
 
         this.dmxAddress = new LabeledEditBox(this.font, xCenter, yCenter, 50, 10, Component.translatable("fixture.dmxStart"));
-        if(itemData.contains("dmxAddress")){
-            this.dmxAddress.setValue(Integer.toString(itemData.getInt("dmxAddress")));
-        }else {
-            this.dmxAddress.setValue("0");
-        }
+        this.dmxAddress.setValue(Integer.toString(itemData.dmxAddress()));
         layout.addChild(dmxAddress, 4, 1, 1, 4, LayoutSettings.defaults().alignHorizontallyCenter().alignVerticallyMiddle().padding(10));
 
         enableAddress = new BetterCheckbox(xCenter, yCenter, Component.translatable("artneti.dmxAddress.enable"),
-                font, 10, 10, itemData.getBoolean("addressEnabled"),
+                font, 10, 10, itemData.addressEnabled(),
                 ((checkbox, bl) -> dmxAddress.active = bl));
         dmxAddress.active = enableAddress.selected();
         layout.addChild(enableAddress, 4, 2, 1, 1,  LayoutSettings.defaults().alignHorizontallyLeft().alignVerticallyMiddle());
         this.autoIncrement = Checkbox.builder(Component.translatable("screen.configurationcard.autoincrement"), font)
                 .pos(xCenter, yCenter)
-                .selected(itemData.getBoolean("autoIncrement"))
+                .selected(itemData.autoIncrement())
                 .build();
 
         layout.addChild(autoIncrement, 5, 1, 1, 4);
@@ -130,7 +125,7 @@ public class ConfigurationCardScreen extends Screen {
             if (universe < 0) {
                 return;
             }
-            new ConfigureConfigurationCard(networkId, dmx, universe, autoIncrement.selected(), enableUniverse.selected(), enableAddress.selected()).sendToServer();
+            NetworkManager.sendToServer( new ConfigureConfigurationCard(networkId, dmx, universe, autoIncrement.selected(), enableUniverse.selected(), enableAddress.selected()));
             Minecraft.getInstance().setScreen(null);
         } catch(NumberFormatException ignored) {
             //We need a nicer way to show that this is invalid?

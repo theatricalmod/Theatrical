@@ -2,6 +2,7 @@ package dev.imabad.theatrical.blocks.light;
 
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import dev.architectury.networking.NetworkManager;
 import dev.imabad.theatrical.TheatricalClient;
 import dev.imabad.theatrical.TheatricalScreen;
 import dev.imabad.theatrical.blockentities.BlockEntities;
@@ -34,6 +35,7 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.EntityCollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.apache.logging.log4j.core.jmx.Server;
 import org.jetbrains.annotations.Nullable;
 
 public class MovingWashBlock extends BaseLightBlock {
@@ -106,22 +108,20 @@ public class MovingWashBlock extends BaseLightBlock {
     }
 
     @Override
-    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
-        if(super.use(state, level, pos, player, hand, hit) == InteractionResult.PASS) {
-            if (level.isClientSide) {
-                if (player.isCrouching()) {
-                    if (TheatricalClient.DEBUG_BLOCKS.contains(pos)) {
-                        TheatricalClient.DEBUG_BLOCKS.remove(pos);
-                    } else {
-                        TheatricalClient.DEBUG_BLOCKS.add(pos);
-                    }
-                    return InteractionResult.SUCCESS;
+    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
+        if (level.isClientSide) {
+            if (player.isCrouching()) {
+                if (TheatricalClient.DEBUG_BLOCKS.contains(pos)) {
+                    TheatricalClient.DEBUG_BLOCKS.remove(pos);
+                } else {
+                    TheatricalClient.DEBUG_BLOCKS.add(pos);
                 }
-            } else {
-                new OpenScreen(pos, TheatricalScreen.GENERIC_DMX).sendTo((ServerPlayer) player);
+                return InteractionResult.SUCCESS;
             }
+        } else {
+            NetworkManager.sendToPlayer((ServerPlayer) player, new OpenScreen(pos, TheatricalScreen.GENERIC_DMX));
         }
-        return InteractionResult.SUCCESS;
+        return super.useWithoutItem(state, level, pos, player, hitResult);
     }
 
     @Override

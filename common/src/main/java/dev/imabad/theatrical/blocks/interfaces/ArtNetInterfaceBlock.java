@@ -48,16 +48,6 @@ public class ArtNetInterfaceBlock extends Block implements EntityBlock {
     }
 
     @Override
-    @Environment(EnvType.CLIENT)
-    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
-        if(level.isClientSide){
-            ArtNetInterfaceBlockEntity be = (ArtNetInterfaceBlockEntity)level.getBlockEntity(pos);
-            Minecraft.getInstance().setScreen(new ArtNetInterfaceScreen(be));
-        }
-        return InteractionResult.SUCCESS;
-    }
-
-    @Override
     public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
         if(!level.isClientSide){
             BlockEntity be = level.getBlockEntity(pos);

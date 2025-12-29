@@ -1,8 +1,10 @@
 package dev.imabad.theatrical.networks;
 
+import dev.architectury.networking.NetworkManager;
 import dev.architectury.utils.GameInstance;
 import dev.imabad.theatrical.net.artnet.NotifyNetworks;
 import dev.imabad.theatrical.networks.members.TheatricalNetworkMemberRole;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
@@ -10,6 +12,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.SavedData;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -76,7 +79,7 @@ public class TheatricalNetworkData extends SavedData {
 
     public void notifyNetworks(Player player){
         Map<UUID, String> collect = getNetworksForPlayer(player.getUUID()).stream().collect(Collectors.toMap(TheatricalNetwork::id, TheatricalNetwork::name));
-        new NotifyNetworks(collect).sendTo((ServerPlayer) player);
+        NetworkManager.sendToPlayer((ServerPlayer) player, new NotifyNetworks(collect));
     }
 
     public List<TheatricalNetwork> getNetworksForPlayer(UUID player){
@@ -99,7 +102,7 @@ public class TheatricalNetworkData extends SavedData {
         return first.orElseGet(() -> createNetwork(player));
     }
 
-    public static TheatricalNetworkData read(CompoundTag tag) {
+    public static TheatricalNetworkData read(CompoundTag tag, HolderLookup.Provider registries) {
         TheatricalNetworkData data = new TheatricalNetworkData();
         ListTag networksTag = tag.getList("networks", Tag.TAG_COMPOUND);
         for (Tag networkTag : networksTag) {
@@ -109,13 +112,14 @@ public class TheatricalNetworkData extends SavedData {
         return data;
     }
 
+
     @Override
-    public CompoundTag save(CompoundTag compoundTag) {
+    public @NotNull CompoundTag save(CompoundTag tag, HolderLookup.Provider registries) {
         ListTag networksTag = new ListTag();
         for (TheatricalNetwork value : networks.values()) {
             networksTag.add(value.save());
         }
-        compoundTag.put("networks", networksTag);
-        return compoundTag;
+        tag.put("networks", networksTag);
+        return tag;
     }
 }

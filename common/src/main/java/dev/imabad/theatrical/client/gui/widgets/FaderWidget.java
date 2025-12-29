@@ -9,7 +9,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
 public class FaderWidget extends AbstractWidget {
-    private static final ResourceLocation background = new ResourceLocation(Theatrical.MOD_ID,
+    private static final ResourceLocation background = Theatrical.location(
             "textures/gui/lighting_console.png");
 
     private final int channel;

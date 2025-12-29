@@ -1,40 +1,28 @@
 package dev.imabad.theatrical.net;
 
 import dev.architectury.networking.NetworkManager;
-import dev.architectury.networking.simple.BaseC2SMessage;
-import dev.architectury.networking.simple.MessageType;
+import dev.imabad.theatrical.Theatrical;
 import dev.imabad.theatrical.blockentities.control.BasicLightingDeskBlockEntity;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
-public class ControlMoveStep extends BaseC2SMessage {
+public record ControlMoveStep(BlockPos blockPos, boolean forward) implements CustomPacketPayload {
 
-    private final BlockPos blockPos;
-    private final boolean forward;
+    public static final CustomPacketPayload.Type<ControlMoveStep> TYPE
+            = new CustomPacketPayload.Type<>(Theatrical.location("control_move_step"));
 
-    public ControlMoveStep(BlockPos pos, boolean forward) {
-        this.blockPos = pos;
-        this.forward = forward;
-    }
+    public static final StreamCodec<RegistryFriendlyByteBuf, ControlMoveStep> STREAM_CODEC = StreamCodec.composite(
+            BlockPos.STREAM_CODEC,
+            ControlMoveStep::blockPos,
+            ByteBufCodecs.BOOL,
+            ControlMoveStep::forward,
+            ControlMoveStep::new
+    );
 
-    ControlMoveStep(FriendlyByteBuf buf){
-        this.blockPos = buf.readBlockPos();
-        this.forward = buf.readBoolean();
-    }
-
-    @Override
-    public MessageType getType() {
-        return TheatricalNet.CONTROL_MOVE_STEP;
-    }
-
-    @Override
-    public void write(FriendlyByteBuf buf) {
-        buf.writeBlockPos(blockPos);
-        buf.writeBoolean(forward);
-    }
-
-    @Override
     public void handle(NetworkManager.PacketContext context) {
         BlockEntity be = context.getPlayer().level().getBlockEntity(blockPos);
         if(be instanceof BasicLightingDeskBlockEntity lightingDeskBlock){
@@ -44,5 +32,10 @@ public class ControlMoveStep extends BaseC2SMessage {
                 lightingDeskBlock.moveBack();
             }
         }
+    }
+
+    @Override
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
 }

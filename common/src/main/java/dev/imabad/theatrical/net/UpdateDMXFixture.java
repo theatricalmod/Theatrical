@@ -1,45 +1,31 @@
 package dev.imabad.theatrical.net;
 
 import dev.architectury.networking.NetworkManager;
-import dev.architectury.networking.simple.BaseC2SMessage;
-import dev.architectury.networking.simple.MessageType;
+import dev.imabad.theatrical.Theatrical;
 import dev.imabad.theatrical.blockentities.interfaces.RedstoneInterfaceBlockEntity;
 import dev.imabad.theatrical.blockentities.light.BaseDMXConsumerLightBlockEntity;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
-public class UpdateDMXFixture extends BaseC2SMessage {
+public record UpdateDMXFixture(BlockPos pos, int dmxAddress, int dmxUniverse) implements CustomPacketPayload {
 
-    private final BlockPos pos;
-    private final int dmxAddress;
-    private final int dmxUniverse;
+    public static final CustomPacketPayload.Type<UpdateDMXFixture> TYPE =
+            new CustomPacketPayload.Type<>(Theatrical.location("update_dmx_fixture"));
 
-    public UpdateDMXFixture(BlockPos blockPos, int dmxAddress, int dmxUniverse){
-        this.pos = blockPos;
-        this.dmxAddress = dmxAddress;
-        this.dmxUniverse = dmxUniverse;
-    }
+    public static final StreamCodec<RegistryFriendlyByteBuf, UpdateDMXFixture> STREAM_CODEC = StreamCodec.composite(
+            BlockPos.STREAM_CODEC,
+            UpdateDMXFixture::pos,
+            ByteBufCodecs.INT,
+            UpdateDMXFixture::dmxAddress,
+            ByteBufCodecs.INT,
+            UpdateDMXFixture::dmxUniverse,
+            UpdateDMXFixture::new
+    );
 
-    UpdateDMXFixture(FriendlyByteBuf buf){
-        pos = buf.readBlockPos();
-        dmxAddress = buf.readInt();
-        dmxUniverse = buf.readInt();
-    }
-
-    @Override
-    public MessageType getType() {
-        return TheatricalNet.UPDATE_DMX_FIXTURE;
-    }
-
-    @Override
-    public void write(FriendlyByteBuf buf) {
-        buf.writeBlockPos(pos);
-        buf.writeInt(dmxAddress);
-        buf.writeInt(dmxUniverse);
-    }
-
-    @Override
     public void handle(NetworkManager.PacketContext context) {
         BlockEntity be = context.getPlayer().level().getBlockEntity(pos);
         if(be instanceof BaseDMXConsumerLightBlockEntity dmxConsumerLightBlock){
@@ -49,5 +35,10 @@ public class UpdateDMXFixture extends BaseC2SMessage {
             redstoneInterfaceBlockEntity.setChannelStartPoint(dmxAddress);
             redstoneInterfaceBlockEntity.setUniverse(dmxUniverse);
         }
+    }
+
+    @Override
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
 }

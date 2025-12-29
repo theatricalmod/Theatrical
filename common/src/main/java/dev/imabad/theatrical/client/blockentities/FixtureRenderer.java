@@ -116,7 +116,8 @@ public abstract class FixtureRenderer<T extends BaseLightBlockEntity> implements
     }
 
     protected void addVertex(VertexConsumer builder, Matrix4f matrix4f, Matrix3f matrix3f, int r, int g, int b, int a, float x, float y, float z) {
-        builder.vertex(matrix4f, x, y, z).color(r, g, b, a).endVertex();
+        builder.addVertex(matrix4f, x, y, z)
+                        .setColor(r,g,b,a);
     }
 
     @Override
@@ -131,6 +132,6 @@ public abstract class FixtureRenderer<T extends BaseLightBlockEntity> implements
 
     @Override
     public boolean shouldRender(T blockEntity, Vec3 cameraPos) {
-        return true;
+        return Vec3.atCenterOf(blockEntity.getBlockPos()).multiply(1.0, 0.0, 1.0).closerThan(cameraPos.multiply(1.0, 0.0, 1.0), this.getViewDistance());
     }
 }

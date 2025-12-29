@@ -21,7 +21,6 @@ public class ArtNetUniverseConfigurationList extends ObjectSelectionList<ArtNetU
     public ArtNetUniverseConfigurationList(Minecraft minecraft, ArtNetConfigurationScreen screen, int width, int height, Component title) {
         super(minecraft, width, height, height - 55 + 4, 30);
         this.parent = screen;
-        this.setRenderBackground(true);
         this.setRenderHeader(false, 0);
     }
 

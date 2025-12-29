@@ -1,48 +1,39 @@
 package dev.imabad.theatrical.net;
 
 import dev.architectury.networking.NetworkManager;
-import dev.architectury.networking.simple.BaseC2SMessage;
-import dev.architectury.networking.simple.MessageType;
+import dev.imabad.theatrical.Theatrical;
 import dev.imabad.theatrical.blockentities.control.BasicLightingDeskBlockEntity;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
-public class ControlUpdateFader extends BaseC2SMessage {
+public record ControlUpdateFader(BlockPos pos, int fader, int value) implements CustomPacketPayload {
 
-    private final BlockPos blockPos;
-    private final int fader;
-    private final int value;
+    public static final CustomPacketPayload.Type<ControlUpdateFader> TYPE
+            = new CustomPacketPayload.Type<>(Theatrical.location("control_update_fader"));
 
-    public ControlUpdateFader(BlockPos blockPos, int fader, int value) {
-        this.blockPos = blockPos;
-        this.fader = fader;
-        this.value = value;
-    }
+    public static final StreamCodec<RegistryFriendlyByteBuf, ControlUpdateFader> STREAM_CODEC = StreamCodec.composite(
+            BlockPos.STREAM_CODEC,
+            ControlUpdateFader::pos,
+            ByteBufCodecs.INT,
+            ControlUpdateFader::fader,
+            ByteBufCodecs.INT,
+            ControlUpdateFader::value,
+            ControlUpdateFader::new
+    );
 
-    ControlUpdateFader(FriendlyByteBuf buf) {
-        this.blockPos = buf.readBlockPos();
-        this.fader = buf.readInt();
-        this.value = buf.readInt();
-    }
-
-    @Override
-    public MessageType getType() {
-        return TheatricalNet.UPDATE_CONSOLE_FADER;
-    }
-
-    @Override
-    public void write(FriendlyByteBuf buf) {
-        buf.writeBlockPos(blockPos);
-        buf.writeInt(fader);
-        buf.writeInt(value);
-    }
-
-    @Override
     public void handle(NetworkManager.PacketContext context) {
-        BlockEntity be = context.getPlayer().level().getBlockEntity(blockPos);
+        BlockEntity be = context.getPlayer().level().getBlockEntity(pos);
         if(be instanceof BasicLightingDeskBlockEntity lightingDeskBlock){
             lightingDeskBlock.setFader(fader, value);
         }
+    }
+
+    @Override
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
 }

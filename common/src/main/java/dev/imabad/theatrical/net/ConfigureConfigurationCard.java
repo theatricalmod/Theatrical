@@ -1,60 +1,42 @@
 package dev.imabad.theatrical.net;
 
 import dev.architectury.networking.NetworkManager;
-import dev.architectury.networking.simple.BaseC2SMessage;
-import dev.architectury.networking.simple.MessageType;
+import dev.imabad.theatrical.Theatrical;
+import dev.imabad.theatrical.items.ConfigurationCardData;
+import dev.imabad.theatrical.items.DataComponents;
 import dev.imabad.theatrical.items.Items;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.UUID;
 
-public class ConfigureConfigurationCard extends BaseC2SMessage {
+public record ConfigureConfigurationCard(UUID network, int dmxAddress,
+                                         int dmxUniverse, boolean autoIncrement,
+                                         boolean universeEnabled, boolean addressEnabled) implements CustomPacketPayload {
 
-    private final UUID network;
-    private final int dmxAddress;
-    private final int dmxUniverse;
-    private final boolean autoIncrement;
-    private final boolean universeEnabled;
-    private final boolean addressEnabled;
+    public static final CustomPacketPayload.Type<ConfigureConfigurationCard> TYPE
+            = new CustomPacketPayload.Type<>(Theatrical.location("configure_configuration_card"));
 
-    public ConfigureConfigurationCard(UUID network, int dmxAddress, int dmxUniverse, boolean autoIncrement,  boolean universeEnabled, boolean addressEnabled) {
-        this.network = network;
-        this.dmxAddress = dmxAddress;
-        this.dmxUniverse = dmxUniverse;
-        this.autoIncrement = autoIncrement;
-        this.universeEnabled = universeEnabled;
-        this.addressEnabled = addressEnabled;
+    public static final StreamCodec<RegistryFriendlyByteBuf, ConfigureConfigurationCard> STREAM_CODEC = StreamCodec.ofMember(ConfigureConfigurationCard::encode, ConfigureConfigurationCard::new);
+
+    ConfigureConfigurationCard(FriendlyByteBuf buf) {
+        this(buf.readUUID(), buf.readInt(), buf.readInt(), buf.readBoolean(), buf.readBoolean(), buf.readBoolean());
     }
 
-    public ConfigureConfigurationCard(FriendlyByteBuf buf){
-        this.network = buf.readUUID();
-        this.dmxAddress = buf.readInt();
-        this.dmxUniverse = buf.readInt();
-        this.autoIncrement = buf.readBoolean();
-        this.universeEnabled = buf.readBoolean();
-        this.addressEnabled = buf.readBoolean();
+    private void encode(FriendlyByteBuf out) {
+        out.writeUUID(network);
+        out.writeInt(dmxAddress);
+        out.writeInt(dmxUniverse);
+        out.writeBoolean(autoIncrement);
+        out.writeBoolean(universeEnabled);
+        out.writeBoolean(addressEnabled);
     }
 
-    @Override
-    public MessageType getType() {
-        return TheatricalNet.CONFIGURE_CONFIGURATION_CARD;
-    }
-
-    @Override
-    public void write(FriendlyByteBuf buf) {
-        buf.writeUUID(network);
-        buf.writeInt(dmxAddress);
-        buf.writeInt(dmxUniverse);
-        buf.writeBoolean(autoIncrement);
-        buf.writeBoolean(universeEnabled);
-        buf.writeBoolean(addressEnabled);
-    }
-
-    @Override
     public void handle(NetworkManager.PacketContext context) {
         context.queue(() -> {
             Player player = context.getPlayer();
@@ -65,15 +47,21 @@ public class ConfigureConfigurationCard extends BaseC2SMessage {
                 itemStack = player.getItemInHand(InteractionHand.OFF_HAND);
             }
             if(itemStack != null){
-                CompoundTag dataTag = itemStack.getOrCreateTag();
-                dataTag.putUUID("network", network);
-                dataTag.putInt("dmxUniverse", dmxUniverse);
-                dataTag.putInt("dmxAddress", dmxAddress);
-                dataTag.putBoolean("autoIncrement", autoIncrement);
-                dataTag.putBoolean("universeEnabled", universeEnabled);
-                dataTag.putBoolean("addressEnabled", addressEnabled);
-                itemStack.save(dataTag);
+                ConfigurationCardData data = new ConfigurationCardData(
+                        network,
+                        dmxUniverse,
+                        dmxAddress,
+                        autoIncrement,
+                        universeEnabled,
+                        addressEnabled
+                );
+                itemStack.set(DataComponents.CONFIGURATION_CARD_DATA.get(), data);
             }
         });
+    }
+
+    @Override
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
 }

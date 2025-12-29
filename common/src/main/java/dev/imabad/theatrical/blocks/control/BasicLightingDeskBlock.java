@@ -1,5 +1,6 @@
 package dev.imabad.theatrical.blocks.control;
 
+import dev.architectury.networking.NetworkManager;
 import dev.imabad.theatrical.TheatricalScreen;
 import dev.imabad.theatrical.blockentities.BlockEntities;
 import dev.imabad.theatrical.blockentities.control.BasicLightingDeskBlockEntity;
@@ -13,7 +14,9 @@ import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -94,7 +97,7 @@ public class BasicLightingDeskBlock extends Block implements EntityBlock {
     }
 
     @Override
-    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
         if(!level.isClientSide){
             BasicLightingDeskBlockEntity be = (BasicLightingDeskBlockEntity) level.getBlockEntity(pos);
             if(be.getNetworkId() != UUIDUtil.NULL){
@@ -103,10 +106,11 @@ public class BasicLightingDeskBlock extends Block implements EntityBlock {
                     return InteractionResult.FAIL;
                 }
             }
-            new OpenScreen(pos, TheatricalScreen.BASIC_LIGHTING_DESK).sendTo((ServerPlayer) player);
+            NetworkManager.sendToPlayer((ServerPlayer) player, new OpenScreen(pos, TheatricalScreen.BASIC_LIGHTING_DESK));
         }
-        return InteractionResult.SUCCESS;
+        return super.useWithoutItem(state, level, pos, player, hitResult);
     }
+
     public void neighborChanged(BlockState state, Level level, BlockPos pos, Block neighborBlock, BlockPos neighborPos, boolean movedByPiston) {
         if (!level.isClientSide) {
             boolean powered=level.hasNeighborSignal(pos);

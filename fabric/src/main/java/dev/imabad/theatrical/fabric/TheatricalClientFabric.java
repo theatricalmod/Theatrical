@@ -37,7 +37,8 @@ public class TheatricalClientFabric implements ClientModInitializer {
     }
 
     private void renderWorldLastFabric(WorldRenderContext context){
-        TheatricalClient.renderWorldLast(context.matrixStack(), context.projectionMatrix(), context.camera(), context.tickDelta());
+        TheatricalClient.renderWorldLast(context.matrixStack(), context.projectionMatrix(), context.camera(),
+                context.tickCounter().getGameTimeDeltaPartialTick(false));
     }
 
 }

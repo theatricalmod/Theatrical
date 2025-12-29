@@ -1,6 +1,7 @@
 package dev.imabad.theatrical.blocks.light;
 
 import com.mojang.serialization.MapCodec;
+import dev.architectury.networking.NetworkManager;
 import dev.imabad.theatrical.TheatricalClient;
 import dev.imabad.theatrical.TheatricalScreen;
 import dev.imabad.theatrical.blockentities.BlockEntities;
@@ -118,21 +119,20 @@ public class FresnelBlock extends BaseLightBlock {
     }
 
     @Override
-    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
-        if(super.use(state, level, pos, player, hand, hit) == InteractionResult.PASS) {
-            if (!level.isClientSide) {
-                if (player.isCrouching()) {
-                    if (TheatricalClient.DEBUG_BLOCKS.contains(pos)) {
-                        TheatricalClient.DEBUG_BLOCKS.remove(pos);
-                    } else {
-                        TheatricalClient.DEBUG_BLOCKS.add(pos);
-                    }
-                    return InteractionResult.SUCCESS;
+    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
+        if (level.isClientSide) {
+            if (player.isCrouching()) {
+                if (TheatricalClient.DEBUG_BLOCKS.contains(pos)) {
+                    TheatricalClient.DEBUG_BLOCKS.remove(pos);
+                } else {
+                    TheatricalClient.DEBUG_BLOCKS.add(pos);
                 }
-                new OpenScreen(pos, TheatricalScreen.GENERIC_PAN_TILT).sendTo((ServerPlayer) player);
+                return InteractionResult.SUCCESS;
             }
+        } else {
+            NetworkManager.sendToPlayer((ServerPlayer) player, new OpenScreen(pos, TheatricalScreen.GENERIC_PAN_TILT));
         }
-        return InteractionResult.SUCCESS;
+        return super.useWithoutItem(state, level, pos, player, hitResult);
     }
 
     @Override

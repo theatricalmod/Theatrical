@@ -37,17 +37,17 @@ public class DataEvent {
         protected void registerStatesAndModels() {
             simpleBlock(Blocks.ART_NET_INTERFACE.get());
             simpleBlock(Blocks.REDSTONE_INTERFACE.get());
-            ModelFile.ExistingModelFile trussModel = models().getExistingFile(new ResourceLocation("theatrical:block/truss"));
+            ModelFile.ExistingModelFile trussModel = models().getExistingFile(ResourceLocation.tryParse("theatrical:block/truss"));
             axisBlock(Blocks.TRUSS_BLOCK.get(), trussModel, trussModel);
-            horizontalBlock(Blocks.BASIC_LIGHTING_DESK.get(), models().getExistingFile(new ResourceLocation("theatrical:block/lighting_console")));
+            horizontalBlock(Blocks.BASIC_LIGHTING_DESK.get(), models().getExistingFile(ResourceLocation.tryParse("theatrical:block/lighting_console")));
             getVariantBuilder(Blocks.TANK_TRAP.get()).forAllStates(blockState -> {
-                ModelFile file = models().getExistingFile(new ResourceLocation("theatrical:block/tank_trap"));
+                ModelFile file = models().getExistingFile(ResourceLocation.tryParse("theatrical:block/tank_trap"));
                 if(blockState.getValue(TankTrapBlock.HAS_PIPE)){
-                    file = models().getExistingFile(new ResourceLocation("theatrical:block/tank_trap_with_pipe"));
+                    file = models().getExistingFile(ResourceLocation.tryParse("theatrical:block/tank_trap_with_pipe"));
                 }
                 return ConfiguredModel.builder().modelFile(file).build();
             });
-//            horizontalBlock(Blocks.PIPE_BLOCK.get(), new ModelFile.UncheckedModelFile(new ResourceLocation("theatrical:block/pipe")));
+//            horizontalBlock(Blocks.PIPE_BLOCK.get(), new ModelFile.UncheckedModelFile(ResourceLocation.tryParse("theatrical:block/pipe")));
         }
 
     }
@@ -60,18 +60,18 @@ public class DataEvent {
 
         @Override
         protected void registerModels() {
-            cubeAll(Blocks.ART_NET_INTERFACE.getId().getPath(), new ResourceLocation(Theatrical.MOD_ID, "block/artnet_interface"));
-            cubeAll(Blocks.REDSTONE_INTERFACE.getId().getPath(), new ResourceLocation(Theatrical.MOD_ID, "block/redstone_interface"));
-            withExistingParent(Blocks.PIPE_BLOCK.getId().getPath(), new ResourceLocation(Theatrical.MOD_ID, "block/vertical_pipe"));
-            withExistingParent(Blocks.TRUSS_BLOCK.getId().getPath(), new ResourceLocation(Theatrical.MOD_ID, "block/truss"));
-            withExistingParent(Blocks.MOVING_LIGHT_BLOCK.getId().getPath(), new ResourceLocation(Theatrical.MOD_ID, "block/moving_light/moving_head_whole"));
-            withExistingParent(Blocks.MOVING_WASH_BLOCK.getId().getPath(), new ResourceLocation(Theatrical.MOD_ID, "block/moving_wash/moving_wash_whole"));
-            withExistingParent(Blocks.LED_FRESNEL.getId().getPath(), new ResourceLocation(Theatrical.MOD_ID, "block/fresnel/fresnel_whole"));
-            withExistingParent(Blocks.TANK_TRAP.getId().getPath(), new ResourceLocation(Theatrical.MOD_ID, "block/tank_trap"));
-            withExistingParent(Blocks.LED_PANEL.getId().getPath(), new ResourceLocation(Theatrical.MOD_ID, "block/led_panel"));
-            withExistingParent(Blocks.BASIC_LIGHTING_DESK.getId().getPath(), new ResourceLocation(Theatrical.MOD_ID, "block/lighting_console"));
+            cubeAll(Blocks.ART_NET_INTERFACE.getId().getPath(), Theatrical.location( "block/artnet_interface"));
+            cubeAll(Blocks.REDSTONE_INTERFACE.getId().getPath(), Theatrical.location( "block/redstone_interface"));
+            withExistingParent(Blocks.PIPE_BLOCK.getId().getPath(), Theatrical.location( "block/vertical_pipe"));
+            withExistingParent(Blocks.TRUSS_BLOCK.getId().getPath(), Theatrical.location( "block/truss"));
+            withExistingParent(Blocks.MOVING_LIGHT_BLOCK.getId().getPath(), Theatrical.location( "block/moving_light/moving_head_whole"));
+            withExistingParent(Blocks.MOVING_WASH_BLOCK.getId().getPath(), Theatrical.location( "block/moving_wash/moving_wash_whole"));
+            withExistingParent(Blocks.LED_FRESNEL.getId().getPath(), Theatrical.location( "block/fresnel/fresnel_whole"));
+            withExistingParent(Blocks.TANK_TRAP.getId().getPath(), Theatrical.location( "block/tank_trap"));
+            withExistingParent(Blocks.LED_PANEL.getId().getPath(), Theatrical.location( "block/led_panel"));
+            withExistingParent(Blocks.BASIC_LIGHTING_DESK.getId().getPath(), Theatrical.location( "block/lighting_console"));
             withExistingParent(Items.CONFIGURATION_CARD.getId().getPath(), mcLoc("item/generated"))
-                    .texture("layer0", new ResourceLocation(Theatrical.MOD_ID, "item/configuration_card"));
+                    .texture("layer0", Theatrical.location( "item/configuration_card"));
         }
     }
 

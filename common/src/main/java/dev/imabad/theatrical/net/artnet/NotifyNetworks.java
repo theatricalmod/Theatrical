@@ -1,50 +1,38 @@
 package dev.imabad.theatrical.net.artnet;
 
 import dev.architectury.networking.NetworkManager;
-import dev.architectury.networking.simple.BaseS2CMessage;
-import dev.architectury.networking.simple.MessageType;
+import dev.imabad.theatrical.Theatrical;
 import dev.imabad.theatrical.TheatricalClient;
-import dev.imabad.theatrical.net.TheatricalNet;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.core.UUIDUtil;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class NotifyNetworks extends BaseS2CMessage {
+public record NotifyNetworks(Map<UUID, String> networks) implements CustomPacketPayload {
 
-    private final Map<UUID, String> networks;
+    public static final CustomPacketPayload.Type<NotifyNetworks> TYPE = new CustomPacketPayload.Type<>(Theatrical.location("notify_networks"));
 
-    public NotifyNetworks(Map<UUID, String> networks) {
-        this.networks = networks;
-    }
+    public static final StreamCodec<RegistryFriendlyByteBuf, NotifyNetworks> STREAM_CODEC = StreamCodec.composite(
+            ByteBufCodecs.map(
+                    HashMap::new,
+                    UUIDUtil.STREAM_CODEC,
+                    ByteBufCodecs.STRING_UTF8
+            ),
+            NotifyNetworks::networks,
+            NotifyNetworks::new
+    );
 
-    public NotifyNetworks(FriendlyByteBuf buf) {
-        networks = new HashMap<>();
-        int count = buf.readInt();
-        for(int i = 0; i < count; i++){
-            String name = buf.readUtf();
-            UUID uuid = buf.readUUID();
-            networks.put(uuid, name);
-        }
-    }
-
-    @Override
-    public MessageType getType() {
-        return TheatricalNet.NOTIFY_NETWORKS;
-    }
-
-    @Override
-    public void write(FriendlyByteBuf buf) {
-        buf.writeInt(networks.size());
-        for (UUID u : networks.keySet()) {
-            buf.writeUtf(networks.get(u));
-            buf.writeUUID(u);
-        }
-    }
-
-    @Override
     public void handle(NetworkManager.PacketContext context) {
         TheatricalClient.getArtNetManager().populateNetworks(networks);
+    }
+
+    @Override
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
 }

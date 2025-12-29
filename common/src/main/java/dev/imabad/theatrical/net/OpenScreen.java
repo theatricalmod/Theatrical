@@ -1,49 +1,32 @@
 package dev.imabad.theatrical.net;
 
 import dev.architectury.networking.NetworkManager;
-import dev.architectury.networking.simple.BaseS2CMessage;
-import dev.architectury.networking.simple.MessageType;
+import dev.imabad.theatrical.Theatrical;
 import dev.imabad.theatrical.TheatricalClient;
 import dev.imabad.theatrical.TheatricalScreen;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 
-public class OpenScreen extends BaseS2CMessage {
+public record OpenScreen(BlockPos pos, TheatricalScreen screen) implements CustomPacketPayload {
 
-    private final BlockPos pos;
-    private final TheatricalScreen screen;
+    public static final CustomPacketPayload.Type<OpenScreen> TYPE = new CustomPacketPayload.Type<>(Theatrical.location("open_screen"));
 
-    public OpenScreen(BlockPos pos, TheatricalScreen screen) {
-        this.pos = pos;
-        this.screen = screen;
-    }
-
-    public OpenScreen(FriendlyByteBuf buf){
-        this.pos = buf.readBlockPos();
-        this.screen = buf.readEnum(TheatricalScreen.class);
-    }
-
-    @Override
-    public MessageType getType() {
-        return TheatricalNet.OPEN_SCREEN;
-    }
+    public static final StreamCodec<RegistryFriendlyByteBuf, OpenScreen> STREAM_CODEC = StreamCodec.composite(
+            BlockPos.STREAM_CODEC,
+            OpenScreen::pos,
+            TheatricalScreen.ID_STREAM_CODEC,
+            OpenScreen::screen,
+            OpenScreen::new
+    );
 
     @Override
-    public void write(FriendlyByteBuf buf) {
-        buf.writeBlockPos(pos);
-        buf.writeEnum(screen);
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
 
-    @Override
     public void handle(NetworkManager.PacketContext context) {
         context.queue(() -> TheatricalClient.handleOpenScreen(this));
-    }
-
-    public BlockPos getPos() {
-        return pos;
-    }
-
-    public TheatricalScreen getScreen() {
-        return screen;
     }
 }

@@ -1,5 +1,6 @@
 package dev.imabad.theatrical.client.gui.screen;
 
+import dev.architectury.networking.NetworkManager;
 import dev.imabad.theatrical.blockentities.light.BaseDMXConsumerLightBlockEntity;
 import dev.imabad.theatrical.client.gui.widgets.BasicSlider;
 import dev.imabad.theatrical.net.UpdateFixturePosition;
@@ -35,7 +36,7 @@ public class GenericManualPanTiltScreen extends GenericDMXConfigurationScreen<Ba
     @Override
     protected void update() {
         super.update();
-        new UpdateFixturePosition(be.getBlockPos(), be.getTilt(), be.getPan()).sendToServer();
+        NetworkManager.sendToServer(new UpdateFixturePosition(be.getBlockPos(), be.getTilt(), be.getPan()));
     }
 
     @Override

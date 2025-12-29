@@ -2,7 +2,6 @@ package dev.imabad.theatrical.fabric;
 
 import dev.imabad.theatrical.Theatrical;
 import dev.imabad.theatrical.TheatricalExpectPlatform;
-import net.fabricmc.fabric.api.client.model.BakedModelManagerHelper;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.minecraft.client.Minecraft;
@@ -21,8 +20,9 @@ public class TheatricalExpectPlatformImpl {
     }
 
     public static BakedModel getBakedModel(ResourceLocation modelLocation){
-        return BakedModelManagerHelper.getModel(Minecraft.getInstance().getModelManager(), modelLocation);
+        return Minecraft.getInstance().getModelManager().getModel(modelLocation);
     }
+
     public static String getModVersion() {
         Optional<ModContainer> modContainer = FabricLoader.getInstance().getModContainer(Theatrical.MOD_ID);
         if(modContainer.isPresent()){

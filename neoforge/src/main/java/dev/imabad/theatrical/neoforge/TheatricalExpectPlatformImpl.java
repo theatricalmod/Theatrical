@@ -4,6 +4,7 @@ import dev.imabad.theatrical.Theatrical;
 import dev.imabad.theatrical.TheatricalExpectPlatform;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.fml.loading.FMLPaths;
 import net.neoforged.fml.loading.LoadingModList;
@@ -20,7 +21,7 @@ public class TheatricalExpectPlatformImpl {
     }
 
     public static BakedModel getBakedModel(ResourceLocation modelLocation){
-        return Minecraft.getInstance().getModelManager().getModel(modelLocation);
+        return Minecraft.getInstance().getModelManager().getModel(ModelResourceLocation.standalone(modelLocation));
     }
     public static String getModVersion() {
         ModFileInfo modFileById = LoadingModList.get().getModFileById(Theatrical.MOD_ID);

@@ -7,6 +7,7 @@ import ch.bildspur.artnet.rdm.RDMCommandClass;
 import ch.bildspur.artnet.rdm.RDMDeviceId;
 import ch.bildspur.artnet.rdm.RDMPacket;
 import ch.bildspur.artnet.rdm.RDMParameter;
+import dev.architectury.networking.NetworkManager;
 import dev.imabad.theatrical.Constants;
 import dev.imabad.theatrical.TheatricalExpectPlatform;
 import dev.imabad.theatrical.api.Fixture;
@@ -53,7 +54,7 @@ public class TheatricalArtNetClient extends ArtNetClient {
         if(manager.getNetworkId() != UUIDUtil.NULL) {
             for (Map.Entry<Integer, UniverseConfig> integerUniverseConfigEntry : TheatricalConfig.INSTANCE.CLIENT.universes.entrySet()) {
                 if (integerUniverseConfigEntry.getValue().enabled) {
-                    new RequestConsumers(manager.getNetworkId(), integerUniverseConfigEntry.getKey()).sendToServer();
+                    NetworkManager.sendToServer(new RequestConsumers(manager.getNetworkId(), integerUniverseConfigEntry.getKey()));
                 }
             }
         }
@@ -65,7 +66,7 @@ public class TheatricalArtNetClient extends ArtNetClient {
         if(manager.getNetworkId() != UUIDUtil.NULL) {
             for (Map.Entry<Integer, UniverseConfig> integerUniverseConfigEntry : TheatricalConfig.INSTANCE.CLIENT.universes.entrySet()) {
                 if (integerUniverseConfigEntry.getValue().enabled) {
-                    new RequestConsumers(manager.getNetworkId(), integerUniverseConfigEntry.getKey()).sendToServer();
+                    NetworkManager.sendToServer(new RequestConsumers(manager.getNetworkId(), integerUniverseConfigEntry.getKey()));
                 }
             }
         }
@@ -184,7 +185,7 @@ public class TheatricalArtNetClient extends ArtNetClient {
                 getInputBuffer().setDmxData((short) subnet, (short) universe, dmxPacket.getDmxData());
                 int networkUniverse = getNetworkUniverse(subnet, universe);
                 if(networkUniverse != -1){
-                    new SendArtNetData(manager.getNetworkId(), networkUniverse, dmxPacket.getDmxData()).sendToServer();
+                    NetworkManager.sendToServer(new SendArtNetData(manager.getNetworkId(), networkUniverse, dmxPacket.getDmxData()));
                 }
                 break;
             }
@@ -459,7 +460,7 @@ public class TheatricalArtNetClient extends ArtNetClient {
                                     setCommandResponse.setParameter(RDMParameter.DMX_START_ADDRESS);
                                     ch.bildspur.artnet.packets.ByteUtils inData = new ch.bildspur.artnet.packets.ByteUtils(rdmPacket.getParameterData());
                                     int newAddress = inData.getInt16(0);
-                                    new RDMUpdateConsumer(manager.getNetworkId(), universe, targetDevice.getDeviceId(), newAddress).sendToServer();
+                                    NetworkManager.sendToServer(new RDMUpdateConsumer(manager.getNetworkId(), universe, newAddress, targetDevice.getDeviceId()));
                                     break;
                                 }
                                 default:

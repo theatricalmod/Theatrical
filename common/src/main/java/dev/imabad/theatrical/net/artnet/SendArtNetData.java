@@ -1,50 +1,34 @@
 package dev.imabad.theatrical.net.artnet;
 
 import dev.architectury.networking.NetworkManager;
-import dev.architectury.networking.simple.BaseC2SMessage;
-import dev.architectury.networking.simple.MessageType;
 import dev.imabad.theatrical.Theatrical;
 import dev.imabad.theatrical.api.dmx.DMXConsumer;
 import dev.imabad.theatrical.networks.TheatricalNetwork;
 import dev.imabad.theatrical.networks.TheatricalNetworkData;
-import dev.imabad.theatrical.net.TheatricalNet;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.core.UUIDUtil;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.world.level.Level;
 
 import java.util.Collection;
 import java.util.UUID;
 
-public class SendArtNetData extends BaseC2SMessage {
+public record SendArtNetData(UUID networkId, int universe, byte[] artNetData) implements CustomPacketPayload {
 
-    private final UUID networkId;
-    private final int universe;
-    private final byte[] artNetData;
+    public static final CustomPacketPayload.Type<SendArtNetData> TYPE = new CustomPacketPayload.Type<>(Theatrical.location("artnet_data"));
 
-    public SendArtNetData(UUID networkId, int universe, byte[] data){
-        this.networkId = networkId;
-        this.universe = universe;
-        artNetData = data;
-    }
+    public static final StreamCodec<RegistryFriendlyByteBuf, SendArtNetData> STREAM_CODEC = StreamCodec.composite(
+            UUIDUtil.STREAM_CODEC,
+            SendArtNetData::networkId,
+            ByteBufCodecs.INT,
+            SendArtNetData::universe,
+            ByteBufCodecs.BYTE_ARRAY,
+            SendArtNetData::artNetData,
+            SendArtNetData::new
+    );
 
-    public SendArtNetData(FriendlyByteBuf buf){
-        networkId = buf.readUUID();
-        universe = buf.readInt();
-        artNetData = buf.readByteArray();
-    }
-
-    @Override
-    public MessageType getType() {
-        return TheatricalNet.SEND_ARTNET_TO_SERVER;
-    }
-
-    @Override
-    public void write(FriendlyByteBuf buf) {
-        buf.writeUUID(networkId);
-        buf.writeInt(universe);
-        buf.writeByteArray(artNetData);
-    }
-
-    @Override
     public void handle(NetworkManager.PacketContext context) {
         Level level = context.getPlayer().level();
         if(level.getServer() != null) {
@@ -65,5 +49,10 @@ public class SendArtNetData extends BaseC2SMessage {
                 Theatrical.LOGGER.info("{} tried to send ArtNet data to a network that doesn't exist.", context.getPlayer().getName().getString());
             }
         }
+    }
+
+    @Override
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
 }

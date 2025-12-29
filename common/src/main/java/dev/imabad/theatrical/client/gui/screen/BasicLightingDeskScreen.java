@@ -1,5 +1,6 @@
 package dev.imabad.theatrical.client.gui.screen;
 
+import dev.architectury.networking.NetworkManager;
 import dev.imabad.theatrical.Theatrical;
 import dev.imabad.theatrical.TheatricalClient;
 import dev.imabad.theatrical.blockentities.control.BasicLightingDeskBlockEntity;
@@ -21,7 +22,7 @@ import java.util.stream.Stream;
 
 public class BasicLightingDeskScreen extends Screen {
 
-    private final ResourceLocation GUI = new ResourceLocation(Theatrical.MOD_ID, "textures/gui/lighting_console.png");
+    private final ResourceLocation GUI = Theatrical.location( "textures/gui/lighting_console.png");
 
     private final int imageWidth;
     private final int imageHeight;
@@ -125,20 +126,21 @@ public class BasicLightingDeskScreen extends Screen {
                 .create(xCenter + 45, yCenter + 130, 150, 20,
                         Component.translatable("screen.artnetconfig.network"), (obj, val) -> {
                             this.networkId = val;
-                            new UpdateNetworkId(be.getBlockPos(), networkId).sendToServer();
+                            NetworkManager.sendToServer(new UpdateNetworkId(be.getBlockPos(), networkId));
                         }));
     }
 
     private void moveStep(boolean forward){
-        new ControlMoveStep(be.getBlockPos(), forward).sendToServer();
+        NetworkManager.sendToServer(new ControlMoveStep(be.getBlockPos(), forward));
     }
 
     private void go(){
-        new ControlGo(be.getBlockPos(), Integer.parseInt(fadeInTime.getValue()), Integer.parseInt(fadeOutTime.getValue())).sendToServer();
+        NetworkManager.sendToServer(new ControlGo(be.getBlockPos(),
+                Integer.parseInt(fadeInTime.getValue()), Integer.parseInt(fadeOutTime.getValue())));
     }
 
     private void mode(){
-        new ControlModeToggle(be.getBlockPos()).sendToServer();
+        NetworkManager.sendToServer(new ControlModeToggle(be.getBlockPos()));
     }
 
     @Override
@@ -147,7 +149,7 @@ public class BasicLightingDeskScreen extends Screen {
             if(widget instanceof FaderWidget fader) {
                 if (fader.isMouseOver(mouseX, mouseY) && fader.isDragging()) {
                     int newVal = fader.updateValue(mouseY);
-                    new ControlUpdateFader(be.getBlockPos(), fader.getChannel(), newVal).sendToServer();
+                    NetworkManager.sendToServer(new ControlUpdateFader(be.getBlockPos(), fader.getChannel(), newVal));
                 }
             }
         });

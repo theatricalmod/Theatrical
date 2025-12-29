@@ -7,6 +7,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
@@ -92,39 +93,37 @@ public class TrussBlock extends RotatedPillarBlock implements SimpleWaterloggedB
     }
 
     @Override
-    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
-        if(!player.getItemInHand(hand).isEmpty()){
-            Item item = player.getItemInHand(hand).getItem();
-            if (item instanceof BlockItem blockItem) {
-                if(blockItem.getBlock() instanceof HangableBlock hangableBlock){
-                    BlockPos offset;
-                    if(hit.getDirection().getAxis() == Direction.Axis.Y){
-                        offset = pos.relative(player.getDirection().getOpposite());
-                    } else {
-                        offset = pos.relative(Direction.DOWN);
-                    }
-                    if(!level.getBlockState(offset).isAir()){
-                        return InteractionResult.FAIL;
-                    }
-                    Direction hangDirection = Direction.UP;
-                    if(hit.getDirection().getAxis() == Direction.Axis.Y){
-                        hangDirection = player.getDirection();
-                    }
-                    level.setBlock(offset, hangableBlock.defaultBlockState()
-                            .setValue(HangableBlock.FACING, player.getDirection())
-                            .setValue(HangableBlock.HANGING, true)
-                            .setValue(HangableBlock.HANG_DIRECTION, hangDirection), Block.UPDATE_CLIENTS);
-                    if (!player.isCreative()) {
-                        if (player.getItemInHand(hand).getCount() > 1) {
-                            player.getItemInHand(hand).setCount(player.getItemInHand(hand).getCount() - 1);
-                        } else {
-                            player.setItemInHand(hand, new ItemStack(Items.AIR));
-                        }
-                    }
-                    return InteractionResult.CONSUME;
+    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+        Item item = player.getItemInHand(hand).getItem();
+        if (item instanceof BlockItem blockItem) {
+            if(blockItem.getBlock() instanceof HangableBlock hangableBlock){
+                BlockPos offset;
+                if(hitResult.getDirection().getAxis() == Direction.Axis.Y){
+                    offset = pos.relative(player.getDirection().getOpposite());
+                } else {
+                    offset = pos.relative(Direction.DOWN);
                 }
+                if(!level.getBlockState(offset).isAir()){
+                    return ItemInteractionResult.FAIL;
+                }
+                Direction hangDirection = Direction.UP;
+                if(hitResult.getDirection().getAxis() == Direction.Axis.Y){
+                    hangDirection = player.getDirection();
+                }
+                level.setBlock(offset, hangableBlock.defaultBlockState()
+                        .setValue(HangableBlock.FACING, player.getDirection())
+                        .setValue(HangableBlock.HANGING, true)
+                        .setValue(HangableBlock.HANG_DIRECTION, hangDirection), Block.UPDATE_CLIENTS);
+                if (!player.isCreative()) {
+                    if (player.getItemInHand(hand).getCount() > 1) {
+                        player.getItemInHand(hand).setCount(player.getItemInHand(hand).getCount() - 1);
+                    } else {
+                        player.setItemInHand(hand, new ItemStack(Items.AIR));
+                    }
+                }
+                return ItemInteractionResult.CONSUME;
             }
         }
-        return super.use(state, level, pos, player, hand, hit);
+        return super.useItemOn(stack, state, level, pos, player, hand, hitResult);
     }
 }

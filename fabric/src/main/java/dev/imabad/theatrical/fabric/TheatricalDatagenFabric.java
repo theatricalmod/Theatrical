@@ -9,6 +9,7 @@ import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricLanguageProvider;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricModelProvider;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.data.models.BlockModelGenerators;
 import net.minecraft.data.models.ItemModelGenerators;
 import net.minecraft.data.models.blockstates.MultiVariantGenerator;
@@ -20,6 +21,8 @@ import net.minecraft.data.models.model.ModelLocationUtils;
 import net.minecraft.data.models.model.ModelTemplates;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
+
+import java.util.concurrent.CompletableFuture;
 
 public class TheatricalDatagenFabric implements DataGeneratorEntrypoint {
     @Override
@@ -41,8 +44,8 @@ public class TheatricalDatagenFabric implements DataGeneratorEntrypoint {
             blockModelGenerators.createTrivialCube(Blocks.REDSTONE_INTERFACE.get());
             blockModelGenerators.createAxisAlignedPillarBlockCustomModel(Blocks.TRUSS_BLOCK.get(), ResourceLocation.tryParse("theatrical:block/truss"));
             createHorizontallyRotatedBlock(blockModelGenerators, Blocks.BASIC_LIGHTING_DESK.get());
-            ResourceLocation tankTrapWithPipe = new ResourceLocation("theatrical:block/tank_trap_with_pipe");
-            ResourceLocation tankTrap = new ResourceLocation("theatrical:block/tank_trap");
+            ResourceLocation tankTrapWithPipe = ResourceLocation.tryParse("theatrical:block/tank_trap_with_pipe");
+            ResourceLocation tankTrap = ResourceLocation.tryParse("theatrical:block/tank_trap");
             blockModelGenerators.blockStateOutput.accept(
                     MultiVariantGenerator.multiVariant(Blocks.TANK_TRAP.get())
                             .with(PropertyDispatch.property(TankTrapBlock.HAS_PIPE)
@@ -64,11 +67,11 @@ public class TheatricalDatagenFabric implements DataGeneratorEntrypoint {
         @Override
         public void generateItemModels(ItemModelGenerators itemModelGenerators) {
             itemModelGenerators.generateFlatItem(Items.CONFIGURATION_CARD.get(), ModelTemplates.FLAT_ITEM);
-            parent(itemModelGenerators, Blocks.LED_FRESNEL.get(),  new ResourceLocation(Theatrical.MOD_ID, "block/fresnel/fresnel_whole"));
-            parent(itemModelGenerators, Blocks.PIPE_BLOCK.get(),  new ResourceLocation(Theatrical.MOD_ID, "block/vertical_pipe"));
-            parent(itemModelGenerators, Blocks.MOVING_LIGHT_BLOCK.get(),  new ResourceLocation(Theatrical.MOD_ID, "block/moving_light/moving_head_whole"));
-            parent(itemModelGenerators, Blocks.MOVING_WASH_BLOCK.get(),  new ResourceLocation(Theatrical.MOD_ID, "block/moving_wash/moving_wash_whole"));
-            parent(itemModelGenerators, Blocks.LED_PANEL.get(),  new ResourceLocation(Theatrical.MOD_ID, "block/led_panel"));
+            parent(itemModelGenerators, Blocks.LED_FRESNEL.get(),  Theatrical.location( "block/fresnel/fresnel_whole"));
+            parent(itemModelGenerators, Blocks.PIPE_BLOCK.get(),  Theatrical.location( "block/vertical_pipe"));
+            parent(itemModelGenerators, Blocks.MOVING_LIGHT_BLOCK.get(),  Theatrical.location( "block/moving_light/moving_head_whole"));
+            parent(itemModelGenerators, Blocks.MOVING_WASH_BLOCK.get(),  Theatrical.location( "block/moving_wash/moving_wash_whole"));
+            parent(itemModelGenerators, Blocks.LED_PANEL.get(),  Theatrical.location( "block/led_panel"));
         }
 
         private static void parent(ItemModelGenerators itemModelGenerators, Block block) {
@@ -98,12 +101,14 @@ public class TheatricalDatagenFabric implements DataGeneratorEntrypoint {
     }
 
     public static class Lang extends FabricLanguageProvider {
-        protected Lang(FabricDataOutput dataOutput) {
+        protected Lang(FabricDataOutput dataOutput, CompletableFuture<HolderLookup.Provider> registryLookup) {
             // Specifying en_us is optional, as it's the default language code
-            super(dataOutput, "en_us");
+            super(dataOutput, "en_us", registryLookup);
         }
+
         @Override
-        public void generateTranslations(TranslationBuilder translationBuilder) {
+        public void generateTranslations(HolderLookup.Provider provider, TranslationBuilder translationBuilder) {
+
             translationBuilder.add(Blocks.ART_NET_INTERFACE.get(), "ArtNet Interface");
             translationBuilder.add(Blocks.MOVING_LIGHT_BLOCK.get(), "Moving Light");
             translationBuilder.add(Blocks.MOVING_WASH_BLOCK.get(), "Moving Wash");

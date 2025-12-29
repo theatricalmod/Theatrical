@@ -4,6 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import dev.architectury.event.events.client.ClientPlayerEvent;
+import dev.architectury.networking.NetworkManager;
 import dev.architectury.platform.Platform;
 import dev.architectury.registry.client.rendering.BlockEntityRendererRegistry;
 import dev.imabad.theatrical.api.dmx.DMXConsumer;
@@ -65,7 +66,7 @@ public class TheatricalClient {
         BlockEntityRendererRegistry.register(BlockEntities.BASIC_LIGHTING_DESK.get(), BasicLightingConsoleRenderer::new);
         artNetManager = new ArtNetManager();
         ClientPlayerEvent.CLIENT_PLAYER_JOIN.register((event) -> {
-            new RequestNetworks().sendToServer();
+            NetworkManager.sendToServer(new RequestNetworks());
             if(TheatricalConfig.INSTANCE.CLIENT.artnetEnabled){
                 artNetManager.getClient();
             }
@@ -99,9 +100,13 @@ public class TheatricalClient {
         Vec3 origin = new Vec3(0.5, 0.5, 0.5);
         Vec3 destination = origin.add(viewVector.x * distance, viewVector.y * distance, viewVector.z * distance);
         Matrix4f matrix4f = poseStack.last().pose();
-        Matrix3f matrix3f = poseStack.last().normal();
-        consumer.vertex(matrix4f, (float) origin.x, (float) origin.y, (float) origin.z).color(255, 255, 255, 255).normal(matrix3f, 0.0f, 0.0f, 0.0f).endVertex();
-        consumer.vertex(matrix4f, (float) destination.x, (float) destination.y, (float) destination.z).color(255, 255, 255, 255).normal(matrix3f, 0.0f, 0.0f, 0.0f).endVertex();
+        PoseStack.Pose last = poseStack.last();
+        consumer.addVertex(matrix4f, (float) origin.x, (float) origin.y, (float) origin.z)
+                        .setColor(255, 255, 255, 255)
+                                .setNormal(last, 0 ,0 ,0);
+        consumer.addVertex(matrix4f, (float) destination.x, (float) destination.y, (float) destination.z)
+                .setColor(255, 255, 255, 255)
+                .setNormal(last, 0 ,0 ,0);
         return new float[]{be.getTilt(), be.getPan()};
     }
 
@@ -184,12 +189,12 @@ public class TheatricalClient {
     public static void handleConsumerChange(NotifyConsumerChange notifyConsumerChange){
         if(TheatricalConfig.INSTANCE.CLIENT.artnetEnabled){
             TheatricalArtNetClient artNetClient = getArtNetManager().getClient();
-            if(TheatricalConfig.INSTANCE.CLIENT.universes.containsKey(notifyConsumerChange.getUniverse())){
-                UniverseConfig universeConfig = TheatricalConfig.INSTANCE.CLIENT.universes.get(notifyConsumerChange.getUniverse());
-                DMXDevice dmxDevice = notifyConsumerChange.getDmxDevice();
-                if(notifyConsumerChange.getChangeType() == NotifyConsumerChange.ChangeType.ADD){
+            if(TheatricalConfig.INSTANCE.CLIENT.universes.containsKey(notifyConsumerChange.universe())){
+                UniverseConfig universeConfig = TheatricalConfig.INSTANCE.CLIENT.universes.get(notifyConsumerChange.universe());
+                DMXDevice dmxDevice = notifyConsumerChange.dmxDevice();
+                if(notifyConsumerChange.changeType() == NotifyConsumerChange.ChangeType.ADD){
                     artNetClient.addDevice((short) universeConfig.subnet,(short)  universeConfig.universe, dmxDevice.getDeviceId(), dmxDevice);
-                } else if(notifyConsumerChange.getChangeType() == NotifyConsumerChange.ChangeType.UPDATE) {
+                } else if(notifyConsumerChange.changeType() == NotifyConsumerChange.ChangeType.UPDATE) {
                     artNetClient.updateDevice((short) universeConfig.subnet,(short)  universeConfig.universe, dmxDevice.getDeviceId(), dmxDevice);
                 } else {
                     artNetClient.removeDevice((short) universeConfig.subnet,(short)  universeConfig.universe, dmxDevice.getDeviceId());
@@ -201,9 +206,9 @@ public class TheatricalClient {
     public static void handleListConsumers(ListConsumers listConsumers){
         if(TheatricalConfig.INSTANCE.CLIENT.artnetEnabled) {
             TheatricalArtNetClient artNetClient = getArtNetManager().getClient();
-            if(TheatricalConfig.INSTANCE.CLIENT.universes.containsKey(listConsumers.getUniverse())) {
-                UniverseConfig universeConfig = TheatricalConfig.INSTANCE.CLIENT.universes.get(listConsumers.getUniverse());
-                for (DMXDevice dmxDevice : listConsumers.getDmxDevices()) {
+            if(TheatricalConfig.INSTANCE.CLIENT.universes.containsKey(listConsumers.universe())) {
+                UniverseConfig universeConfig = TheatricalConfig.INSTANCE.CLIENT.universes.get(listConsumers.universe());
+                for (DMXDevice dmxDevice : listConsumers.dmxDevices()) {
                     artNetClient.addDevice((short) universeConfig.subnet, (short) universeConfig.universe, dmxDevice.getDeviceId(), dmxDevice);
                 }
             }
@@ -211,19 +216,19 @@ public class TheatricalClient {
     }
 
     public static void handleOpenScreen(OpenScreen openScreen){
-        switch (openScreen.getScreen()){
+        switch (openScreen.screen()){
             case GENERIC_DMX -> {
-                if(Minecraft.getInstance().level.getBlockEntity(openScreen.getPos()) instanceof DMXConsumer dmxConsumer){
-                    Minecraft.getInstance().setScreen(new GenericDMXConfigurationScreen<>(dmxConsumer, openScreen.getPos(), dmxConsumer.getTranslationKey()));
+                if(Minecraft.getInstance().level.getBlockEntity(openScreen.pos()) instanceof DMXConsumer dmxConsumer){
+                    Minecraft.getInstance().setScreen(new GenericDMXConfigurationScreen<>(dmxConsumer, openScreen.pos(), dmxConsumer.getTranslationKey()));
                 }
             }
             case GENERIC_PAN_TILT -> {
-                if(Minecraft.getInstance().level.getBlockEntity(openScreen.getPos()) instanceof BaseDMXConsumerLightBlockEntity be) {
+                if(Minecraft.getInstance().level.getBlockEntity(openScreen.pos()) instanceof BaseDMXConsumerLightBlockEntity be) {
                     Minecraft.getInstance().setScreen(new GenericManualPanTiltScreen(be, be.getBlockState().getBlock().getDescriptionId()));
                 }
             }
             case BASIC_LIGHTING_DESK -> {
-                if(Minecraft.getInstance().level.getBlockEntity(openScreen.getPos()) instanceof BasicLightingDeskBlockEntity bse) {
+                if(Minecraft.getInstance().level.getBlockEntity(openScreen.pos()) instanceof BasicLightingDeskBlockEntity bse) {
                     Minecraft.getInstance().setScreen(new BasicLightingDeskScreen(bse));
                 }
             }

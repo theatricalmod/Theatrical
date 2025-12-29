@@ -1,5 +1,5 @@
 modLoader = "javafml"
-loaderVersion = "[1,)"
+loaderVersion = "[4,)"
 #issueTrackerURL = ""
 license = "Apache-2.0"
 
@@ -17,23 +17,26 @@ Theatrical, bringing the theatre to Minecraft.
 [[mixins]]
 config = "theatrical-common.mixins.json"
 
+[[mixins]]
+config = "theatrical-forge.mixins.json"
+
 [[dependencies.theatrical]]
 modId = "neoforge"
 type = "required"
-versionRange = "[20.4.251,)"
+versionRange = "[21.1,)"
 ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.theatrical]]
 modId = "minecraft"
 type = "required"
-versionRange = "[1.20.4,1.20.5)"
+versionRange = "[1.21.1,)"
 ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.theatrical]]
 modId = "architectury"
 type = "required"
-versionRange = "[11.1.17,)"
+versionRange = "[13.0.8,)"
 ordering = "AFTER"
 side = "BOTH"

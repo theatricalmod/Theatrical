@@ -1,5 +1,6 @@
 package dev.imabad.theatrical.client.gui.screen;
 
+import dev.architectury.networking.NetworkManager;
 import dev.imabad.theatrical.Theatrical;
 import dev.imabad.theatrical.TheatricalClient;
 import dev.imabad.theatrical.api.dmx.DMXConsumer;
@@ -25,7 +26,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class GenericDMXConfigurationScreen<T extends DMXConsumer> extends Screen {
-    private final ResourceLocation GUI = new ResourceLocation(Theatrical.MOD_ID, "textures/gui/blank.png");
+    private final ResourceLocation GUI = Theatrical.location( "textures/gui/blank.png");
 
     protected final int imageWidth;
     protected final int imageHeight;
@@ -110,8 +111,8 @@ public class GenericDMXConfigurationScreen<T extends DMXConsumer> extends Screen
             if (universe < 0) {
                 return;
             }
-            new UpdateDMXFixture(blockPos, dmx, universe).sendToServer();
-            new UpdateNetworkId(blockPos, networkId).sendToServer();
+            NetworkManager.sendToServer(new UpdateDMXFixture(blockPos, dmx, universe));
+            NetworkManager.sendToServer(new UpdateNetworkId(blockPos, networkId));
         } catch(NumberFormatException ignored) {
             //We need a nicer way to show that this is invalid?
         }

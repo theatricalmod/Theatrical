@@ -20,7 +20,7 @@ public class LEDPanelFixture extends Fixture {
                     .addSlot(SharedSlots.GREEN)
                     .addSlot(SharedSlots.BLUE)
     );
-    private static final ResourceLocation STATIC_MODEL = new ResourceLocation(Theatrical.MOD_ID, "block/led_panel");
+    private static final ResourceLocation STATIC_MODEL = Theatrical.location( "block/led_panel");
 
 
     @Override

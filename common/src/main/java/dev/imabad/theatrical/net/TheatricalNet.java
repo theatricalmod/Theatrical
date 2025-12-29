@@ -1,32 +1,43 @@
 package dev.imabad.theatrical.net;
 
-import dev.architectury.networking.simple.MessageType;
-import dev.architectury.networking.simple.SimpleNetworkManager;
-import dev.imabad.theatrical.Theatrical;
+import dev.architectury.networking.NetworkManager;
+import dev.architectury.platform.Platform;
+import dev.architectury.utils.Env;
 import dev.imabad.theatrical.net.artnet.*;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 
 public interface TheatricalNet {
-    SimpleNetworkManager MAIN = SimpleNetworkManager.create(Theatrical.MOD_ID);
-    // C2S
-    MessageType SEND_ARTNET_TO_SERVER = MAIN.registerC2S("send_artnet_to_server", SendArtNetData::new);
-    MessageType UPDATE_ARTNET_INTERFACE = MAIN.registerC2S("update_artnet_interface", UpdateArtNetInterface::new);
-    MessageType UPDATE_DMX_FIXTURE = MAIN.registerC2S("update_dmx_fixture", UpdateDMXFixture::new);
-    MessageType UPDATE_FIXTURE_POS = MAIN.registerC2S("update_fixture_pos", UpdateFixturePosition::new);
-    MessageType RDM_UPDATE_FIXTURE = MAIN.registerC2S("rdm_update_fixture", RDMUpdateConsumer::new);
-    MessageType REQUEST_CONSUMERS = MAIN.registerC2S("request_consumers", RequestConsumers::new);
-    MessageType UPDATE_CONSOLE_FADER = MAIN.registerC2S("update_console_fader", ControlUpdateFader::new);
-    MessageType CONTROL_MOVE_STEP = MAIN.registerC2S("control_move_step", ControlMoveStep::new);
-    MessageType CONTROL_MODE_TOGGLE = MAIN.registerC2S("control_mode_toggle", ControlModeToggle::new);
-    MessageType CONTROL_GO = MAIN.registerC2S("control_go", ControlGo::new);
-    MessageType REQUEST_NETWORKS = MAIN.registerC2S("request_networks", RequestNetworks::new);
-    MessageType UPDATE_NETWORK_ID = MAIN.registerC2S("update_network_id", UpdateNetworkId::new);
-    MessageType CONFIGURE_CONFIGURATION_CARD = MAIN.registerC2S("configure_configuration_card", ConfigureConfigurationCard::new);
 
-    // S2C
-    MessageType NOTIFY_CONSUMER_CHANGE = MAIN.registerS2C("notify_consumer_change", NotifyConsumerChange::new);
-    MessageType LIST_CONSUMERS = MAIN.registerS2C("list_consumers", ListConsumers::new);
-    MessageType NOTIFY_NETWORKS = MAIN.registerS2C("notify_networks", NotifyNetworks::new);
-    MessageType OPEN_SCREEN = MAIN.registerS2C("open_screen", OpenScreen::new);
+    static void init(){
+        // S2C
+        registerS2C(ListConsumers.TYPE, ListConsumers.STREAM_CODEC, ListConsumers::handle);
+        registerS2C(NotifyNetworks.TYPE, NotifyNetworks.STREAM_CODEC, NotifyNetworks::handle);
+        registerS2C(OpenScreen.TYPE, OpenScreen.STREAM_CODEC, OpenScreen::handle);
 
-    static void init(){}
+        // C2S
+        NetworkManager.registerReceiver(NetworkManager.Side.C2S, SendArtNetData.TYPE, SendArtNetData.STREAM_CODEC, SendArtNetData::handle);
+        NetworkManager.registerReceiver(NetworkManager.Side.C2S, UpdateDMXFixture.TYPE, UpdateDMXFixture.STREAM_CODEC, UpdateDMXFixture::handle);
+        NetworkManager.registerReceiver(NetworkManager.Side.C2S, UpdateFixturePosition.TYPE, UpdateFixturePosition.STREAM_CODEC, UpdateFixturePosition::handle);
+        NetworkManager.registerReceiver(NetworkManager.Side.C2S, RDMUpdateConsumer.TYPE, RDMUpdateConsumer.STREAM_CODEC, RDMUpdateConsumer::handle);
+        NetworkManager.registerReceiver(NetworkManager.Side.C2S, RequestConsumers.TYPE, RequestConsumers.STREAM_CODEC, RequestConsumers::handle);
+        NetworkManager.registerReceiver(NetworkManager.Side.C2S, ControlUpdateFader.TYPE, ControlUpdateFader.STREAM_CODEC, ControlUpdateFader::handle);
+        NetworkManager.registerReceiver(NetworkManager.Side.C2S, ControlMoveStep.TYPE, ControlMoveStep.STREAM_CODEC, ControlMoveStep::handle);
+        NetworkManager.registerReceiver(NetworkManager.Side.C2S, ControlModeToggle.TYPE, ControlModeToggle.STREAM_CODEC, ControlModeToggle::handle);
+        NetworkManager.registerReceiver(NetworkManager.Side.C2S, ControlGo.TYPE, ControlGo.STREAM_CODEC, ControlGo::handle);
+        NetworkManager.registerReceiver(NetworkManager.Side.C2S, RequestNetworks.TYPE, RequestNetworks.STREAM_CODEC, RequestNetworks::handle);
+        NetworkManager.registerReceiver(NetworkManager.Side.C2S, UpdateNetworkId.TYPE, UpdateNetworkId.STREAM_CODEC, UpdateNetworkId::handle);
+        NetworkManager.registerReceiver(NetworkManager.Side.C2S, ConfigureConfigurationCard.TYPE, ConfigureConfigurationCard.STREAM_CODEC, ConfigureConfigurationCard::handle);
+    }
+
+    private static <T extends CustomPacketPayload> void registerS2C(CustomPacketPayload.Type<T> packetType,
+                                                                    StreamCodec<? super RegistryFriendlyByteBuf, T> codec,
+                                                                    NetworkManager.NetworkReceiver<T> receiver) {
+        if (Platform.getEnvironment().equals(Env.SERVER)) {
+            NetworkManager.registerS2CPayloadType(packetType, codec);
+        } else {
+            NetworkManager.registerReceiver(NetworkManager.Side.S2C, packetType, codec, receiver);
+        }
+    }
 }

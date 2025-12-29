@@ -1,8 +1,13 @@
 package dev.imabad.theatrical.blocks.interfaces;
 
+import dev.architectury.networking.NetworkManager;
 import dev.imabad.theatrical.TheatricalScreen;
+import dev.imabad.theatrical.blockentities.control.BasicLightingDeskBlockEntity;
 import dev.imabad.theatrical.blockentities.interfaces.RedstoneInterfaceBlockEntity;
+import dev.imabad.theatrical.blockentities.light.BaseDMXConsumerLightBlockEntity;
 import dev.imabad.theatrical.blocks.Blocks;
+import dev.imabad.theatrical.items.ConfigurationCardData;
+import dev.imabad.theatrical.items.DataComponents;
 import dev.imabad.theatrical.networks.TheatricalNetwork;
 import dev.imabad.theatrical.networks.TheatricalNetworkData;
 import dev.imabad.theatrical.items.Items;
@@ -15,6 +20,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
@@ -46,40 +52,60 @@ public class RedstoneInterfaceBlock  extends Block implements EntityBlock {
     }
 
     @Override
-    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
         if(!level.isClientSide()) {
             BlockEntity be = level.getBlockEntity(pos);
             if (be instanceof RedstoneInterfaceBlockEntity redstoneInterfaceBlockEntity) {
                 if (!redstoneInterfaceBlockEntity.getNetworkId().equals(UUIDUtil.NULL)) {
                     TheatricalNetwork network = TheatricalNetworkData.getInstance(level.getServer().overworld()).getNetwork(redstoneInterfaceBlockEntity.getNetworkId());
                     if (network != null && !network.members().isMember(player.getUUID())) {
-                        return InteractionResult.FAIL;
+                        return ItemInteractionResult.FAIL;
                     }
                 }
                 if (player.getItemInHand(hand).getItem() == Items.CONFIGURATION_CARD.get()) {
                     ItemStack itemInHand = player.getItemInHand(hand);
-                    CompoundTag tagData = itemInHand.getOrCreateTag();
-                    redstoneInterfaceBlockEntity.setNetworkId(tagData.getUUID("network"));
-                    if (tagData.getBoolean("universeEnabled")) {
-                        redstoneInterfaceBlockEntity.setUniverse(tagData.getInt("dmxUniverse"));
+                    if(itemInHand.has(DataComponents.CONFIGURATION_CARD_DATA.get())){
+                        ConfigurationCardData data = itemInHand.get(DataComponents.CONFIGURATION_CARD_DATA.get());
+                        redstoneInterfaceBlockEntity.setNetworkId(data.network());
+                        if (data.universeEnabled()) {
+                            redstoneInterfaceBlockEntity.setUniverse(data.dmxUniverse());
+                        }
+                        if (data.addressEnabled()) {
+                            redstoneInterfaceBlockEntity.setChannelStartPoint(data.dmxAddress());
+                        }
+                        if (data.autoIncrement()) {
+                            data = data.increment(redstoneInterfaceBlockEntity.getChannelCount());
+                            itemInHand.set(DataComponents.CONFIGURATION_CARD_DATA.get(), data);
+                        }
+                        TheatricalNetworkData instance = TheatricalNetworkData.getInstance(level.getServer().overworld());
+                        player.sendSystemMessage(Component.translatable("item.configurationcard.success",
+                                instance.getNetwork(redstoneInterfaceBlockEntity.getNetworkId()).name(),
+                                Integer.toString(redstoneInterfaceBlockEntity.getUniverse()),
+                                Integer.toString(redstoneInterfaceBlockEntity.getChannelStart()),
+                                Integer.toString(data.dmxAddress())));
+                        return ItemInteractionResult.SUCCESS;
                     }
-                    if (tagData.getBoolean("addressEnabled")) {
-                        redstoneInterfaceBlockEntity.setChannelStartPoint(tagData.getInt("dmxAddress"));
-                    }
-                    if (tagData.getBoolean("autoIncrement")) {
-                        tagData.putInt("dmxAddress", tagData.getInt("dmxAddress") + redstoneInterfaceBlockEntity.getChannelCount());
-                    }
-                    itemInHand.save(tagData);
-                    TheatricalNetworkData instance = TheatricalNetworkData.getInstance(level.getServer().overworld());
-                    player.sendSystemMessage(Component.translatable("item.configurationcard.success", instance.getNetwork(redstoneInterfaceBlockEntity.getNetworkId()).name(), Integer.toString(redstoneInterfaceBlockEntity.getUniverse()), Integer.toString(redstoneInterfaceBlockEntity.getChannelStart()), Integer.toString(tagData.getInt("dmxAddress"))));
-                    return InteractionResult.SUCCESS;
                 }
-                new OpenScreen(pos, TheatricalScreen.GENERIC_DMX).sendTo((ServerPlayer) player);
+                return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
             }
         }
-        return InteractionResult.SUCCESS;
+        return super.useItemOn(stack, state, level, pos, player, hand, hitResult);
     }
 
+    @Override
+    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
+        if(!level.isClientSide){
+            RedstoneInterfaceBlockEntity be = (RedstoneInterfaceBlockEntity) level.getBlockEntity(pos);
+            if(be.getNetworkId() != UUIDUtil.NULL){
+                TheatricalNetwork network = TheatricalNetworkData.getInstance(level.getServer().overworld()).getNetwork(be.getNetworkId());
+                if(network != null && !network.members().isMember(player.getUUID())) {
+                    return InteractionResult.FAIL;
+                }
+            }
+            NetworkManager.sendToPlayer((ServerPlayer) player, new OpenScreen(pos, TheatricalScreen.GENERIC_DMX));
+        }
+        return super.useWithoutItem(state, level, pos, player, hitResult);
+    }
 
     @Override
     public int getSignal(BlockState state, BlockGetter level, BlockPos pos, Direction direction) {
