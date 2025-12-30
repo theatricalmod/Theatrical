@@ -87,7 +87,10 @@ public abstract class FixtureRenderer<T extends BaseLightBlockEntity> implements
         int a = (int) (alpha * 255);
         Matrix4f m = stack.last().pose();
         Matrix3f normal = stack.last().normal();
-        float endMultiplier = beamSize * tileEntityFixture.getFocus();
+        length += 0.5f;
+        float endMultiplier = 1 + tileEntityFixture.getFocus()*length*0.03f;
+
+
         addVertex(builder, m, normal, r, g, b, 0, beamSize * endMultiplier, beamSize * endMultiplier, -length);
         addVertex(builder, m, normal, r, g, b, a,  beamSize, beamSize, 0);
         addVertex(builder, m, normal, r, g, b, a, beamSize, -beamSize, 0);
@@ -107,6 +110,9 @@ public abstract class FixtureRenderer<T extends BaseLightBlockEntity> implements
         addVertex(builder, m, normal, r, g, b, a, beamSize, -beamSize, 0);
         addVertex(builder, m, normal, r, g, b, a, -beamSize, -beamSize, 0);
         addVertex(builder, m, normal, r, g, b, 0, -beamSize * endMultiplier, -beamSize * endMultiplier, -length);
+
+
+
     }
 
     protected void addVertex(VertexConsumer builder, Matrix4f matrix4f, Matrix3f matrix3f, int r, int g, int b, int a, float x, float y, float z) {
