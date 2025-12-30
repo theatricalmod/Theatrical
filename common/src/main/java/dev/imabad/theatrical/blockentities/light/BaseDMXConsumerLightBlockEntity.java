@@ -5,13 +5,17 @@ import dev.imabad.theatrical.Constants;
 import dev.imabad.theatrical.api.dmx.DMXConsumer;
 import dev.imabad.theatrical.networks.TheatricalNetworkData;
 import dev.imabad.theatrical.util.RndUtils;
+import dev.imabad.theatrical.util.TheatricalCodecs;
 import dev.imabad.theatrical.util.UUIDUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.util.ExtraCodecs;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 import java.util.Random;
 import java.util.UUID;
@@ -27,31 +31,29 @@ public abstract class BaseDMXConsumerLightBlockEntity extends BaseLightBlockEnti
     }
 
     @Override
-    public void write(CompoundTag compoundTag) {
-        super.write(compoundTag);
-        compoundTag.putInt("channelCount", channelCount);
-        compoundTag.putInt("channelStartPoint", channelStartPoint);
-        compoundTag.putInt("dmxUniverse", dmxUniverse);
+    public void write(ValueOutput out) {
+        super.write(out);
+        out.putInt("channelCount", channelCount);
+        out.putInt("channelStartPoint", channelStartPoint);
+        out.putInt("dmxUniverse", dmxUniverse);
         if(deviceId != null) {
-            compoundTag.putByteArray("deviceId", deviceId.toBytes());
+            out.store("deviceId", TheatricalCodecs.BYTE_ARRAY, deviceId.toBytes());
         }
-        compoundTag.putUUID("network", networkId);
+        out.store("network", net.minecraft.core.UUIDUtil.CODEC, networkId);
     }
 
     @Override
-    public void read(CompoundTag compoundTag) {
-        super.read(compoundTag);
-        channelCount = compoundTag.getInt("channelCount");
-        channelStartPoint = compoundTag.getInt("channelStartPoint");
-        if(compoundTag.contains("dmxUniverse")){
-            dmxUniverse = compoundTag.getInt("dmxUniverse");
-        }
-        if(compoundTag.contains("deviceId")){
-            deviceId = new RDMDeviceId(compoundTag.getByteArray("deviceId"));
-        }
-        if(compoundTag.contains("network")){
-            networkId = compoundTag.getUUID("network");
-        }
+    public void read(ValueInput input) {
+        super.read(input);
+        channelCount = input.getIntOr("channelCount", 0);
+        channelStartPoint = input.getIntOr("channelStartPoint", 0);
+        dmxUniverse = input.getIntOr("dmxUniverse", 0);
+        input.read("deviceId", TheatricalCodecs.BYTE_ARRAY).ifPresent(bytes -> {
+            deviceId = new RDMDeviceId(bytes);
+        });
+        input.read("network", net.minecraft.core.UUIDUtil.CODEC).ifPresent(inID -> {
+            networkId = inID;
+        });
     }
 
     private void generateDeviceId(){
@@ -139,14 +141,14 @@ public abstract class BaseDMXConsumerLightBlockEntity extends BaseLightBlockEnti
     @Override
     public void setLevel(Level level) {
         super.setLevel(level);
-        if(level != null && !level.isClientSide) {
+        if(level != null && !level.isClientSide()) {
             addConsumer();
         }
     }
 
     @Override
     public void setRemoved() {
-        if(level != null && !level.isClientSide) {
+        if(level != null && !level.isClientSide()) {
             removeConsumer();
         }
         super.setRemoved();

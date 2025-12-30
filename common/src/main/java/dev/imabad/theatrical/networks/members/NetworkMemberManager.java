@@ -1,45 +1,35 @@
 package dev.imabad.theatrical.networks.members;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import dev.imabad.theatrical.networks.TheatricalNetwork;
 import dev.imabad.theatrical.networks.TheatricalNetworkData;
+import dev.imabad.theatrical.networks.TheatricalNetworkMode;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
+import net.minecraft.core.UUIDUtil;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
-public record NetworkMemberManager(Set<TheatricalNetworkMember> members) {
+public record NetworkMemberManager(HashSet<TheatricalNetworkMember> members) {
 
-    public NetworkMemberManager(CompoundTag data) {
-        this(new HashSet<>());
-        ListTag membersList = data.getList("members", CompoundTag.TAG_COMPOUND);
-        for (Tag tag : membersList) {
-            CompoundTag member = (CompoundTag) tag;
-            UUID player = member.getUUID("player");
-            TheatricalNetworkMemberRole role = TheatricalNetworkMemberRole.valueOf(member.getString("role"));
-            members.add(new TheatricalNetworkMember(player, role));
-        }
-    }
+    public static final Codec<NetworkMemberManager> CODEC = RecordCodecBuilder.create(
+            instance -> instance.group(
+                TheatricalNetworkMember.CODEC.listOf().fieldOf("members")
+                        .xmap(HashSet::new, ArrayList::new).forGetter(NetworkMemberManager::members)
+            )
+            .apply(instance, NetworkMemberManager::new)
+    );
+
 
     public NetworkMemberManager() {
         this(new HashSet<>());
     }
 
-    public CompoundTag save(CompoundTag output) {
-        CompoundTag tag = new CompoundTag();
-        ListTag membersList = new ListTag();
-        for (TheatricalNetworkMember member : members) {
-            CompoundTag memberTag = new CompoundTag();
-            memberTag.putUUID("player", member.playerId());
-            memberTag.putString("role", member.role().toString());
-            membersList.add(memberTag);
-        }
-        output.put("members", membersList);
-        return output;
-    }
+
 
     public void addMember(UUID playerUUID, TheatricalNetworkMemberRole role) {
         members.add(new TheatricalNetworkMember(playerUUID, role));

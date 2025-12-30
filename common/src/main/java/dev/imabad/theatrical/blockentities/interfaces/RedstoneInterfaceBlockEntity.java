@@ -8,16 +8,20 @@ import dev.imabad.theatrical.blockentities.ClientSyncBlockEntity;
 import dev.imabad.theatrical.networks.TheatricalNetworkData;
 import dev.imabad.theatrical.fixtures.Fixtures;
 import dev.imabad.theatrical.util.RndUtils;
+import dev.imabad.theatrical.util.TheatricalCodecs;
 import dev.imabad.theatrical.util.UUIDUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
 
@@ -33,30 +37,26 @@ public class RedstoneInterfaceBlockEntity extends ClientSyncBlockEntity implemen
     }
 
     @Override
-    public void write(CompoundTag compoundTag) {
-        compoundTag.putInt("channelCount", 1);
-        compoundTag.putInt("channelStartPoint", channelStartPoint);
-        compoundTag.putInt("dmxUniverse", dmxUniverse);
+    public void write(ValueOutput output) {
+        output.putInt("channelCount", 1);
+        output.putInt("channelStartPoint", channelStartPoint);
+        output.putInt("dmxUniverse", dmxUniverse);
         if(deviceId != null) {
-            compoundTag.putByteArray("deviceId", deviceId.toBytes());
+            output.store("deviceId", TheatricalCodecs.BYTE_ARRAY, deviceId.toBytes());
         }
-        if(networkId != null){
-            compoundTag.putUUID("network", networkId);
-        }
+        output.store("network", net.minecraft.core.UUIDUtil.CODEC, networkId);
     }
 
     @Override
-    public void read(CompoundTag compoundTag) {
-        channelStartPoint = compoundTag.getInt("channelStartPoint");
-        if(compoundTag.contains("dmxUniverse")){
-            dmxUniverse = compoundTag.getInt("dmxUniverse");
-        }
-        if(compoundTag.contains("deviceId")){
-            deviceId = new RDMDeviceId(compoundTag.getByteArray("deviceId"));
-        }
-        if(compoundTag.contains("network")){
-            networkId = compoundTag.getUUID("network");
-        }
+    public void read(ValueInput input) {
+        channelStartPoint = input.getIntOr("channelStartPoint", 0);
+        dmxUniverse = input.getIntOr("dmxUniverse", 0);
+        input.read("deviceId", TheatricalCodecs.BYTE_ARRAY).ifPresent(bytes -> {
+            deviceId = new RDMDeviceId(bytes);
+        });
+        input.read("network", net.minecraft.core.UUIDUtil.CODEC).ifPresent(inID -> {
+            networkId = inID;
+        });
     }
 
     @Override
@@ -94,7 +94,7 @@ public class RedstoneInterfaceBlockEntity extends ClientSyncBlockEntity implemen
     }
 
     @Override
-    public ResourceLocation getFixtureId() {
+    public Identifier getFixtureId() {
         return Fixtures.REDSTONE_INTERFACE.getId();
     }
 
@@ -192,14 +192,14 @@ public class RedstoneInterfaceBlockEntity extends ClientSyncBlockEntity implemen
     @Override
     public void setLevel(Level level) {
         super.setLevel(level);
-        if(level != null && !level.isClientSide) {
+        if(level != null && !level.isClientSide()) {
             addConsumer();
         }
     }
 
     @Override
     public void setRemoved() {
-        if(level != null && !level.isClientSide) {
+        if(level != null && !level.isClientSide()) {
             removeConsumer();
         }
         super.setRemoved();

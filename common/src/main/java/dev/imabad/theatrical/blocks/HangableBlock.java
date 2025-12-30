@@ -9,21 +9,22 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.ScheduledTickAccess;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.HorizontalDirectionalBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
-import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.ticks.ScheduledTick;
 import org.jetbrains.annotations.Nullable;
 
 public abstract class HangableBlock extends HorizontalDirectionalBlock {
 
-    public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
+    public static final EnumProperty<Direction> FACING = HorizontalDirectionalBlock.FACING;
 
     public static final BooleanProperty BROKEN = BooleanProperty.create("broken");
-    public static final DirectionProperty HANG_DIRECTION = DirectionProperty.create("hang_direction");
+    public static final EnumProperty<Direction> HANG_DIRECTION = EnumProperty.create("hang_direction", Direction.class);
     public static final BooleanProperty HANGING = BooleanProperty.create("hanging");
 
     protected HangableBlock(Properties properties) {
@@ -48,9 +49,9 @@ public abstract class HangableBlock extends HorizontalDirectionalBlock {
     }
 
     @Override
-    public BlockState updateShape(BlockState blockState, Direction direction, BlockState blockState2, LevelAccessor levelAccessor, BlockPos blockPos, BlockPos blockPos2) {
-        levelAccessor.getBlockTicks().schedule(new ScheduledTick<>(this, blockPos, 3, 0));
-        return super.updateShape(blockState, direction, blockState2, levelAccessor, blockPos, blockPos2);
+    protected BlockState updateShape(BlockState blockState, LevelReader levelReader, ScheduledTickAccess scheduledTickAccess, BlockPos blockPos, Direction direction, BlockPos blockPos2, BlockState blockState2, RandomSource randomSource) {
+        scheduledTickAccess.scheduleTick(blockPos, this, 3);
+        return super.updateShape(blockState, levelReader, scheduledTickAccess, blockPos, direction, blockPos2, blockState2, randomSource);
     }
 
     public boolean isHanging(LevelReader levelReader, BlockPos pos){

@@ -3,6 +3,7 @@ package dev.imabad.theatrical.client.gui.widgets;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.components.StringWidget;
 import net.minecraft.locale.Language;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
@@ -17,21 +18,25 @@ public class LabeledEditBox extends EditBox {
     private int color = 4210752;
     private boolean shadow = false;
     private int textOffsetY = 0;
+    private StringWidget labelWidget;
 
     public LabeledEditBox(Font font, int width, int height, Component message) {
         super(font, width, height, message);
         this.width = width + 10;
         this.font = font;
+        this.labelWidget = new StringWidget(message, font);
     }
 
     public LabeledEditBox(Font font, int x, int y, int width, int height, Component message) {
         super(font, x, y, width, height, message);
         this.font = font;
+        this.labelWidget = new StringWidget(message, font);
     }
 
     public LabeledEditBox(Font font, int x, int y, int width, int height, @Nullable EditBox editBox, Component message) {
         super(font, x, y, width, height, editBox, message);
         this.font = font;
+        this.labelWidget = new StringWidget(message, font);
     }
 
     @Override
@@ -73,14 +78,16 @@ public class LabeledEditBox extends EditBox {
     public void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         super.renderWidget(guiGraphics, mouseX, mouseY, partialTick);
         guiGraphics.fill(getX(), getY(), getX() + getWidth(), getY() + getHeight(), 0xffffff);
-        Component component = this.getMessage();
         int i = this.getWidth();
-        int j = font.width(component);
+        int j = labelWidget.getWidth();
         int k = this.getX() + Math.round(this.alignX * (float)(i - j));
-        int l = (this.getY() + (this.getHeight() - 9) / 2) + textOffsetY;
-        // j > i ? this.clipText(component, i) :
-        FormattedCharSequence formattedCharSequence =  component.getVisualOrderText();
-        guiGraphics.drawString(font, formattedCharSequence, k, l - (font.lineHeight), color, shadow);
+        labelWidget.setPosition(k, getY() - (font.lineHeight));
+        labelWidget.renderWidget(guiGraphics, mouseX, mouseY, partialTick);
+//        Component component = this.getMessage();
+//        int l = (this.getY() + (this.getHeight() - 9) / 2) + textOffsetY;
+//        // j > i ? this.clipText(component, i) :
+//        FormattedCharSequence formattedCharSequence =  component.getVisualOrderText();
+//        guiGraphics.drawString(font, formattedCharSequence, k, l - (font.lineHeight), color, shadow);
     }
 
     private FormattedCharSequence clipText(Component message, int width) {

@@ -6,11 +6,11 @@ import dev.imabad.theatrical.Theatrical;
 import dev.imabad.theatrical.TheatricalRegistry;
 import dev.imabad.theatrical.api.Fixture;
 import net.minecraft.core.Registry;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 
 public class Fixtures {
-	private static final ResourceLocation REGISTRY_ID = Theatrical.location("fixtures");
+	private static final Identifier REGISTRY_ID = Theatrical.location("fixtures");
 	public static final ResourceKey<Registry<Fixture>> FIXTURE_REGISTRY = ResourceKey.createRegistryKey(REGISTRY_ID);
 	public static final Registrar<Fixture> FIXTURES = TheatricalRegistry.create(REGISTRY_ID);
 

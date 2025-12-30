@@ -5,8 +5,9 @@ import dev.architectury.registry.registries.DeferredRegister;
 import dev.architectury.registry.registries.Registrar;
 import dev.architectury.registry.registries.RegistrarManager;
 import net.minecraft.core.Registry;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.function.Supplier;
 
@@ -19,7 +20,7 @@ public class TheatricalRegistry {
 	}
 
 	@SuppressWarnings("unchecked")
-	public static <T> Registrar<T> create(ResourceLocation registryId) {
+	public static <T> Registrar<T> create(Identifier registryId) {
 		return (Registrar<T>) MANAGER.get().builder(registryId).build();
 	}
 }

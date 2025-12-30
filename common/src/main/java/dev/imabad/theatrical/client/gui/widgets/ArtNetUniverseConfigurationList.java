@@ -9,11 +9,14 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.ObjectSelectionList;
+import net.minecraft.client.gui.components.StringWidget;
 import net.minecraft.client.gui.layouts.LayoutElement;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 public class ArtNetUniverseConfigurationList extends ObjectSelectionList<ArtNetUniverseConfigurationList.Entry> implements LayoutElement {
 
@@ -21,17 +24,18 @@ public class ArtNetUniverseConfigurationList extends ObjectSelectionList<ArtNetU
     public ArtNetUniverseConfigurationList(Minecraft minecraft, ArtNetConfigurationScreen screen, int width, int height, Component title) {
         super(minecraft, width, height, height - 55 + 4, 30);
         this.parent = screen;
-        this.setRenderHeader(false, 0);
     }
 
     public void setEntries(Map<Integer, UniverseConfig> configs){
-        this.clearEntries();
-        configs.forEach((key, value) -> addEntry(new Entry(parent, key, value)));
+        replaceEntries(configs.entrySet().stream().map(integerUniverseConfigEntry
+                -> new Entry(parent, integerUniverseConfigEntry.getKey(),
+                integerUniverseConfigEntry.getValue())).toList());
+        repositionEntries();
     }
 
+
     @Override
-    protected int getScrollbarPosition() {
-        return this.getX() + this.getRowWidth() + 6;
+    protected int scrollBarX() {return this.getX() + this.getRowWidth() + 6;
     }
 
     @Override
@@ -44,20 +48,17 @@ public class ArtNetUniverseConfigurationList extends ObjectSelectionList<ArtNetU
         return height;
     }
 
-    @Override
-    public void visitWidgets(Consumer<AbstractWidget> consumer) {
-    }
-
-    @Environment(EnvType.CLIENT)
     public static class Entry extends ObjectSelectionList.Entry<Entry> implements AutoCloseable {
 
         private final ArtNetConfigurationScreen parent;
         private final UniverseConfig config;
         private final int networkUniverse;
+        private final StringWidget nameWidget;
         public Entry(ArtNetConfigurationScreen parent, int networkUniverse, UniverseConfig config) {
             this.parent = parent;
             this.config = config;
             this.networkUniverse = networkUniverse;
+            this.nameWidget = new StringWidget(Component.translatable("screen.artnetconfig.entry.universe", networkUniverse), parent.getFont());
         }
 
         @Override
@@ -77,17 +78,15 @@ public class ArtNetUniverseConfigurationList extends ObjectSelectionList<ArtNetU
         }
 
         @Override
-        public void render(GuiGraphics guiGraphics, int index, int top, int left, int width, int height, int mouseX, int mouseY, boolean hovering, float partialTick) {
-            Font font = Minecraft.getInstance().font;
-            guiGraphics.drawString(font, Component.translatable("screen.artnetconfig.entry.universe", networkUniverse),  left, top + 1, 16777215 );
-//            guiGraphics.drawString(font, Component.translatable("screen.artnetconfig.entry.subnet", config.getSubnet()),  left, top + 1, 16777215 );
-//            guiGraphics.drawString(font, Component.translatable("screen.artnetconfig.entry.universe", config.getUniverse()),  left, top + 4 + font.lineHeight, 16777215 );
+        public boolean mouseClicked(MouseButtonEvent mouseButtonEvent, boolean bl) {
+            this.parent.setSelected(this);
+            return super.mouseClicked(mouseButtonEvent, bl);
         }
 
         @Override
-        public boolean mouseClicked(double mouseX, double mouseY, int button) {
-            this.parent.setSelected(this);
-            return false;
+        public void renderContent(GuiGraphics guiGraphics, int i, int j, boolean bl, float f) {
+            nameWidget.setPosition(this.getContentX() + 2, this.getContentY() + 1);
+            nameWidget.render(guiGraphics, i, j, f);
         }
     }
 }

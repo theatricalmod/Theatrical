@@ -1,11 +1,23 @@
 package dev.imabad.theatrical.networks.members;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.core.UUIDUtil;
+
 import java.util.Objects;
 import java.util.UUID;
 
 public final class TheatricalNetworkMember {
     private final UUID playerId;
     private TheatricalNetworkMemberRole role;
+
+    public static final Codec<TheatricalNetworkMember> CODEC = RecordCodecBuilder.create(
+            instance -> instance.group(
+                    UUIDUtil.CODEC.fieldOf("player").forGetter(TheatricalNetworkMember::playerId),
+                    TheatricalNetworkMemberRole.CODEC.fieldOf("role").forGetter(TheatricalNetworkMember::role)
+            ).apply(instance,
+                    TheatricalNetworkMember::new)
+    );
 
     public TheatricalNetworkMember(UUID playerId, TheatricalNetworkMemberRole role) {
         this.playerId = playerId;

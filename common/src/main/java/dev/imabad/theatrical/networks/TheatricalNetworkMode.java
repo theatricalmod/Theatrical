@@ -1,5 +1,6 @@
 package dev.imabad.theatrical.networks;
 
+import net.minecraft.core.Direction;
 import net.minecraft.util.StringRepresentable;
 import org.jetbrains.annotations.NotNull;
 
@@ -8,6 +9,8 @@ public enum TheatricalNetworkMode implements StringRepresentable {
     PUBLIC("PUBLIC"),
     INVITE("INVITE"),
     PRIVATE("PRIVATE");
+
+    public static final EnumCodec<TheatricalNetworkMode> CODEC = StringRepresentable.fromEnum(TheatricalNetworkMode::values);
 
     private final String name;
 

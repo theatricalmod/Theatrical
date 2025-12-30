@@ -1,8 +1,8 @@
 package dev.imabad.theatrical;
 
 import dev.architectury.injectables.annotations.ExpectPlatform;
-import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.renderer.block.model.BlockStateModel;
+import net.minecraft.resources.Identifier;
 
 import java.nio.file.Path;
 
@@ -15,7 +15,7 @@ public class TheatricalExpectPlatform {
     }
 
     @ExpectPlatform
-    public static BakedModel getBakedModel(ResourceLocation modelLocation){
+    public static BlockStateModel getBakedModel(Identifier modelLocation){
         throw new AssertionError();
     }
     @ExpectPlatform

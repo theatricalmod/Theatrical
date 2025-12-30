@@ -19,6 +19,7 @@ import net.minecraft.client.gui.layouts.FrameLayout;
 import net.minecraft.client.gui.layouts.GridLayout;
 import net.minecraft.client.gui.layouts.LayoutSettings;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.achievement.StatsScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 
@@ -100,33 +101,22 @@ public class ArtNetConfigurationScreen extends Screen {
         universe.visible = false;
         universe.active = false;
         layout.addChild(universe, 3, 3);
-        layout.addChild(new CycleButton.Builder<Boolean>((enabled) ->
-            Component.translatable("screen.artnetconfig.enabled", enabled ? "Yes" : "No")
-        ).withValues(List.of(true, false)).displayOnlyValue().withInitialValue(enabled).create(xCenter, yCenter, 150, 20, Component.translatable("screen.artnetconfig.enabled"), (obj, val) -> {
-            this.enabled = val;
-        }), 5, 1);
-        layout.addChild(new CycleButton.Builder<UUID>((networkId) ->
-        {
-            if (TheatricalClient.getArtNetManager().getKnownNetworks().containsKey(networkId)) {
-                return Component.literal(TheatricalClient.getArtNetManager().getKnownNetworks().get(networkId));
-            }
-            return Component.literal("Unknown");
-        }
-        ).withValues(CycleButton.ValueListSupplier.create(Stream.concat(Stream.of(UUIDUtil.NULL),
+        ;
+        layout.addChild(CycleButton.booleanBuilder(
+                Component.literal("Yes"),
+                Component.literal("No"), enabled)
+                .create(xCenter, yCenter, 150, 20, Component.translatable("screen.artnetconfig.enabled"),
+                        (obj, val) -> this.enabled = val), 5, 1);
+        layout.addChild(CycleButton.builder(networkId -> {
+                    if (TheatricalClient.getArtNetManager().getKnownNetworks().containsKey(networkId)) {
+                        return Component.literal(TheatricalClient.getArtNetManager().getKnownNetworks().get(networkId));
+                    }
+                    return Component.literal("Unknown");
+                }, networkId).withValues(CycleButton.ValueListSupplier.create(Stream.concat(Stream.of(UUIDUtil.NULL),
                         TheatricalClient.getArtNetManager().getKnownNetworks().keySet().stream()).collect(Collectors.toList())))
-                .displayOnlyValue().withInitialValue(networkId)
+                .displayOnlyValue()
                 .create(xCenter, yCenter, 150, 20,
-                        Component.translatable("screen.artnetconfig.enabled"), (obj, val) -> {
-                            this.networkId = val;
-                        }), 5, 3);
-//        layout.addChild(new Button.Builder(
-//                ,
-//                button -> {
-//                    enabled = !enabled;
-//                }).pos(xCenter + 40, yCenter + 150)
-//                .size(100, 20)
-//                .build()
-//        );
+                        Component.translatable("screen.artnetconfig.network"), (obj, val) -> this.networkId = val), 5, 3);
         layout.addChild(
                 new Button.Builder(Component.translatable("artneti.save"), button -> this.update())
                         .pos(xCenter + 40, yCenter + 200)
@@ -152,10 +142,12 @@ public class ArtNetConfigurationScreen extends Screen {
 
     protected void repositionElements() {
         FrameLayout.alignInRectangle(this.layout, 0, this.height / 6 - 12, this.width, this.height, 0.5F, 0.0F);
+        configList.repositionEntries();
     }
 
     protected void refresh(){
         configList.setEntries(universeConfigs);
+        this.repositionElements();
     }
 
     private void saveCurrentSelection(){
@@ -196,9 +188,9 @@ public class ArtNetConfigurationScreen extends Screen {
             universeEnabled.visible = true;
             universeEnabled.active = true;
             if (!universeEnabled.selected() && entry.getConfig().isEnabled()) {
-                universeEnabled.onPress();
+                universeEnabled.onPress(null);
             } else if (universeEnabled.selected() && !entry.getConfig().isEnabled()) {
-                universeEnabled.onPress();
+                universeEnabled.onPress(null);
             }
             deleteConfig.active = true;
             deleteConfig.visible = true;

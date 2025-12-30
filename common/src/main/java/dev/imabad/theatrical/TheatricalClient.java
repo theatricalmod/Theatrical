@@ -39,7 +39,9 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.state.BlockState;
@@ -119,12 +121,12 @@ public class TheatricalClient {
         LightManager.updateAll(levelRenderer);
     }
 
-    public static void renderWorldLast(PoseStack poseStack, Matrix4f projectionMatrix, Camera camera, float tickDelta){
+    public static void renderWorldLast(PoseStack poseStack, CameraRenderState camera){
         Minecraft mc = Minecraft.getInstance();
-        LazyRenderers.doRender(camera,poseStack, mc.renderBuffers().bufferSource(), tickDelta);
+        LazyRenderers.doRender(camera, poseStack);
         if(Platform.isDevelopmentEnvironment()) {
             if (mc.getDebugOverlay().showDebugScreen()) {
-                Vec3 cameraPos = camera.getPosition();
+                Vec3 cameraPos = camera.pos;
                 //#region translateToCamera
                 poseStack.pushPose();
                 poseStack.translate(-cameraPos.x, -cameraPos.y, -cameraPos.z);
@@ -135,16 +137,17 @@ public class TheatricalClient {
                     //#region MainRender
                     poseStack.pushPose();
                     MultiBufferSource.BufferSource bufferSource = Minecraft.getInstance().renderBuffers().bufferSource();
-                    VertexConsumer buffer = bufferSource.getBuffer(RenderType.lines());
+                    VertexConsumer buffer = bufferSource.getBuffer(RenderTypes.lines());
                     poseStack.pushPose();
                     poseStack.translate(0.5, 0.5, 0.5);
-                    LevelRenderer.renderLineBox(poseStack, buffer, AABB.ofSize(new Vec3(0, 0, 0), 1d, 1d, 1d), 1, 1, 1, 1);
+                    //TODO: Gizmos!
+//                    LevelRenderer.renderLineBox(poseStack, buffer, AABB.ofSize(new Vec3(0, 0, 0), 1d, 1d, 1d), 1, 1, 1, 1);
                     poseStack.popPose();
                     float[] values = null;
                     if (Minecraft.getInstance().level.getBlockEntity(MY_BLOCK) != null) {
                         values = renderThings(MY_BLOCK, buffer, poseStack, (BaseLightBlockEntity) Minecraft.getInstance().level.getBlockEntity(MY_BLOCK), bufferSource);
                     }
-                    bufferSource.endBatch(RenderType.lines());
+                    bufferSource.endBatch(RenderTypes.lines());
                     if (values != null) {
                         poseStack.pushPose();
                         poseStack.translate(-0.5, 1.25, 0.5);
@@ -153,8 +156,9 @@ public class TheatricalClient {
                         Direction opposite = blockState.getValue(MovingLightBlock.HANG_DIRECTION).getOpposite();
                         poseStack.mulPose(Axis.XP.rotationDegrees(180));
                         poseStack.mulPose(Axis.YP.rotationDegrees(opposite.toYRot()));
-                        Minecraft.getInstance().font.drawInBatch(String.format("OG Tilt: %s OG Pan: %s", values[0], values[1]), 0, -10, 0xffffff, false, poseStack.last().pose(), bufferSource, Font.DisplayMode.NORMAL, 0, 0xF000F0, false);
-                        Minecraft.getInstance().font.drawInBatch(String.format("DIR: %s", blockState.getValue(MovingLightBlock.FACING)), 0, -30, 0xffffff, false, poseStack.last().pose(), bufferSource, Font.DisplayMode.NORMAL, 0, 0xF000F0, false);
+                        //TODO: Gizmos
+//                        Minecraft.getInstance().font.drawInBatch(String.format("OG Tilt: %s OG Pan: %s", values[0], values[1]), 0, -10, 0xffffff, false, poseStack.last().pose(), bufferSource, Font.DisplayMode.NORMAL, 0, 0xF000F0, false);
+//                        Minecraft.getInstance().font.drawInBatch(String.format("DIR: %s", blockState.getValue(MovingLightBlock.FACING)), 0, -30, 0xffffff, false, poseStack.last().pose(), bufferSource, Font.DisplayMode.NORMAL, 0, 0xF000F0, false);
                         poseStack.popPose();
                     }
                     //#endregion

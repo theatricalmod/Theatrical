@@ -14,6 +14,9 @@ public class FixtureRendererMixin implements IBlockEntityRendererExtension<BaseL
     @Override
     public AABB getRenderBoundingBox(BaseLightBlockEntity blockEntity) {
         BlockPos pos = blockEntity.getBlockPos();
-        return AABB.encapsulatingFullBlocks(pos, blockEntity.getEmissionBlock());
+        if(blockEntity.getEmissionBlock() != null) {
+            return AABB.encapsulatingFullBlocks(pos, blockEntity.getEmissionBlock());
+        }
+        return AABB.of(new BoundingBox(pos));
     }
 }

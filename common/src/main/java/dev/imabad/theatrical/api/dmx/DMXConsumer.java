@@ -1,7 +1,7 @@
 package dev.imabad.theatrical.api.dmx;
 
 import ch.bildspur.artnet.rdm.RDMDeviceId;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.UUID;
 
@@ -21,7 +21,7 @@ public interface DMXConsumer extends BelongsToNetwork {
 
     String getModelName();
 
-    ResourceLocation getFixtureId();
+    Identifier getFixtureId();
 
     int getActivePersonality();
 

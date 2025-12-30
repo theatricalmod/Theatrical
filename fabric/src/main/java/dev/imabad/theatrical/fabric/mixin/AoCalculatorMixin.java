@@ -23,7 +23,7 @@ public abstract class AoCalculatorMixin {
     private static void onGetLightmapCoordinates(BlockAndTintGetter world, BlockState state, BlockPos pos, CallbackInfoReturnable<Integer> cir) {
         if (!LightManager.shouldUpdateDynamicLight(true))
             return; // Do not touch to the value.
-        if (!world.getBlockState(pos).isSolidRender(world, pos))
+        if (!world.getBlockState(pos).isSolidRender())
             cir.setReturnValue(LightManager.getLightmapWithDynamicLight(pos, cir.getReturnValue()));
     }
 }

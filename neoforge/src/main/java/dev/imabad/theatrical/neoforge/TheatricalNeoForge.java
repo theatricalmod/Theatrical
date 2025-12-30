@@ -10,8 +10,7 @@ public class TheatricalNeoForge {
 
     public TheatricalNeoForge(IEventBus modBus) {
         Theatrical.init();
-        modBus.addListener(DataEvent::onData);
-        if (FMLEnvironment.dist.isClient()) {
+        if (FMLEnvironment.getDist().isClient()) {
             TheatricalNeoForgeClient.init(modBus);
         }
     }

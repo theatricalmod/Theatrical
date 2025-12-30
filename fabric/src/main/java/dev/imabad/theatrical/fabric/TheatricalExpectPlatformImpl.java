@@ -5,8 +5,8 @@ import dev.imabad.theatrical.TheatricalExpectPlatform;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.renderer.block.model.BlockStateModel;
+import net.minecraft.resources.Identifier;
 
 import java.nio.file.Path;
 import java.util.Optional;
@@ -19,8 +19,8 @@ public class TheatricalExpectPlatformImpl {
         return FabricLoader.getInstance().getConfigDir();
     }
 
-    public static BakedModel getBakedModel(ResourceLocation modelLocation){
-        return Minecraft.getInstance().getModelManager().getModel(modelLocation);
+    public static BlockStateModel getBakedModel(Identifier modelLocation){
+        return Minecraft.getInstance().getModelManager().getModel(TheatricalClientFabric.EXTRA_MODELS.get(modelLocation));
     }
 
     public static String getModVersion() {

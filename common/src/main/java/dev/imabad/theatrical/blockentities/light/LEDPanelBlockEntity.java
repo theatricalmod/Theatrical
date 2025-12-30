@@ -4,7 +4,7 @@ import dev.imabad.theatrical.api.Fixture;
 import dev.imabad.theatrical.blockentities.BlockEntities;
 import dev.imabad.theatrical.fixtures.Fixtures;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -70,7 +70,7 @@ public class LEDPanelBlockEntity extends BaseDMXConsumerLightBlockEntity {
     }
 
     @Override
-    public ResourceLocation getFixtureId() {
+    public Identifier getFixtureId() {
         return Fixtures.LED_PANEL.getId();
     }
 

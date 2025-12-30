@@ -1,3 +1,6 @@
 accessWidener   v2  named
-accessible method net/minecraft/client/renderer/RenderType translucentState (Lnet/minecraft/client/renderer/RenderStateShard$ShaderStateShard;)Lnet/minecraft/client/renderer/RenderType$CompositeState;
+#accessible method net/minecraft/client/renderer/RenderType translucentState (Lnet/minecraft/client/renderer/RenderStateShard$ShaderStateShard;)Lnet/minecraft/client/renderer/RenderType$CompositeState;
 accessible method net/minecraft/client/gui/components/Checkbox <init> (IIILnet/minecraft/network/chat/Component;Lnet/minecraft/client/gui/Font;ZLnet/minecraft/client/gui/components/Checkbox$OnValueChange;)V
+accessible method net/minecraft/world/level/block/entity/BlockEntityType <init> (Lnet/minecraft/world/level/block/entity/BlockEntityType$BlockEntitySupplier;Ljava/util/Set;)V
+accessible field net/minecraft/client/gui/components/Checkbox textWidget Lnet/minecraft/client/gui/components/MultiLineTextWidget;
+accessible method net/minecraft/client/gui/components/AbstractSelectionList repositionEntries ()V

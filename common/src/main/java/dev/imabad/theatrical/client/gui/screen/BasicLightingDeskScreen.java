@@ -12,9 +12,11 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.CycleButton;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -22,7 +24,7 @@ import java.util.stream.Stream;
 
 public class BasicLightingDeskScreen extends Screen {
 
-    private final ResourceLocation GUI = Theatrical.location( "textures/gui/lighting_console.png");
+    private final Identifier GUI = Theatrical.location( "textures/gui/lighting_console.png");
 
     private final int imageWidth;
     private final int imageHeight;
@@ -54,7 +56,7 @@ public class BasicLightingDeskScreen extends Screen {
     private void renderWindow(GuiGraphics guiGraphics) {
         int relX = (this.width - this.imageWidth) / 2;
         int relY = (this.height - this.imageHeight) / 2;
-        guiGraphics.blit(GUI, relX, relY, 0, 0, this.imageWidth, this.imageHeight);
+        guiGraphics.blit(RenderPipelines.GUI_TEXTURED, GUI, relX, relY, 0f, 0f, this.imageWidth, this.imageHeight, 256, 256);
     }
 
     private void renderLabels(GuiGraphics guiGraphics) {
@@ -69,11 +71,11 @@ public class BasicLightingDeskScreen extends Screen {
     }
 
     private void renderLabel(GuiGraphics guiGraphics, String translationKey, int offSetX, int offSetY, Object... replacements) {
-        guiGraphics.pose().pushPose();
+        guiGraphics.pose().pushMatrix();
 //        guiGraphics.pose().scale(0.8f, 0.8f, 0.8f);
         MutableComponent translatable = Component.translatable(translationKey, replacements);
         guiGraphics.drawString(font, translatable, (xCenter + (this.imageWidth / 2) - (this.font.width(translatable.getString()) / 2)) + offSetX, yCenter + offSetY, 0x404040, false);
-        guiGraphics.pose().popPose();
+        guiGraphics.pose().popMatrix();
     }
 
     @Override
@@ -113,17 +115,15 @@ public class BasicLightingDeskScreen extends Screen {
         this.fadeOutTime.setValue(Integer.toString(be.getFadeOutTicks()));
         this.addRenderableWidget(fadeInTime);
         this.addRenderableWidget(fadeOutTime);
-        this.addRenderableWidget(new CycleButton.Builder<UUID>((networkId) ->
-        {
-            if (TheatricalClient.getArtNetManager().getKnownNetworks().containsKey(networkId)) {
-                return Component.literal(TheatricalClient.getArtNetManager().getKnownNetworks().get(networkId));
-            }
-            return Component.literal("Unknown");
-        }
-        ).withValues(CycleButton.ValueListSupplier.create(Stream.concat(Stream.of(UUIDUtil.NULL),
+        this.addRenderableWidget(CycleButton.builder(networkId -> {
+                    if (TheatricalClient.getArtNetManager().getKnownNetworks().containsKey(networkId)) {
+                        return Component.literal(TheatricalClient.getArtNetManager().getKnownNetworks().get(networkId));
+                    }
+                    return Component.literal("Unknown");
+                }, networkId).withValues(CycleButton.ValueListSupplier.create(Stream.concat(Stream.of(UUIDUtil.NULL),
                         TheatricalClient.getArtNetManager().getKnownNetworks().keySet().stream()).collect(Collectors.toList())))
-                .displayOnlyValue().withInitialValue(networkId)
-                .create(xCenter + 45, yCenter + 130, 150, 20,
+                .displayOnlyValue()
+                .create(xCenter +45, yCenter + 130, 150, 20,
                         Component.translatable("screen.artnetconfig.network"), (obj, val) -> {
                             this.networkId = val;
                             NetworkManager.sendToServer(new UpdateNetworkId(be.getBlockPos(), networkId));
@@ -144,16 +144,16 @@ public class BasicLightingDeskScreen extends Screen {
     }
 
     @Override
-    public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
+    public boolean mouseDragged(MouseButtonEvent mouseButtonEvent, double dragX, double dragY) {
         this.children().forEach(widget -> {
             if(widget instanceof FaderWidget fader) {
-                if (fader.isMouseOver(mouseX, mouseY) && fader.isDragging()) {
-                    int newVal = fader.updateValue(mouseY);
+                if (fader.isMouseOver(mouseButtonEvent.x(), mouseButtonEvent.y()) && fader.isDragging()) {
+                    int newVal = fader.updateValue(mouseButtonEvent.y());
                     NetworkManager.sendToServer(new ControlUpdateFader(be.getBlockPos(), fader.getChannel(), newVal));
                 }
             }
         });
-        return super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
+        return super.mouseDragged(mouseButtonEvent, dragX, dragY);
     }
 
     @Override

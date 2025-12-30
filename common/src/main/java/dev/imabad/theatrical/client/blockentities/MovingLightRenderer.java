@@ -1,49 +1,65 @@
 package dev.imabad.theatrical.client.blockentities;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import dev.imabad.theatrical.TheatricalExpectPlatform;
-import dev.imabad.theatrical.blockentities.light.LEDPanelBlockEntity;
 import dev.imabad.theatrical.blockentities.light.MovingLightBlockEntity;
-import dev.imabad.theatrical.blocks.HangableBlock;
 import dev.imabad.theatrical.client.LazyRenderers;
 import dev.imabad.theatrical.client.TheatricalRenderTypes;
+import dev.imabad.theatrical.client.blockentities.state.MovingLightRenderState;
 import net.minecraft.client.Camera;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.block.model.BlockStateModel;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
-import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.Direction;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 
-import java.util.Optional;
-
+import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 
-public class MovingLightRenderer extends FixtureRenderer<MovingLightBlockEntity> {
-    private BakedModel cachedPanModel, cachedTiltModel, cachedStaticModel;
+public class MovingLightRenderer extends FixtureRenderer<MovingLightBlockEntity, MovingLightRenderState> {
+    private BlockStateModel cachedPanModel, cachedTiltModel, cachedStaticModel;
 
     public MovingLightRenderer(BlockEntityRendererProvider.Context context) {
         super(context);
     }
 
     @Override
-    public void renderModel(MovingLightBlockEntity blockEntity, PoseStack poseStack, VertexConsumer vertexConsumer, Direction facing, float partialTicks, boolean isFlipped, BlockState blockState, boolean isHanging, int packedLight, int packedOverlay) {
+    public void renderModel(MovingLightRenderState renderState, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, Direction facing, boolean isFlipped, boolean isHanging) {
         if(cachedStaticModel == null){
-            cachedStaticModel = TheatricalExpectPlatform.getBakedModel(blockEntity.getFixture().getStaticModel());
+            cachedStaticModel = TheatricalExpectPlatform.getBakedModel(renderState.fixtureRenderState.staticModel);
         }
         if (cachedPanModel == null){
-            cachedPanModel = TheatricalExpectPlatform.getBakedModel(blockEntity.getFixture().getPanModel());
+            cachedPanModel = TheatricalExpectPlatform.getBakedModel(renderState.fixtureRenderState.panModel);
         }
         if (cachedTiltModel == null){
-            cachedTiltModel = TheatricalExpectPlatform.getBakedModel(blockEntity.getFixture().getTiltModel());
+            cachedTiltModel = TheatricalExpectPlatform.getBakedModel(renderState.fixtureRenderState.tiltModel);
         }
+        setupPoseStack(renderState, poseStack, submitNodeCollector, facing, isFlipped, isHanging,
+                (nodeCollector, ps, state) ->
+                        minecraftRenderModel(ps, nodeCollector, cachedStaticModel, state.lightCoords,
+                                OverlayTexture.NO_OVERLAY, 0),
+                (nodeCollector, ps, state) ->
+                        minecraftRenderModel(poseStack, submitNodeCollector,  cachedPanModel, renderState.lightCoords,
+                                OverlayTexture.NO_OVERLAY, 0),
+                (nodeCollector, ps, state) ->
+                        minecraftRenderModel(poseStack, submitNodeCollector, cachedTiltModel, renderState.lightCoords,
+                                OverlayTexture.NO_OVERLAY, 0));
+    }
+
+    private void setupPoseStack(MovingLightRenderState renderState, PoseStack poseStack,
+                                SubmitNodeCollector submitNodeCollector, Direction facing,
+                                boolean isFlipped, boolean isHanging,
+                                @Nullable FixtureRenderCall<MovingLightRenderState> staticRender,
+                                @Nullable FixtureRenderCall<MovingLightRenderState> panRender,
+                                @Nullable FixtureRenderCall<MovingLightRenderState> tiltRender) {
         //#region Fixture Hanging
         poseStack.translate(0.5F, 0, .5F);
         if(isHanging){
-            Direction hangDirection = blockState.getValue(HangableBlock.HANG_DIRECTION);
+            Direction hangDirection = renderState.hangDirection;
             poseStack.translate(0, 0.5, 0F);
             if(hangDirection.getAxis() != Direction.Axis.Y){
                 if(hangDirection.getAxis() == Direction.Axis.Z){
@@ -70,13 +86,8 @@ public class MovingLightRenderer extends FixtureRenderer<MovingLightBlockEntity>
         poseStack.mulPose(Axis.YP.rotationDegrees(facing.toYRot()));
         poseStack.translate(-0.5F, 0, -.5F);
         if (isHanging) {
-            Optional<BlockState> optionalSupport = blockEntity.getSupportingStructure();
-            if (optionalSupport.isPresent()) {
-                float[] transforms = blockEntity.getFixture().getTransforms(blockState, optionalSupport.get());
-                poseStack.translate(transforms[0], transforms[1], transforms[2]);
-            } else {
-                poseStack.translate(0, 0.19, 0);
-            }
+            float[] supportTransforms = renderState.supportTransforms;
+            poseStack.translate(supportTransforms[0], supportTransforms[1], supportTransforms[2]);
             poseStack.translate(0, -0.08, 0);
         }
         if (isFlipped) {
@@ -85,131 +96,65 @@ public class MovingLightRenderer extends FixtureRenderer<MovingLightBlockEntity>
             poseStack.translate(-0.5F, -0.5, -.5F);
         }
         // Static Model Render
-        minecraftRenderModel(poseStack, vertexConsumer, blockState, cachedStaticModel, packedLight, packedOverlay);
+        if(staticRender != null) {
+            staticRender.render(submitNodeCollector, poseStack, renderState);
+        }
         //#region Model Pan
-        float[] pans = blockEntity.getFixture().getPanRotationPosition();
+        float[] pans = renderState.fixtureRenderState.panRotationPosition;
         poseStack.translate(pans[0], pans[1], pans[2]);
-        int prevPan = blockEntity.getPrevPan();
-        int pan = blockEntity.getPan();
-        poseStack.mulPose(Axis.YP.rotationDegrees((prevPan + (pan - prevPan) * partialTicks)));
+        poseStack.mulPose(Axis.YP.rotationDegrees(renderState.interpolatedPan));
         poseStack.translate(-pans[0], -pans[1], -pans[2]);
-        minecraftRenderModel(poseStack, vertexConsumer, blockState, cachedPanModel, packedLight, packedOverlay);
+        if(panRender != null) {
+            panRender.render(submitNodeCollector, poseStack, renderState);
+        }
         //#endregion
         //#region Model Tilt
-        float[] tilts = blockEntity.getFixture().getTiltRotationPosition();
+        float[] tilts = renderState.fixtureRenderState.tiltRotationPosition;
         poseStack.translate(tilts[0], tilts[1], tilts[2]);
-        int prevTilt = blockEntity.getPrevTilt();
-        int tilt = blockEntity.getTilt();
         if (isFlipped) {
             poseStack.mulPose(Axis.XP.rotationDegrees(-180));
         } else {
             poseStack.mulPose(Axis.XP.rotationDegrees(180));
         }
-        poseStack.mulPose(Axis.XP.rotationDegrees((prevTilt + (tilt - prevTilt) * partialTicks)));
+        poseStack.mulPose(Axis.XP.rotationDegrees(renderState.interpolatedTilt));
         poseStack.translate(-tilts[0], -tilts[1], -tilts[2]);
-        minecraftRenderModel(poseStack, vertexConsumer, blockState, cachedTiltModel, packedLight, packedOverlay);
+        if(tiltRender != null) {
+            tiltRender.render(submitNodeCollector, poseStack, renderState);
+        }
         //#endregion
     }
-    @Override
-    public void beforeRenderBeam(MovingLightBlockEntity blockEntity, PoseStack poseStack, VertexConsumer vertexConsumer, MultiBufferSource multiBufferSource, Direction facing, float partialTicks, boolean isFlipped, BlockState blockstate, boolean isHanging, int packedLight, int packedOverlay) {
-        if(blockEntity.getIntensity() > 0){
-            LazyRenderers.addLazyRender(new LazyRenderers.LazyRenderer() {
-                @Override
-                public void render(MultiBufferSource.BufferSource bufferSource, PoseStack poseStack, Camera camera, float partialTick) {
-                    poseStack.pushPose();
-                    Vec3 offset = Vec3.atLowerCornerOf(blockEntity.getBlockPos()).subtract(camera.getPosition());
-                    poseStack.translate(offset.x, offset.y, offset.z);
-                    preparePoseStack(blockEntity, poseStack, facing, partialTick, isFlipped, blockstate, isHanging);
-                    VertexConsumer beamConsumer = multiBufferSource.getBuffer(TheatricalRenderTypes.BEAM);
-//            poseStack.translate(blockEntity.getFixture().getBeamStartPosition()[0], blockEntity.getFixture().getBeamStartPosition()[1], blockEntity.getFixture().getBeamStartPosition()[2]);
-                    float intensity = (blockEntity.getPrevIntensity() + ((blockEntity.getIntensity()) - blockEntity.getPrevIntensity()) * partialTicks);
-                    int color = blockEntity.getColour();
-                    int r = (color >> 16) & 0xFF;
-                    int g = (color >> 8) & 0xFF;
-                    int b = color & 0xFF;
-                    int a = (int) (((intensity * 1) / 255f) * 255);
-                    poseStack.translate(0, 0f, 0.123f);
-                    Matrix4f m = poseStack.last().pose();
-                    Matrix3f normal = poseStack.last().normal();
-                    addVertex(beamConsumer, m, normal, r, g, b, a, 0.375f, 0.625f , 0f);
-                    addVertex(beamConsumer, m, normal, r, g, b, a,  0.625f, 0.625f, 0f);
-                    addVertex(beamConsumer, m, normal, r, g, b, a, 0.625f, 0.375f,0f);
-                    addVertex(beamConsumer, m, normal, r, g, b, a,0.375f, 0.375f, 0f);
-                    poseStack.popPose();
-                }
 
-                @Override
-                public Vec3 getPos(float partialTick) {
-                    return blockEntity.getBlockPos().getCenter();
-                }
+    @Override
+    public void preparePoseStack(MovingLightRenderState renderState, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, Direction facing, boolean isFlipped, boolean isHanging) {
+        setupPoseStack(renderState, poseStack, submitNodeCollector, facing, isFlipped, isHanging, null, null, null);
+    }
+
+
+    @Override
+    public void beforeRenderBeam(MovingLightRenderState renderState, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, Direction facing, boolean isFlipped, boolean isHanging) {
+        if(renderState.intensity > 0){
+            poseStack.pushPose();
+            float intensity = renderState.interpolatedIntensity;
+            int color = renderState.colour;
+            int r = (color >> 16) & 0xFF;
+            int g = (color >> 8) & 0xFF;
+            int b = color & 0xFF;
+            int a = (int) (((intensity * 1) / 255f) * 255);
+            poseStack.translate(0, 0f, 0.123f);
+            Matrix4f m = poseStack.last().pose();
+            Matrix3f normal = poseStack.last().normal();
+            submitNodeCollector.order(1).submitCustomGeometry(poseStack, TheatricalRenderTypes.BEAM, (pose, beamConsumer) -> {
+                addVertex(beamConsumer, m, normal, r, g, b, a, 0.375f, 0.625f , 0f);
+                addVertex(beamConsumer, m, normal, r, g, b, a,  0.625f, 0.625f, 0f);
+                addVertex(beamConsumer, m, normal, r, g, b, a, 0.625f, 0.375f,0f);
+                addVertex(beamConsumer, m, normal, r, g, b, a,0.375f, 0.375f, 0f);
             });
+            poseStack.popPose();
         }
     }
 
     @Override
-    public void preparePoseStack(MovingLightBlockEntity blockEntity, PoseStack poseStack, Direction facing, float partialTicks, boolean isFlipped, BlockState blockState, boolean isHanging) {
-        poseStack.translate(0.5F, 0, .5F);
-        if(isHanging){
-            Direction hangDirection = blockState.getValue(HangableBlock.HANG_DIRECTION);
-            poseStack.translate(0, 0.5, 0F);
-            if(hangDirection.getAxis() != Direction.Axis.Y){
-                if(hangDirection.getAxis() == Direction.Axis.Z){
-                    if(hangDirection == Direction.SOUTH) {
-                        poseStack.mulPose(Axis.ZP.rotationDegrees(90));
-                        poseStack.mulPose(Axis.XP.rotationDegrees(-90));
-                    } else {
-                        poseStack.mulPose(Axis.ZP.rotationDegrees(90));
-                        poseStack.mulPose(Axis.XP.rotationDegrees(90));
-                    }
-                } else {
-                    if(hangDirection == Direction.EAST) {
-                        poseStack.mulPose(Axis.ZN.rotationDegrees(-90));
-                    } else {
-                        poseStack.mulPose(Axis.ZN.rotationDegrees(90));
-                    }
-                }
-            } else {
-                //TODO: Handle hanging up
-            }
-            poseStack.translate(0, -0.5, 0F);
-        }
-        //#endregion
-        poseStack.mulPose(Axis.YP.rotationDegrees(facing.toYRot()));
-        poseStack.translate(-0.5F, 0, -.5F);
-        if (isHanging) {
-            Optional<BlockState> optionalSupport = blockEntity.getSupportingStructure();
-            if (optionalSupport.isPresent()) {
-                float[] transforms = blockEntity.getFixture().getTransforms(blockState, optionalSupport.get());
-                poseStack.translate(transforms[0], transforms[1], transforms[2]);
-            } else {
-                poseStack.translate(0, 0.19, 0);
-            }
-            poseStack.translate(0, -0.08, 0);
-        }
-        if (isFlipped) {
-            poseStack.translate(0.5F, 0.5, .5F);
-            poseStack.mulPose(Axis.ZP.rotationDegrees(180));
-            poseStack.translate(-0.5F, -0.5, -.5F);
-        }
-        float[] pans = blockEntity.getFixture().getPanRotationPosition();
-        poseStack.translate(pans[0], pans[1], pans[2]);
-        int prevPan = blockEntity.getPrevPan();
-        int pan = blockEntity.getPan();
-        poseStack.mulPose(Axis.YP.rotationDegrees((prevPan + (pan - prevPan) * partialTicks)));
-        poseStack.translate(-pans[0], -pans[1], -pans[2]);
-        //#endregion
-        //#region Model Tilt
-        float[] tilts = blockEntity.getFixture().getTiltRotationPosition();
-        poseStack.translate(tilts[0], tilts[1], tilts[2]);
-        int prevTilt = blockEntity.getPrevTilt();
-        int tilt = blockEntity.getTilt();
-        if (isFlipped) {
-            poseStack.mulPose(Axis.XP.rotationDegrees(-180));
-        } else {
-            poseStack.mulPose(Axis.XP.rotationDegrees(180));
-        }
-        poseStack.mulPose(Axis.XP.rotationDegrees((prevTilt + (tilt - prevTilt) * partialTicks)));
-        poseStack.translate(-tilts[0], -tilts[1], -tilts[2]);
-        //#endregion
+    public MovingLightRenderState createRenderState() {
+        return new MovingLightRenderState();
     }
 }

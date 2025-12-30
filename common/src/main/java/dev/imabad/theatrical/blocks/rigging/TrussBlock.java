@@ -5,19 +5,16 @@ import dev.imabad.theatrical.blocks.Blocks;
 import dev.imabad.theatrical.blocks.HangableBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.context.BlockPlaceContext;
-import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.*;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.RotatedPillarBlock;
 import net.minecraft.world.level.block.SimpleWaterloggedBlock;
@@ -36,9 +33,8 @@ public class TrussBlock extends RotatedPillarBlock implements SimpleWaterloggedB
 
     private static final VoxelShape SHAPE = Block.box(0, 0, 0, 16, 16, 16);
 
-    public TrussBlock() {
-        super(Properties.of()
-                .requiresCorrectToolForDrops()
+    public TrussBlock(Properties properties) {
+        super(properties.requiresCorrectToolForDrops()
                 .strength(3, 3)
                 .noOcclusion()
                 .isValidSpawn(Blocks::neverAllowSpawn)
@@ -71,12 +67,13 @@ public class TrussBlock extends RotatedPillarBlock implements SimpleWaterloggedB
     }
 
     @Override
-    public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
-        if(state.getValue(BlockStateProperties.WATERLOGGED)){
-            level.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
+    protected BlockState updateShape(BlockState blockState, LevelReader levelReader, ScheduledTickAccess scheduledTickAccess, BlockPos blockPos, Direction direction, BlockPos blockPos2, BlockState blockState2, RandomSource randomSource) {
+        if(blockState.getValue(BlockStateProperties.WATERLOGGED)){
+            scheduledTickAccess.scheduleTick(blockPos, Fluids.WATER, Fluids.WATER.getTickDelay(levelReader));
         }
-        return super.updateShape(state, direction, neighborState, level, pos, neighborPos);
+        return super.updateShape(blockState, levelReader, scheduledTickAccess, blockPos, direction, blockPos2, blockState2, randomSource);
     }
+
     @Override
     public float[] getHookTransforms(LevelReader levelReader, BlockPos pos, Direction facing) {
         return new float[]{0, 0F, 0};
@@ -88,12 +85,12 @@ public class TrussBlock extends RotatedPillarBlock implements SimpleWaterloggedB
     }
 
     @Override
-    public boolean propagatesSkylightDown(BlockState blockState, BlockGetter blockGetter, BlockPos blockPos) {
+    protected boolean propagatesSkylightDown(BlockState blockState) {
         return true;
     }
 
     @Override
-    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+    protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
         Item item = player.getItemInHand(hand).getItem();
         if (item instanceof BlockItem blockItem) {
             if(blockItem.getBlock() instanceof HangableBlock hangableBlock){
@@ -104,7 +101,7 @@ public class TrussBlock extends RotatedPillarBlock implements SimpleWaterloggedB
                     offset = pos.relative(Direction.DOWN);
                 }
                 if(!level.getBlockState(offset).isAir()){
-                    return ItemInteractionResult.FAIL;
+                    return InteractionResult.FAIL;
                 }
                 Direction hangDirection = Direction.UP;
                 if(hitResult.getDirection().getAxis() == Direction.Axis.Y){
@@ -121,7 +118,7 @@ public class TrussBlock extends RotatedPillarBlock implements SimpleWaterloggedB
                         player.setItemInHand(hand, new ItemStack(Items.AIR));
                     }
                 }
-                return ItemInteractionResult.CONSUME;
+                return InteractionResult.CONSUME;
             }
         }
         return super.useItemOn(stack, state, level, pos, player, hand, hitResult);

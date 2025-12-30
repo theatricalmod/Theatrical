@@ -1,5 +1,6 @@
 package dev.imabad.theatrical.networks.members;
 
+import dev.imabad.theatrical.networks.TheatricalNetworkMode;
 import net.minecraft.util.StringRepresentable;
 import org.jetbrains.annotations.NotNull;
 
@@ -8,6 +9,7 @@ public enum TheatricalNetworkMemberRole implements StringRepresentable {
     SEND("SEND"),
     ADMIN("ADMIN");
 
+    public static final EnumCodec<TheatricalNetworkMemberRole> CODEC = StringRepresentable.fromEnum(TheatricalNetworkMemberRole::values);
     private final String name;
 
     TheatricalNetworkMemberRole(String name) {

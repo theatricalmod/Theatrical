@@ -120,7 +120,7 @@ public class FresnelBlock extends BaseLightBlock {
 
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
-        if (level.isClientSide) {
+        if (level.isClientSide()) {
             if (player.isCrouching()) {
                 if (TheatricalClient.DEBUG_BLOCKS.contains(pos)) {
                     TheatricalClient.DEBUG_BLOCKS.remove(pos);
@@ -129,10 +129,10 @@ public class FresnelBlock extends BaseLightBlock {
                 }
                 return InteractionResult.SUCCESS;
             }
-        } else {
+        } else if(super.useWithoutItem(state, level, pos, player, hitResult) == InteractionResult.PASS) {
             NetworkManager.sendToPlayer((ServerPlayer) player, new OpenScreen(pos, TheatricalScreen.GENERIC_PAN_TILT));
         }
-        return super.useWithoutItem(state, level, pos, player, hitResult);
+        return InteractionResult.FAIL;
     }
 
     @Override

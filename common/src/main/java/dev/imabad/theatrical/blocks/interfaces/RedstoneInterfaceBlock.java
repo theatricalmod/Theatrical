@@ -20,7 +20,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
@@ -35,9 +34,8 @@ import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 
 public class RedstoneInterfaceBlock  extends Block implements EntityBlock {
-    public RedstoneInterfaceBlock() {
-        super(Properties.of()
-                .requiresCorrectToolForDrops()
+    public RedstoneInterfaceBlock(Properties properties) {
+        super(properties.requiresCorrectToolForDrops()
                 .strength(3, 3)
                 .noOcclusion()
                 .isValidSpawn(Blocks::neverAllowSpawn)
@@ -52,14 +50,14 @@ public class RedstoneInterfaceBlock  extends Block implements EntityBlock {
     }
 
     @Override
-    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+    protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
         if(!level.isClientSide()) {
             BlockEntity be = level.getBlockEntity(pos);
             if (be instanceof RedstoneInterfaceBlockEntity redstoneInterfaceBlockEntity) {
                 if (!redstoneInterfaceBlockEntity.getNetworkId().equals(UUIDUtil.NULL)) {
                     TheatricalNetwork network = TheatricalNetworkData.getInstance(level.getServer().overworld()).getNetwork(redstoneInterfaceBlockEntity.getNetworkId());
                     if (network != null && !network.members().isMember(player.getUUID())) {
-                        return ItemInteractionResult.FAIL;
+                        return InteractionResult.FAIL;
                     }
                 }
                 if (player.getItemInHand(hand).getItem() == Items.CONFIGURATION_CARD.get()) {
@@ -78,15 +76,15 @@ public class RedstoneInterfaceBlock  extends Block implements EntityBlock {
                             itemInHand.set(DataComponents.CONFIGURATION_CARD_DATA.get(), data);
                         }
                         TheatricalNetworkData instance = TheatricalNetworkData.getInstance(level.getServer().overworld());
-                        player.sendSystemMessage(Component.translatable("item.configurationcard.success",
+                        player.displayClientMessage(Component.translatable("item.configurationcard.success",
                                 instance.getNetwork(redstoneInterfaceBlockEntity.getNetworkId()).name(),
                                 Integer.toString(redstoneInterfaceBlockEntity.getUniverse()),
                                 Integer.toString(redstoneInterfaceBlockEntity.getChannelStart()),
-                                Integer.toString(data.dmxAddress())));
-                        return ItemInteractionResult.SUCCESS;
+                                Integer.toString(data.dmxAddress())), false);
+                        return InteractionResult.SUCCESS;
                     }
                 }
-                return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+                return InteractionResult.PASS;
             }
         }
         return super.useItemOn(stack, state, level, pos, player, hand, hitResult);
@@ -94,7 +92,7 @@ public class RedstoneInterfaceBlock  extends Block implements EntityBlock {
 
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
-        if(!level.isClientSide){
+        if(!level.isClientSide()){
             RedstoneInterfaceBlockEntity be = (RedstoneInterfaceBlockEntity) level.getBlockEntity(pos);
             if(be.getNetworkId() != UUIDUtil.NULL){
                 TheatricalNetwork network = TheatricalNetworkData.getInstance(level.getServer().overworld()).getNetwork(be.getNetworkId());

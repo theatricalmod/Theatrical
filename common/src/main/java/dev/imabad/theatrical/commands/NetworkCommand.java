@@ -15,7 +15,7 @@ import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.commands.arguments.GameProfileArgument;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.server.players.GameProfileCache;
+import net.minecraft.server.players.NameAndId;
 import net.minecraft.server.players.PlayerList;
 import net.minecraft.util.Tuple;
 
@@ -63,17 +63,13 @@ public class NetworkCommand {
                                                         (commandContext, suggestionsBuilder) -> {
                                                             Set<TheatricalNetworkMember> members =
                                                                     getDMXNetwork(commandContext).members().members();
-                                                            GameProfileCache profileCache = commandContext.getSource()
-                                                                    .getServer().getProfileCache();
+                                                            PlayerList playerList = commandContext.getSource()
+                                                                    .getServer().getPlayerList();
+                                                            //TODO: Clean this up.
                                                             return SharedSuggestionProvider.suggest(
                                                                     members.stream()
-                                                                            .map(serverPlayer -> profileCache
-                                                                                    .get(serverPlayer.playerId())
-                                                                                    .orElse(new GameProfile(
-                                                                                            serverPlayer.playerId(),
-                                                                                            serverPlayer.playerId()
-                                                                                                    .toString()
-                                                                                    )).getName()),
+                                                                            .map(serverPlayer -> playerList
+                                                                                    .getPlayer(serverPlayer.playerId()).getPlainTextName()),
                                                                     suggestionsBuilder
                                                             );
                                                         }
@@ -88,7 +84,7 @@ public class NetworkCommand {
                                                             return SharedSuggestionProvider.suggest(
                                                                     playerList.getPlayers()
                                                                             .stream()
-                                                                            .map(serverPlayer -> serverPlayer.getGameProfile().getName()),
+                                                                            .map(serverPlayer -> serverPlayer.getGameProfile().name()),
                                                                     suggestionsBuilder
                                                             );
                                                         }
@@ -100,17 +96,13 @@ public class NetworkCommand {
                                                         (commandContext, suggestionsBuilder) -> {
                                                             Set<TheatricalNetworkMember> members =
                                                                     getDMXNetwork(commandContext).members().members();
-                                                            GameProfileCache profileCache = commandContext.getSource()
-                                                                    .getServer().getProfileCache();
+                                                            PlayerList playerList = commandContext.getSource()
+                                                                    .getServer().getPlayerList();
+                                                            //TODO: Clean this up.
                                                             return SharedSuggestionProvider.suggest(
                                                                     members.stream()
-                                                                            .map(serverPlayer -> profileCache
-                                                                                    .get(serverPlayer.playerId())
-                                                                                    .orElse(new GameProfile(
-                                                                                            serverPlayer.playerId(),
-                                                                                            serverPlayer.playerId()
-                                                                                                    .toString()
-                                                                                    )).getName()),
+                                                                            .map(serverPlayer -> playerList
+                                                                                    .getPlayer(serverPlayer.playerId()).getPlainTextName()),
                                                                     suggestionsBuilder
                                                             );
                                                         }
@@ -128,10 +120,10 @@ public class NetworkCommand {
                 throw ERROR_NETWORK_DOES_NOT_EXIST.create();
             }
         }
-        Collection<GameProfile> players = GameProfileArgument.getGameProfiles(context, "target");
+        Collection<NameAndId> players = GameProfileArgument.getGameProfiles(context, "target");
         TheatricalNetworkMemberRole role = MemberRoleArgument.getMode(context, "role");
-        for (GameProfile player : players) {
-            theatricalNetwork.members().setMemberRole(player.getId(), role);
+        for (NameAndId player : players) {
+            theatricalNetwork.members().setMemberRole(player.id(), role);
         }
         context.getSource().sendSuccess(() -> Component.translatable("commands.network.updated"), false);
         return 0;
@@ -185,11 +177,11 @@ public class NetworkCommand {
 
     private static int listNetworkMembers(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         TheatricalNetwork theatricalNetwork = getDMXNetwork(context);
-        GameProfileCache profileCache = context.getSource().getServer().getProfileCache();
+        PlayerList playerList = context.getSource().getServer().getPlayerList();
         List<String> list = theatricalNetwork.members().members()
                 .stream().map(TheatricalNetworkMember::playerId)
-                .map((playerUUID) -> new Tuple<>(playerUUID, profileCache.get(playerUUID)))
-                .map(uuidOptionalTuple -> uuidOptionalTuple.getB().isPresent() ? uuidOptionalTuple.getB().get().getName() : uuidOptionalTuple.getA().toString())
+                .map((playerUUID) -> new Tuple<>(playerUUID, Optional.ofNullable(playerList.getPlayer(playerUUID))))
+                .map(uuidOptionalTuple -> uuidOptionalTuple.getB().isPresent() ? uuidOptionalTuple.getB().get().getGameProfile().name() : uuidOptionalTuple.getA().toString())
                 .toList();
         context.getSource().sendSuccess(() -> Component.translatable("commands.network.members", list.size(), String.join(", ", list)), false);
         return 1;
@@ -215,12 +207,12 @@ public class NetworkCommand {
             }
         }
         int i = 0;
-        Collection<GameProfile> players = GameProfileArgument.getGameProfiles(context, "targets");
-        for (GameProfile player : players) {
-            if (!theatricalNetwork.members().isMember(player.getId())) {
-                theatricalNetwork.members().addMember(player.getId(), TheatricalNetworkMemberRole.NONE);
-                context.getSource().sendSuccess(() -> Component.translatable("commands.network.members.add.success", Component.literal(player.getName())), false);
-                ServerPlayer serverPlayer = context.getSource().getServer().getPlayerList().getPlayer(player.getId());
+        Collection<NameAndId> players = GameProfileArgument.getGameProfiles(context, "targets");
+        for (NameAndId player : players) {
+            if (!theatricalNetwork.members().isMember(player.id())) {
+                theatricalNetwork.members().addMember(player.id(), TheatricalNetworkMemberRole.NONE);
+                context.getSource().sendSuccess(() -> Component.translatable("commands.network.members.add.success", Component.literal(player.name())), false);
+                ServerPlayer serverPlayer = context.getSource().getServer().getPlayerList().getPlayer(player.id());
                 if (serverPlayer != null) {
                     TheatricalNetworkData.getInstance(context.getSource().getLevel()).notifyNetworks(serverPlayer);
                 }
@@ -292,15 +284,15 @@ public class NetworkCommand {
                 throw ERROR_NETWORK_DOES_NOT_EXIST.create();
             }
         }
-        Collection<GameProfile> players = GameProfileArgument.getGameProfiles(context, "targets");
-        for (GameProfile player : players) {
-            if (theatricalNetwork.members().isMember(player.getId())) {
-                theatricalNetwork.members().removeMember(player.getId());
-                ServerPlayer serverPlayer = context.getSource().getServer().getPlayerList().getPlayer(player.getId());
+        Collection<NameAndId> players = GameProfileArgument.getGameProfiles(context, "targets");
+        for (NameAndId player : players) {
+            if (theatricalNetwork.members().isMember(player.id())) {
+                theatricalNetwork.members().removeMember(player.id());
+                ServerPlayer serverPlayer = context.getSource().getServer().getPlayerList().getPlayer(player.id());
                 if (serverPlayer != null) {
                     TheatricalNetworkData.getInstance(context.getSource().getLevel()).notifyNetworks(serverPlayer);
                 }
-                context.getSource().sendSuccess(() -> Component.translatable("commands.network.members.remove.success", Component.literal(player.getName())), false);
+                context.getSource().sendSuccess(() -> Component.translatable("commands.network.members.remove.success", Component.literal(player.name())), false);
             }
         }
         return 0;
@@ -333,7 +325,7 @@ public class NetworkCommand {
     }
 
     private static boolean isSourceOperator(CommandContext<CommandSourceStack> context) {
-        return context.getSource().hasPermission(context.getSource().getServer().getOperatorUserPermissionLevel());
+        return Commands.hasPermission(Commands.LEVEL_ADMINS).test(context.getSource());
     }
 
     private static TheatricalNetwork getDMXNetwork(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {

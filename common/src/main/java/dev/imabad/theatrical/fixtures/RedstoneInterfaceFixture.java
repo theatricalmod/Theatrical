@@ -3,7 +3,7 @@ package dev.imabad.theatrical.fixtures;
 import dev.imabad.theatrical.api.Fixture;
 import dev.imabad.theatrical.api.HangType;
 import dev.imabad.theatrical.api.dmx.DMXPersonality;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.Collections;
@@ -18,17 +18,17 @@ public class RedstoneInterfaceFixture extends Fixture {
     );
 
     @Override
-    public ResourceLocation getTiltModel() {
+    public Identifier getTiltModel() {
         return null;
     }
 
     @Override
-    public ResourceLocation getPanModel() {
+    public Identifier getPanModel() {
         return null;
     }
 
     @Override
-    public ResourceLocation getStaticModel() {
+    public Identifier getStaticModel() {
         return null;
     }
 

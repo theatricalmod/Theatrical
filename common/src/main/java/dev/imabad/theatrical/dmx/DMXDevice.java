@@ -7,7 +7,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public class DMXDevice {
 
@@ -21,9 +21,9 @@ public class DMXDevice {
     private RDMDeviceId deviceId;
     private int dmxStartAddress, dmxChannelCount, deviceTypeId, activePersonality;
     private String modelName;
-    private ResourceLocation fixtureID;
+    private Identifier fixtureID;
 
-    public DMXDevice(RDMDeviceId deviceId, int dmxStartAddress, int dmxChannelCount, int deviceTypeId, int activePersonality, String modelName, ResourceLocation fixtureID) {
+    public DMXDevice(RDMDeviceId deviceId, int dmxStartAddress, int dmxChannelCount, int deviceTypeId, int activePersonality, String modelName, Identifier fixtureID) {
         this.deviceId = deviceId;
         this.dmxStartAddress = dmxStartAddress;
         this.dmxChannelCount = dmxChannelCount;
@@ -35,7 +35,7 @@ public class DMXDevice {
 
     public DMXDevice(FriendlyByteBuf buf) {
         this(new RDMDeviceId(buf.readByteArray(6)), buf.readInt(),
-                buf.readInt(), buf.readInt(), buf.readInt(), buf.readUtf(), buf.readResourceLocation());
+                buf.readInt(), buf.readInt(), buf.readInt(), buf.readUtf(), buf.readIdentifier());
     }
 
     public void encode(FriendlyByteBuf out) {
@@ -45,7 +45,7 @@ public class DMXDevice {
         out.writeInt(this.getDeviceTypeId());
         out.writeInt(this.getActivePersonality());
         out.writeUtf(this.getModelName());
-        out.writeResourceLocation(this.getFixtureID());
+        out.writeIdentifier(this.getFixtureID());
     }
 
     public int getDmxStartAddress() {
@@ -84,7 +84,7 @@ public class DMXDevice {
         return activePersonality;
     }
 
-    public ResourceLocation getFixtureID() {
+    public Identifier getFixtureID() {
         return fixtureID;
     }
 
@@ -92,7 +92,7 @@ public class DMXDevice {
         this.activePersonality = activePersonality;
     }
 
-    public void setFixtureID(ResourceLocation fixtureID) {
+    public void setFixtureID(Identifier fixtureID) {
         this.fixtureID = fixtureID;
     }
 

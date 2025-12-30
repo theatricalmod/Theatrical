@@ -6,7 +6,7 @@ import dev.imabad.theatrical.blocks.light.MovingWashBlock;
 import dev.imabad.theatrical.fixtures.Fixtures;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -60,7 +60,7 @@ public class MovingWashBlockEntity extends BaseDMXConsumerLightBlockEntity {
     }
 
     @Override
-    public ResourceLocation getFixtureId() {
+    public Identifier getFixtureId() {
         return Fixtures.MOVING_WASH.getId();
     }
 

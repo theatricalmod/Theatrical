@@ -16,7 +16,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -49,7 +48,7 @@ public abstract class BaseLightBlock extends HangableBlock implements EntityBloc
 
     @Override
     public RenderShape getRenderShape(BlockState blockState) {
-        return RenderShape.ENTITYBLOCK_ANIMATED;
+        return RenderShape.INVISIBLE;
     }
 
     @Override
@@ -58,7 +57,7 @@ public abstract class BaseLightBlock extends HangableBlock implements EntityBloc
     }
 
     @Override
-    public boolean propagatesSkylightDown(BlockState blockState, BlockGetter blockGetter, BlockPos blockPos) {
+    protected boolean propagatesSkylightDown(BlockState blockState) {
         return true;
     }
 
@@ -75,7 +74,7 @@ public abstract class BaseLightBlock extends HangableBlock implements EntityBloc
     @Override
     public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
         super.setPlacedBy(level, pos, state, placer, stack);
-        if(!level.isClientSide){
+        if(!level.isClientSide()){
             BlockEntity be = level.getBlockEntity(pos);
             if(be instanceof BaseDMXConsumerLightBlockEntity consumerLightBlockEntity && placer instanceof ServerPlayer player){
                 consumerLightBlockEntity.setNetworkId(TheatricalNetworkData.getInstance(level.getServer().overworld()).getDefaultNetworkForPlayer(player).id());
@@ -83,16 +82,32 @@ public abstract class BaseLightBlock extends HangableBlock implements EntityBloc
         }
     }
 
+    @Override
+    protected InteractionResult useWithoutItem(BlockState blockState, Level level, BlockPos blockPos, Player player, BlockHitResult blockHitResult) {
+        if(!level.isClientSide()){
+            BlockEntity be = level.getBlockEntity(blockPos);
+            if (be instanceof BaseDMXConsumerLightBlockEntity consumerLightBlockEntity) {
+                if (!consumerLightBlockEntity.getNetworkId().equals(UUIDUtil.NULL)) {
+                    TheatricalNetwork network = TheatricalNetworkData.getInstance(level.getServer().overworld()).getNetwork(consumerLightBlockEntity.getNetworkId());
+                    if (network != null && !network.members().isMember(player.getUUID())) {
+                        return InteractionResult.FAIL;
+                    }
+                }
+            }
+            return InteractionResult.PASS;
+        }
+        return super.useWithoutItem(blockState, level, blockPos, player, blockHitResult);
+    }
 
     @Override
-    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+    protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
         if(!level.isClientSide()) {
             BlockEntity be = level.getBlockEntity(pos);
             if (be instanceof BaseDMXConsumerLightBlockEntity consumerLightBlockEntity) {
                 if (!consumerLightBlockEntity.getNetworkId().equals(UUIDUtil.NULL)) {
                     TheatricalNetwork network = TheatricalNetworkData.getInstance(level.getServer().overworld()).getNetwork(consumerLightBlockEntity.getNetworkId());
                     if (network != null && !network.members().isMember(player.getUUID())) {
-                        return ItemInteractionResult.FAIL;
+                        return InteractionResult.FAIL;
                     }
                 }
                 if (player.getItemInHand(hand).getItem() == Items.CONFIGURATION_CARD.get()) {
@@ -111,15 +126,15 @@ public abstract class BaseLightBlock extends HangableBlock implements EntityBloc
                             itemInHand.set(DataComponents.CONFIGURATION_CARD_DATA.get(), data);
                         }
                         TheatricalNetworkData instance = TheatricalNetworkData.getInstance(level.getServer().overworld());
-                        player.sendSystemMessage(Component.translatable("item.configurationcard.success",
+                        player.displayClientMessage(Component.translatable("item.configurationcard.success",
                                 instance.getNetwork(consumerLightBlockEntity.getNetworkId()).name(),
                                 Integer.toString(consumerLightBlockEntity.getUniverse()),
                                 Integer.toString(consumerLightBlockEntity.getChannelStart()),
-                                Integer.toString(data.dmxAddress())));
-                        return ItemInteractionResult.SUCCESS;
+                                Integer.toString(data.dmxAddress())), false);
+                        return InteractionResult.SUCCESS;
                     }
                 }
-                return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+                return InteractionResult.TRY_WITH_EMPTY_HAND;
             }
         }
         return super.useItemOn(stack, state, level, pos, player, hand, hitResult);

@@ -4,7 +4,6 @@ import dev.architectury.networking.NetworkManager;
 import dev.imabad.theatrical.Theatrical;
 import dev.imabad.theatrical.TheatricalClient;
 import dev.imabad.theatrical.api.dmx.DMXConsumer;
-import dev.imabad.theatrical.client.gui.widgets.BetterStringWidget;
 import dev.imabad.theatrical.client.gui.widgets.LabeledEditBox;
 import dev.imabad.theatrical.net.UpdateDMXFixture;
 import dev.imabad.theatrical.net.UpdateNetworkId;
@@ -16,17 +15,18 @@ import net.minecraft.client.gui.components.StringWidget;
 import net.minecraft.client.gui.layouts.FrameLayout;
 import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class GenericDMXConfigurationScreen<T extends DMXConsumer> extends Screen {
-    private final ResourceLocation GUI = Theatrical.location( "textures/gui/blank.png");
+    private final Identifier GUI = Theatrical.location( "textures/gui/blank.png");
 
     protected final int imageWidth;
     protected final int imageHeight;
@@ -56,7 +56,7 @@ public class GenericDMXConfigurationScreen<T extends DMXConsumer> extends Screen
         super.init();
         layout = new LinearLayout(imageWidth, 156, LinearLayout.Orientation.VERTICAL);
         layout.defaultCellSetting().alignHorizontallyCenter().alignVerticallyMiddle().padding(10);
-        layout.addChild(new BetterStringWidget(Component.translatable(titleTranslationKey), this.font).setColor(4210752).setShadow(false));
+        layout.addChild(new StringWidget(Component.translatable(titleTranslationKey), this.font));
         this.dmxAddress = new LabeledEditBox(this.font, xCenter, yCenter, 50, 10, Component.translatable("fixture.dmxStart"));
         this.dmxAddress.setValue(Integer.toString(this.be.getChannelStart()));
         this.setFocused(this.dmxAddress);
@@ -65,16 +65,14 @@ public class GenericDMXConfigurationScreen<T extends DMXConsumer> extends Screen
         this.dmxUniverse.setValue(Integer.toString(this.be.getUniverse()));
         layout.addChild(dmxUniverse);
         addExtraWidgetsToUI();
-        layout.addChild(new CycleButton.Builder<UUID>((networkId) ->
-        {
-            if (TheatricalClient.getArtNetManager().getKnownNetworks().containsKey(networkId)) {
-                return Component.literal(TheatricalClient.getArtNetManager().getKnownNetworks().get(networkId));
-            }
-            return Component.literal("Unknown");
-        }
-        ).withValues(CycleButton.ValueListSupplier.create(Stream.concat(Stream.of(UUIDUtil.NULL),
+        layout.addChild(CycleButton.builder(networkId -> {
+                    if (TheatricalClient.getArtNetManager().getKnownNetworks().containsKey(networkId)) {
+                        return Component.literal(TheatricalClient.getArtNetManager().getKnownNetworks().get(networkId));
+                    }
+                    return Component.literal("Unknown");
+                }, networkId).withValues(CycleButton.ValueListSupplier.create(Stream.concat(Stream.of(UUIDUtil.NULL),
                         TheatricalClient.getArtNetManager().getKnownNetworks().keySet().stream()).collect(Collectors.toList())))
-                .displayOnlyValue().withInitialValue(networkId)
+                .displayOnlyValue()
                 .create(xCenter, yCenter, 150, 20,
                         Component.translatable("screen.artnetconfig.network"), (obj, val) -> {
                             this.networkId = val;
@@ -136,7 +134,7 @@ public class GenericDMXConfigurationScreen<T extends DMXConsumer> extends Screen
         }
         int relX = (this.width - this.imageWidth) / 2;
         int relY = (this.height - layoutHeight) / 2;
-        guiGraphics.blit(GUI, relX, relY, imageWidth, layoutHeight, 0, 0, this.imageWidth, this.imageHeight, 256,256);
+        guiGraphics.blit(RenderPipelines.GUI_TEXTURED, GUI, relX, relY, 0f, 0f, imageWidth, layoutHeight, this.imageWidth, this.imageHeight, 256,256);
     }
 
     protected void renderLabels(GuiGraphics guiGraphics) {

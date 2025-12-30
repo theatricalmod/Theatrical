@@ -6,7 +6,7 @@ import dev.imabad.theatrical.api.HangType;
 import dev.imabad.theatrical.api.dmx.DMXPersonality;
 import dev.imabad.theatrical.blocks.light.BaseLightBlock;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.Collections;
@@ -22,26 +22,26 @@ public class LEDFresnelFixture extends Fixture {
                     .addSlot(SharedSlots.BLUE)
     );
 
-    private static final ResourceLocation TILT_MODEL = Theatrical.location( "block/fresnel/fresnel_body_only");
-    private static final ResourceLocation PAN_MODEL = Theatrical.location( "block/fresnel/fresnel_handle_only");
-    private static final ResourceLocation STATIC_MODEL = Theatrical.location( "block/fresnel/fresnel_hook_bar");
+    private static final Identifier TILT_MODEL = Theatrical.location( "block/fresnel/fresnel_body_only");
+    private static final Identifier PAN_MODEL = Theatrical.location( "block/fresnel/fresnel_handle_only");
+    private static final Identifier STATIC_MODEL = Theatrical.location( "block/fresnel/fresnel_hook_bar");
 
     private final float[] tiltRotation = new float[]{0.5F, .3F, .39F};
     private final float[] panRotation = new float[]{0.5F, 0F, .41F};
     private final float[] beamStartPosition = new float[]{0.5F, 0.24F, 0.1F};
 
     @Override
-    public ResourceLocation getTiltModel() {
+    public Identifier getTiltModel() {
         return TILT_MODEL;
     }
 
     @Override
-    public ResourceLocation getPanModel() {
+    public Identifier getPanModel() {
         return PAN_MODEL;
     }
 
     @Override
-    public ResourceLocation getStaticModel() {
+    public Identifier getStaticModel() {
         return STATIC_MODEL;
     }
 

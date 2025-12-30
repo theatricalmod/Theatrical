@@ -4,23 +4,27 @@ import dev.imabad.theatrical.Theatrical;
 import dev.imabad.theatrical.blocks.Blocks;
 import dev.imabad.theatrical.blocks.rigging.TankTrapBlock;
 import dev.imabad.theatrical.items.Items;
+import net.fabricmc.fabric.api.client.datagen.v1.provider.FabricModelProvider;
 import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricLanguageProvider;
-import net.fabricmc.fabric.api.datagen.v1.provider.FabricModelProvider;
+import net.minecraft.client.data.models.BlockModelGenerators;
+import net.minecraft.client.data.models.ItemModelGenerators;
+import net.minecraft.client.data.models.MultiVariant;
+import net.minecraft.client.data.models.blockstates.MultiVariantGenerator;
+import net.minecraft.client.data.models.blockstates.PropertyDispatch;
+import net.minecraft.client.data.models.model.DelegatedModel;
+import net.minecraft.client.data.models.model.ModelLocationUtils;
+import net.minecraft.client.data.models.model.ModelTemplates;
+import net.minecraft.client.renderer.block.model.Variant;
+import net.minecraft.client.renderer.block.model.VariantMutator;
+import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.data.models.BlockModelGenerators;
-import net.minecraft.data.models.ItemModelGenerators;
-import net.minecraft.data.models.blockstates.MultiVariantGenerator;
-import net.minecraft.data.models.blockstates.PropertyDispatch;
-import net.minecraft.data.models.blockstates.Variant;
-import net.minecraft.data.models.blockstates.VariantProperties;
-import net.minecraft.data.models.model.DelegatedModel;
-import net.minecraft.data.models.model.ModelLocationUtils;
-import net.minecraft.data.models.model.ModelTemplates;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
+import net.minecraft.util.random.WeightedList;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -34,69 +38,60 @@ public class TheatricalDatagenFabric implements DataGeneratorEntrypoint {
 
     public static class Models extends FabricModelProvider {
 
+        private static final PropertyDispatch<VariantMutator> ROTATION_HORIZONTAL_FACING = PropertyDispatch.modify(BlockStateProperties.HORIZONTAL_FACING)
+                .select(Direction.EAST, BlockModelGenerators.Y_ROT_90)
+                .select(Direction.SOUTH, BlockModelGenerators.Y_ROT_180)
+                .select(Direction.WEST, BlockModelGenerators.Y_ROT_270)
+                .select(Direction.NORTH, BlockModelGenerators.NOP);
         public Models(FabricDataOutput output) {
             super(output);
         }
 
         @Override
         public void generateBlockStateModels(BlockModelGenerators blockModelGenerators) {
-            blockModelGenerators.createTrivialCube(Blocks.ART_NET_INTERFACE.get());
             blockModelGenerators.createTrivialCube(Blocks.REDSTONE_INTERFACE.get());
-            blockModelGenerators.createAxisAlignedPillarBlockCustomModel(Blocks.TRUSS_BLOCK.get(), ResourceLocation.tryParse("theatrical:block/truss"));
+            blockModelGenerators.createAxisAlignedPillarBlockCustomModel(Blocks.TRUSS_BLOCK.get(),
+                    new MultiVariant(WeightedList.of(new Variant(Identifier.tryParse("theatrical:block/truss")))));
             createHorizontallyRotatedBlock(blockModelGenerators, Blocks.BASIC_LIGHTING_DESK.get());
-            ResourceLocation tankTrapWithPipe = ResourceLocation.tryParse("theatrical:block/tank_trap_with_pipe");
-            ResourceLocation tankTrap = ResourceLocation.tryParse("theatrical:block/tank_trap");
+            Identifier tankTrapWithPipe = Identifier.tryParse("theatrical:block/tank_trap_with_pipe");
+            Identifier tankTrap = Identifier.tryParse("theatrical:block/tank_trap");
             blockModelGenerators.blockStateOutput.accept(
-                    MultiVariantGenerator.multiVariant(Blocks.TANK_TRAP.get())
-                            .with(PropertyDispatch.property(TankTrapBlock.HAS_PIPE)
-                                    .select(true, Variant.variant().with(VariantProperties.MODEL, tankTrapWithPipe))
-                                    .select(false, Variant.variant().with(VariantProperties.MODEL, tankTrap)))
+                    MultiVariantGenerator.dispatch(Blocks.TANK_TRAP.get())
+                            .with(PropertyDispatch.initial(TankTrapBlock.HAS_PIPE)
+                                    .select(true, BlockModelGenerators.plainVariant(tankTrapWithPipe))
+                                    .select(false, BlockModelGenerators.plainVariant(tankTrap)))
             );
-//            blockModelGenerators.createSimpleFlatItemModel(Blocks.ART_NET_INTERFACE.get());
-//            blockModelGenerators.createSimpleFlatItemModel(Blocks.REDSTONE_INTERFACE.get());
-//            blockModelGenerators.createSimpleFlatItemModel(Blocks.PIPE_BLOCK.get());
-//            blockModelGenerators.createSimpleFlatItemModel(Blocks.TRUSS_BLOCK.get());
-//            blockModelGenerators.createSimpleFlatItemModel(Blocks.MOVING_LIGHT_BLOCK.get());
-//            blockModelGenerators.createSimpleFlatItemModel(Blocks.MOVING_WASH_BLOCK.get());
-//            blockModelGenerators.createSimpleFlatItemModel(Blocks.LED_FRESNEL.get());
-//            blockModelGenerators.createSimpleFlatItemModel(Blocks.TANK_TRAP.get());
-//            blockModelGenerators.createSimpleFlatItemModel(Blocks.LED_PANEL.get());
-//            blockModelGenerators.createSimpleFlatItemModel(Blocks.BASIC_LIGHTING_DESK.get());
+            parent(blockModelGenerators, Blocks.LED_FRESNEL.get(),  Theatrical.location( "block/fresnel/fresnel_whole"));
+            parent(blockModelGenerators, Blocks.PIPE_BLOCK.get(),  Theatrical.location( "block/vertical_pipe"));
+            parent(blockModelGenerators, Blocks.MOVING_LIGHT_BLOCK.get(),  Theatrical.location( "block/moving_light/moving_head_whole"));
+            parent(blockModelGenerators, Blocks.MOVING_WASH_BLOCK.get(),  Theatrical.location( "block/moving_wash/moving_wash_whole"));
+            parent(blockModelGenerators, Blocks.LED_PANEL.get(),  Theatrical.location( "block/led_panel"));
         }
 
         @Override
         public void generateItemModels(ItemModelGenerators itemModelGenerators) {
             itemModelGenerators.generateFlatItem(Items.CONFIGURATION_CARD.get(), ModelTemplates.FLAT_ITEM);
-            parent(itemModelGenerators, Blocks.LED_FRESNEL.get(),  Theatrical.location( "block/fresnel/fresnel_whole"));
-            parent(itemModelGenerators, Blocks.PIPE_BLOCK.get(),  Theatrical.location( "block/vertical_pipe"));
-            parent(itemModelGenerators, Blocks.MOVING_LIGHT_BLOCK.get(),  Theatrical.location( "block/moving_light/moving_head_whole"));
-            parent(itemModelGenerators, Blocks.MOVING_WASH_BLOCK.get(),  Theatrical.location( "block/moving_wash/moving_wash_whole"));
-            parent(itemModelGenerators, Blocks.LED_PANEL.get(),  Theatrical.location( "block/led_panel"));
-        }
 
+
+        }
         private static void parent(ItemModelGenerators itemModelGenerators, Block block) {
-            ResourceLocation itemLoc = ModelLocationUtils.getModelLocation(block.asItem());
-            ResourceLocation blockLoc = ModelLocationUtils.getModelLocation(block);
-            itemModelGenerators.output.accept(
+            Identifier itemLoc = ModelLocationUtils.getModelLocation(block.asItem());
+            Identifier blockLoc = ModelLocationUtils.getModelLocation(block);
+            itemModelGenerators.modelOutput.accept(
                     itemLoc,
                     new DelegatedModel(blockLoc)
             );
         }
 
-        private static void parent(ItemModelGenerators itemModelGenerators, Block block, ResourceLocation parent) {
-            ResourceLocation itemLoc = ModelLocationUtils.getModelLocation(block.asItem());
-            itemModelGenerators.output.accept(
-                    itemLoc,
-                    new DelegatedModel(parent)
-            );
+        private static void parent(BlockModelGenerators blockModelGenerators, Block block, Identifier parent) {
+            blockModelGenerators.registerSimpleItemModel(block, parent);
         }
 
         public final void createHorizontallyRotatedBlock(BlockModelGenerators blockModelGenerators, Block horizontallyRotatedBlock) {
-            ResourceLocation resourceLocation = ModelLocationUtils.getModelLocation(horizontallyRotatedBlock);
-            blockModelGenerators.blockStateOutput.accept(MultiVariantGenerator
-                    .multiVariant(horizontallyRotatedBlock, Variant.variant()
-                            .with(VariantProperties.MODEL, resourceLocation))
-                    .with(BlockModelGenerators.createHorizontalFacingDispatch()));
+            Identifier identifier = ModelLocationUtils.getModelLocation(horizontallyRotatedBlock);
+            blockModelGenerators.blockStateOutput
+                    .accept(MultiVariantGenerator.dispatch(horizontallyRotatedBlock,
+                            BlockModelGenerators.plainVariant(identifier)).with(ROTATION_HORIZONTAL_FACING));
         }
     }
 
@@ -108,8 +103,6 @@ public class TheatricalDatagenFabric implements DataGeneratorEntrypoint {
 
         @Override
         public void generateTranslations(HolderLookup.Provider provider, TranslationBuilder translationBuilder) {
-
-            translationBuilder.add(Blocks.ART_NET_INTERFACE.get(), "ArtNet Interface");
             translationBuilder.add(Blocks.MOVING_LIGHT_BLOCK.get(), "Moving Light");
             translationBuilder.add(Blocks.MOVING_WASH_BLOCK.get(), "Moving Wash");
             translationBuilder.add(Blocks.PIPE_BLOCK.get(), "Rigging Pipe");
@@ -132,7 +125,7 @@ public class TheatricalDatagenFabric implements DataGeneratorEntrypoint {
             translationBuilder.add("fixture.tilt", "Tilt");
             translationBuilder.add("screen.movinglight", "Moving Light");
             translationBuilder.add("button.artnetconfig", "ArtNet Config");
-            translationBuilder.add("screen.artnetconfig.enabled", "ArtNet Enabled: %s");
+            translationBuilder.add("screen.artnetconfig.enabled", "ArtNet Enabled");
             translationBuilder.add("ui.control.step", "Step - %s");
             translationBuilder.add("ui.control.modes.run", "Run Mode");
             translationBuilder.add("ui.control.modes.program", "Program Mode");

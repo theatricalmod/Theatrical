@@ -1,17 +1,17 @@
 package dev.imabad.theatrical.api;
 
 import dev.imabad.theatrical.api.dmx.DMXPersonality;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.List;
 
 public abstract class Fixture {
-    public abstract ResourceLocation getTiltModel();
+    public abstract Identifier getTiltModel();
 
-    public abstract ResourceLocation getPanModel();
+    public abstract Identifier getPanModel();
 
-    public abstract ResourceLocation getStaticModel();
+    public abstract Identifier getStaticModel();
 
     public abstract float[] getTiltRotationPosition();
 

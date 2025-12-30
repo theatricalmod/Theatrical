@@ -6,7 +6,7 @@ import dev.imabad.theatrical.api.HangType;
 import dev.imabad.theatrical.api.dmx.DMXPersonality;
 import dev.imabad.theatrical.blocks.light.BaseLightBlock;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.Collections;
@@ -25,9 +25,9 @@ public class MovingLightFixture extends Fixture {
                     .addSlot(SharedSlots.TILT)
     );
 
-    private static final ResourceLocation TILT_MODEL = Theatrical.location( "block/moving_light/moving_head_tilt");
-    private static final ResourceLocation PAN_MODEL = Theatrical.location( "block/moving_light/moving_head_pan");
-    private static final ResourceLocation STATIC_MODEL = Theatrical.location( "block/moving_light/moving_head_static");
+    private static final Identifier TILT_MODEL = Theatrical.location( "block/moving_light/moving_head_tilt");
+    private static final Identifier PAN_MODEL = Theatrical.location( "block/moving_light/moving_head_pan");
+    private static final Identifier STATIC_MODEL = Theatrical.location( "block/moving_light/moving_head_static");
 
     private final float[] tiltRotation = new float[]{0.5F, .5F, .5F};
     private final float[] panRotation = new float[]{0.5F, .5F, .5F};
@@ -35,17 +35,17 @@ public class MovingLightFixture extends Fixture {
 
 
     @Override
-    public ResourceLocation getTiltModel() {
+    public Identifier getTiltModel() {
         return TILT_MODEL;
     }
 
     @Override
-    public ResourceLocation getPanModel() {
+    public Identifier getPanModel() {
         return PAN_MODEL;
     }
 
     @Override
-    public ResourceLocation getStaticModel() {
+    public Identifier getStaticModel() {
         return STATIC_MODEL;
     }
 

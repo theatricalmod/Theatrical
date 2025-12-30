@@ -28,7 +28,7 @@ import net.minecraft.commands.synchronization.ArgumentTypeInfo;
 import net.minecraft.commands.synchronization.SingletonArgumentInfo;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -47,7 +47,7 @@ public class Theatrical {
             Theatrical.MOD_ID,
             () -> CreativeTabRegistry.create(
                 Component.translatable("itemGroup." + Theatrical.MOD_ID),
-                () -> new ItemStack(Items.ART_NET_INTERFACE.get())
+                () -> new ItemStack(Items.REDSTONE_INTERFACE.get())
             )
         );
 
@@ -69,7 +69,7 @@ public class Theatrical {
         dev.imabad.theatrical.items.Items.ITEMS.register();
         DataComponents.DATA_COMPONENTS.register();
         PlayerEvent.PLAYER_JOIN.register((event) -> {
-            TheatricalNetworkData instance = TheatricalNetworkData.getInstance(event.server.overworld());
+            TheatricalNetworkData instance = TheatricalNetworkData.getInstance(event.level().getServer().overworld());
             for (TheatricalNetwork network : instance.getNetworksForPlayer(event.connection.player.getUUID())) {
                 for (Integer universe : network.dmx().getUniverses()) {
                     List<DMXDevice> devices = new ArrayList<>();
@@ -98,7 +98,7 @@ public class Theatrical {
         ArgumentTypeInfosAccessor.classMap().put(clazz, serializer);
     }
 
-    public static ResourceLocation location(String path) {
-        return ResourceLocation.fromNamespaceAndPath(MOD_ID, path);
+    public static Identifier location(String path) {
+        return Identifier.fromNamespaceAndPath(MOD_ID, path);
     }
 }

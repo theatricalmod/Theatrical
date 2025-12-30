@@ -5,7 +5,6 @@ import dev.imabad.theatrical.items.Items;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
@@ -27,8 +26,8 @@ public class TankTrapBlock extends Block {
     public static final BooleanProperty HAS_PIPE = BooleanProperty.create("has_pipe");
     private final VoxelShape SIMPLE_BOX = Shapes.create(new AABB(0, 0, 0, 1, 0.2, 1));
     private final VoxelShape PIPE = Shapes.create(new AABB(0.4, 0, 0.4, 0.6, 1, 0.6));
-    public TankTrapBlock() {
-        super(Properties.of()
+    public TankTrapBlock(Properties properties) {
+        super(properties
                 .requiresCorrectToolForDrops()
                 .strength(3, 3)
                 .noOcclusion()
@@ -49,8 +48,8 @@ public class TankTrapBlock extends Block {
     }
 
     @Override
-    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
-        if(!level.isClientSide && player.getItemInHand(hand).is(Items.PIPE.get())){
+    protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+        if(!level.isClientSide() && player.getItemInHand(hand).is(Items.PIPE.get())){
             if(!state.getValue(HAS_PIPE)){
                 level.setBlock(pos, state.setValue(HAS_PIPE, true), Block.UPDATE_CLIENTS);
                 if (!player.isCreative()) {
@@ -60,7 +59,7 @@ public class TankTrapBlock extends Block {
                         player.setItemInHand(hand, new ItemStack(net.minecraft.world.item.Items.AIR));
                     }
                 }
-                return ItemInteractionResult.SUCCESS;
+                return InteractionResult.SUCCESS;
             }
         }
         return super.useItemOn(stack, state, level, pos, player, hand, hitResult);

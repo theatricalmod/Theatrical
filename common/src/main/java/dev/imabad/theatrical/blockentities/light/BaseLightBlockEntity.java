@@ -22,6 +22,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
@@ -41,48 +43,47 @@ public abstract class BaseLightBlockEntity extends ClientSyncBlockEntity impleme
     private int prevLuminance;
     private LongOpenHashSet trackedLitChunkPos = new LongOpenHashSet();
 
+    private static final float[] DEFAULT_TRANSFORMS = new float[]{0,0.19f,0};
+
     public BaseLightBlockEntity(BlockEntityType<?> blockEntityType, BlockPos blockPos, BlockState blockState) {
         super(blockEntityType, blockPos, blockState);
     }
 
     @Override
-    public void write(CompoundTag compoundTag) {
-        if (compoundTag == null) {
-            compoundTag = new CompoundTag();
-        }
-        compoundTag.putInt("pan", this.pan);
-        compoundTag.putInt("tilt", this.tilt);
-        compoundTag.putInt("focus", this.focus);
-        compoundTag.putLong("timer", tickTimer);
-        compoundTag.putDouble("distance", distance);
-        compoundTag.putInt("intensity", intensity);
-        compoundTag.putInt("prevIntensity", prevIntensity);
-        compoundTag.putInt("red", red);
-        compoundTag.putInt("green", green);
-        compoundTag.putInt("blue", blue);
-        compoundTag.putInt("prevRed", prevRed);
-        compoundTag.putInt("prevGreen", prevGreen);
-        compoundTag.putInt("prevBlue", prevBlue);
+    public void write(ValueOutput out) {
+        out.putInt("pan", this.pan);
+        out.putInt("tilt", this.tilt);
+        out.putInt("focus", this.focus);
+        out.putLong("timer", tickTimer);
+        out.putDouble("distance", distance);
+        out.putInt("intensity", intensity);
+        out.putInt("prevIntensity", prevIntensity);
+        out.putInt("red", red);
+        out.putInt("green", green);
+        out.putInt("blue", blue);
+        out.putInt("prevRed", prevRed);
+        out.putInt("prevGreen", prevGreen);
+        out.putInt("prevBlue", prevBlue);
     }
 
     @Override
-    public void read(CompoundTag compoundTag) {
-        pan = compoundTag.getInt("pan");
-        tilt = compoundTag.getInt("tilt");
-        focus = compoundTag.getInt("focus");
+    public void read(ValueInput input) {
+        pan = input.getIntOr("pan", 0);
+        tilt = input.getIntOr("tilt", 0);
+        focus = input.getIntOr("focus", 0);
         prevPan = pan;
         prevTilt = tilt;
         prevFocus = focus;
-        tickTimer = compoundTag.getLong("timer");
-        distance = compoundTag.getDouble("distance");
-        intensity = compoundTag.getInt("intensity");
-        prevIntensity = compoundTag.getInt("prevIntensity");
-        red = compoundTag.getInt("red");
-        green = compoundTag.getInt("green");
-        blue = compoundTag.getInt("blue");
-        prevRed = compoundTag.getInt("prevRed");
-        prevGreen = compoundTag.getInt("prevGreen");
-        prevBlue = compoundTag.getInt("prevBlue");
+        tickTimer = input.getLongOr("timer", 0);
+        distance = input.getDoubleOr("distance", 0);
+        intensity = input.getIntOr("intensity", 0);
+        prevIntensity = input.getIntOr("prevIntensity", 0);
+        red = input.getIntOr("red", 0);
+        green = input.getIntOr("green", 0);
+        blue = input.getIntOr("blue", 0);
+        prevRed = input.getIntOr("prevRed", 0);
+        prevGreen = input.getIntOr("prevGreen", 0);
+        prevBlue = input.getIntOr("prevBlue", 0);
     }
 
     public double getDistance() {
@@ -273,15 +274,15 @@ public abstract class BaseLightBlockEntity extends ClientSyncBlockEntity impleme
         this.prevColour = prevColour;
     }
 
-    public Optional<BlockState> getSupportingStructure(){
+    public float[] getSupportingStructureTransforms(){
         if(getLevel() != null){
             BlockState blockState = getLevel().getBlockState(getBlockPos()
                     .relative(getBlockState().getValue(HangableBlock.HANG_DIRECTION)));
             if(blockState.getBlock() instanceof Support) {
-                return Optional.of(blockState);
+                return getFixture().getTransforms(getBlockState(), blockState);
             }
         }
-        return Optional.empty();
+        return DEFAULT_TRANSFORMS;
     }
 
     public int getBasePan(){

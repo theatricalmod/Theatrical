@@ -5,7 +5,7 @@ import dev.imabad.theatrical.api.Fixture;
 import dev.imabad.theatrical.api.HangType;
 import dev.imabad.theatrical.api.dmx.DMXPersonality;
 import dev.imabad.theatrical.blocks.rigging.PipeBlock;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.Collections;
@@ -20,21 +20,21 @@ public class LEDPanelFixture extends Fixture {
                     .addSlot(SharedSlots.GREEN)
                     .addSlot(SharedSlots.BLUE)
     );
-    private static final ResourceLocation STATIC_MODEL = Theatrical.location( "block/led_panel");
+    private static final Identifier STATIC_MODEL = Theatrical.location( "block/led_panel");
 
 
     @Override
-    public ResourceLocation getTiltModel() {
+    public Identifier getTiltModel() {
         return null;
     }
 
     @Override
-    public ResourceLocation getPanModel() {
+    public Identifier getPanModel() {
         return null;
     }
 
     @Override
-    public ResourceLocation getStaticModel() {
+    public Identifier getStaticModel() {
         return STATIC_MODEL;
     }
 

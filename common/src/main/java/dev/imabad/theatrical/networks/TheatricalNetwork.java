@@ -1,7 +1,10 @@
 package dev.imabad.theatrical.networks;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.imabad.theatrical.networks.members.NetworkMemberManager;
 import dev.imabad.theatrical.networks.members.TheatricalNetworkMember;
+import net.minecraft.core.UUIDUtil;
 import net.minecraft.nbt.CompoundTag;
 
 import java.util.*;
@@ -13,35 +16,30 @@ public class TheatricalNetwork {
     private final NetworkMemberManager members;
     private final NetworkDMXManager dmx;
 
-    public TheatricalNetwork(UUID id, String name, TheatricalNetworkMode mode, Set<TheatricalNetworkMember> members) {
+    public static final Codec<TheatricalNetwork> CODEC = RecordCodecBuilder.create(
+            instance -> instance.group(
+                    UUIDUtil.CODEC.fieldOf("id").forGetter(TheatricalNetwork::id),
+                    Codec.STRING.fieldOf("name").forGetter(TheatricalNetwork::name),
+                    TheatricalNetworkMode.CODEC.fieldOf("mode").forGetter(TheatricalNetwork::mode),
+                    NetworkMemberManager.CODEC.fieldOf("members").forGetter(TheatricalNetwork::members)
+            )
+                    .apply(instance,  TheatricalNetwork::new)
+    );
+
+    public TheatricalNetwork(UUID id, String name, TheatricalNetworkMode mode, NetworkMemberManager members){
         this.id = id;
         this.name = name;
         this.mode = mode;
-        this.members = new NetworkMemberManager(members);
+        this.members = members;
         this.dmx = new NetworkDMXManager();
     }
-    public TheatricalNetwork(CompoundTag data){
-        this.id = data.getUUID("id");
-        this.name = data.getString("name");
-        this.mode = TheatricalNetworkMode.valueOf(data.getString("mode"));
-        this.members = new NetworkMemberManager(data);
-        this.dmx = new NetworkDMXManager();
-    }
+
     public TheatricalNetwork(String name){
         this.id = UUID.randomUUID();
         this.name = name;
         this.mode = TheatricalNetworkMode.PRIVATE;
         this.members = new NetworkMemberManager();
         this.dmx = new NetworkDMXManager();
-    }
-
-    public CompoundTag save(){
-        CompoundTag tag = new CompoundTag();
-        tag.putUUID("id", id);
-        tag.putString("mode", mode.toString());
-        tag.putString("name", name);
-        tag = members.save(tag);
-        return tag;
     }
 
     public String name(){ return name;}

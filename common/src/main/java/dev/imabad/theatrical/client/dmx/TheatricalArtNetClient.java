@@ -83,7 +83,7 @@ public class TheatricalArtNetClient extends ArtNetClient {
     }
 
     private byte[] buildDeviceId(){
-        byte[] deviceID =  Arrays.copyOfRange(ByteUtils.longToBytes(Minecraft.getInstance().getGameProfile().getId().getLeastSignificantBits()), 0, 4);
+        byte[] deviceID =  Arrays.copyOfRange(ByteUtils.longToBytes(Minecraft.getInstance().getGameProfile().id().getLeastSignificantBits()), 0, 4);
         ByteBuffer wrap = ByteBuffer.wrap(new byte[6]);
         wrap.putShort(Constants.MANUFACTURER_ID);
         wrap.put(deviceID);
@@ -536,7 +536,7 @@ public class TheatricalArtNetClient extends ArtNetClient {
     private void buildAndSetPollReply(){
         ArtPollReplyPacket defaultReplyPacket = new ArtPollReplyPacket();
         defaultReplyPacket.setIp(address);
-        defaultReplyPacket.setLongName("Theatrical - " + Minecraft.getInstance().getGameProfile().getName());
+        defaultReplyPacket.setLongName("Theatrical - " + Minecraft.getInstance().getGameProfile().name());
         defaultReplyPacket.setShortName("Theatrical");
         defaultReplyPacket.setNodeStyle(NodeStyle.ST_NODE);
         defaultReplyPacket.setEstaManufacturerCode(0x7ff0);
