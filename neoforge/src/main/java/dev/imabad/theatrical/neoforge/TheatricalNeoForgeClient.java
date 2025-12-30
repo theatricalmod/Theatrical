@@ -25,7 +25,7 @@ public class TheatricalNeoForgeClient {
             NeoForge.EVENT_BUS.addListener((RenderLevelStageEvent.AfterTripwireBlocks renderLevelStageEvent) -> {
                 TheatricalClient.renderWorldLastAfterTripwire(renderLevelStageEvent.getLevelRenderer());
             });
-            NeoForge.EVENT_BUS.addListener((RenderLevelStageEvent.AfterParticles renderLevelStageEvent) -> {
+            NeoForge.EVENT_BUS.addListener((RenderLevelStageEvent.AfterEntities renderLevelStageEvent) -> {
                 TheatricalClient.renderWorldLast(renderLevelStageEvent.getPoseStack(),
                         renderLevelStageEvent.getLevelRenderState().cameraRenderState);
             });

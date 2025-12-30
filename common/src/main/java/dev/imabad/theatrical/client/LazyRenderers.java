@@ -27,7 +27,7 @@ public class LazyRenderers {
     public static void doRender(CameraRenderState camera, PoseStack poseStack){
         if(!renderers.isEmpty()){
             if(renderers.size() == 1){
-                LazyRenderer first = renderers.get(0);
+                LazyRenderer first = renderers.getFirst();
                 first.render(poseStack, camera);
             } else {
                 List<Tuple<LazyRenderer, Double>> distanced = new ArrayList<>();
