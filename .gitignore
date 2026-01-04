@@ -20,3 +20,4 @@ classes/
 !gradle/wrapper/gradle-wrapper.jar
 .architectury-transformer
 **/.architectury-transformer
+.DS_Store

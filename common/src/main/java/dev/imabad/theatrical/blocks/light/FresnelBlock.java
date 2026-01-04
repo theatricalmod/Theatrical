@@ -33,7 +33,7 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
-public class FresnelBlock extends BaseLightBlock{
+public class FresnelBlock extends BaseFocusableLightBlock {
 
     public FresnelBlock() {
         super(Properties.of()
@@ -109,8 +109,11 @@ public class FresnelBlock extends BaseLightBlock{
 
     @Override
     public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
-        if(super.use(state, level, pos, player, hand, hit) == InteractionResult.PASS) {
+        InteractionResult superResult = super.use(state, level, pos, player, hand, hit);
+        if(superResult == InteractionResult.PASS) {
             if (!level.isClientSide) {
+                new OpenScreen(pos, TheatricalScreen.GENERIC_PAN_TILT).sendTo((ServerPlayer) player);
+            } else {
                 if (player.isCrouching()) {
                     if (TheatricalClient.DEBUG_BLOCKS.contains(pos)) {
                         TheatricalClient.DEBUG_BLOCKS.remove(pos);
@@ -119,10 +122,9 @@ public class FresnelBlock extends BaseLightBlock{
                     }
                     return InteractionResult.SUCCESS;
                 }
-                new OpenScreen(pos, TheatricalScreen.GENERIC_PAN_TILT).sendTo((ServerPlayer) player);
             }
         }
-        return InteractionResult.SUCCESS;
+        return superResult;
     }
 
     @Override

@@ -81,7 +81,6 @@ public class Theatrical {
         });
         LifecycleEvent.SERVER_LEVEL_UNLOAD.register(world -> {
             if(world.dimension().equals(Level.OVERWORLD)){
-                DMXNetworkData.unloadLevel();
                 TheatricalNetworkData.unloadLevel();
             }
         });

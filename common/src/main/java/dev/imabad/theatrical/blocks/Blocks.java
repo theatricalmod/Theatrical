@@ -32,7 +32,7 @@ public class Blocks {
     public static final RegistrySupplier<Block> REDSTONE_INTERFACE = BLOCKS.register("redstone_interface", RedstoneInterfaceBlock::new);
     public static final RegistrySupplier<Block> TANK_TRAP = BLOCKS.register("tank_trap", TankTrapBlock::new);
     public static final RegistrySupplier<Block> LED_PANEL = BLOCKS.register("led_panel", LEDPanelBlock::new);
-    public static final RegistrySupplier<Block> BASIC_LIGHTING_DESK = BLOCKS.register("basic_lighting_desk", BasicLightingDeskBlock::new);
+    public static final RegistrySupplier<BasicLightingDeskBlock> BASIC_LIGHTING_DESK = BLOCKS.register("basic_lighting_desk", BasicLightingDeskBlock::new);
     public static Boolean neverAllowSpawn(BlockState blockState, BlockGetter blockGetter, BlockPos blockPos, EntityType<?> entity) {
         return false;
     }
