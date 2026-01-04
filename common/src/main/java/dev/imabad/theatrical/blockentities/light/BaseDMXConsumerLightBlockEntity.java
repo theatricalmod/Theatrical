@@ -162,4 +162,5 @@ public abstract class BaseDMXConsumerLightBlockEntity extends BaseLightBlockEnti
         setChanged();
         level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
     }
+
 }

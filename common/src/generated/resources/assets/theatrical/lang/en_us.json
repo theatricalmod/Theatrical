@@ -35,6 +35,7 @@
   "item.configurationcard.description.2": "Right click on fixture to apply",
   "item.configurationcard.success": "Configured device to %s network, universe %s and address %s - next address is %s.",
   "item.theatrical.configuration_card": "Configuration Card",
+  "item.theatrical.fixture_focuser": "Fixture Focuser",
   "itemGroup.theatrical": "Theatrical",
   "screen.artnetconfig.enabled": "ArtNet Enabled: %s",
   "screen.artnetconfig.entry": "Subnet: %s Universe: %s",

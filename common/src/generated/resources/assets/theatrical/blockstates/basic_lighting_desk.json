@@ -1,33 +1,33 @@
 {
   "variants": {
     "facing=east,triggered=false": {
-      "model": "theatrical:block/lighting_console",
+      "model": "theatrical:block/basic_lighting_desk",
       "y": 90
     },
     "facing=east,triggered=true": {
-      "model": "theatrical:block/lighting_console",
+      "model": "theatrical:block/basic_lighting_desk",
       "y": 90
     },
     "facing=north,triggered=false": {
-      "model": "theatrical:block/lighting_console"
+      "model": "theatrical:block/basic_lighting_desk"
     },
     "facing=north,triggered=true": {
-      "model": "theatrical:block/lighting_console"
+      "model": "theatrical:block/basic_lighting_desk"
     },
     "facing=south,triggered=false": {
-      "model": "theatrical:block/lighting_console",
+      "model": "theatrical:block/basic_lighting_desk",
       "y": 180
     },
     "facing=south,triggered=true": {
-      "model": "theatrical:block/lighting_console",
+      "model": "theatrical:block/basic_lighting_desk",
       "y": 180
     },
     "facing=west,triggered=false": {
-      "model": "theatrical:block/lighting_console",
+      "model": "theatrical:block/basic_lighting_desk",
       "y": 270
     },
     "facing=west,triggered=true": {
-      "model": "theatrical:block/lighting_console",
+      "model": "theatrical:block/basic_lighting_desk",
       "y": 270
     }
   }

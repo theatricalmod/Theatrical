@@ -2,6 +2,7 @@ package dev.imabad.theatrical.fabric;
 
 import dev.imabad.theatrical.Theatrical;
 import dev.imabad.theatrical.blocks.Blocks;
+import dev.imabad.theatrical.blocks.control.BasicLightingDeskBlock;
 import dev.imabad.theatrical.blocks.rigging.TankTrapBlock;
 import dev.imabad.theatrical.items.Items;
 import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint;
@@ -40,7 +41,7 @@ public class TheatricalDatagenFabric implements DataGeneratorEntrypoint {
             blockModelGenerators.createTrivialCube(Blocks.ART_NET_INTERFACE.get());
             blockModelGenerators.createTrivialCube(Blocks.REDSTONE_INTERFACE.get());
             blockModelGenerators.createAxisAlignedPillarBlockCustomModel(Blocks.TRUSS_BLOCK.get(), ResourceLocation.tryParse("theatrical:block/truss"));
-            createHorizontallyRotatedBlock(blockModelGenerators, Blocks.BASIC_LIGHTING_DESK.get());
+            createLightingDesk(blockModelGenerators, Blocks.BASIC_LIGHTING_DESK.get());
             ResourceLocation tankTrapWithPipe = new ResourceLocation("theatrical:block/tank_trap_with_pipe");
             ResourceLocation tankTrap = new ResourceLocation("theatrical:block/tank_trap");
             blockModelGenerators.blockStateOutput.accept(
@@ -69,7 +70,7 @@ public class TheatricalDatagenFabric implements DataGeneratorEntrypoint {
             parent(itemModelGenerators, Blocks.MOVING_LIGHT_BLOCK.get(),  new ResourceLocation(Theatrical.MOD_ID, "block/moving_light/moving_head_whole"));
             parent(itemModelGenerators, Blocks.MOVING_WASH_BLOCK.get(),  new ResourceLocation(Theatrical.MOD_ID, "block/moving_wash/moving_wash_whole"));
             parent(itemModelGenerators, Blocks.LED_PANEL.get(),  new ResourceLocation(Theatrical.MOD_ID, "block/led_panel"));
-            parent(itemModelGenerators, Blocks.VIDEO_PANEL.get(),  new ResourceLocation(Theatrical.MOD_ID, "block/led_panel"));
+            itemModelGenerators.generateFlatItem(Items.FIXTURE_FOCUSER.get(), ModelTemplates.FLAT_ITEM);
         }
 
         private static void parent(ItemModelGenerators itemModelGenerators, Block block) {
@@ -89,12 +90,14 @@ public class TheatricalDatagenFabric implements DataGeneratorEntrypoint {
             );
         }
 
-        public final void createHorizontallyRotatedBlock(BlockModelGenerators blockModelGenerators, Block horizontallyRotatedBlock) {
+        public final void createLightingDesk(BlockModelGenerators blockModelGenerators, BasicLightingDeskBlock horizontallyRotatedBlock) {
             ResourceLocation resourceLocation = ModelLocationUtils.getModelLocation(horizontallyRotatedBlock);
             blockModelGenerators.blockStateOutput.accept(MultiVariantGenerator
                     .multiVariant(horizontallyRotatedBlock, Variant.variant()
                             .with(VariantProperties.MODEL, resourceLocation))
-                    .with(BlockModelGenerators.createHorizontalFacingDispatch()));
+                    .with(BlockModelGenerators.createHorizontalFacingDispatch())
+                    .with(PropertyDispatch.property(BasicLightingDeskBlock.TRIGGERED).select(true, Variant.variant())
+                            .select(false, Variant.variant())));
         }
     }
 
@@ -114,9 +117,9 @@ public class TheatricalDatagenFabric implements DataGeneratorEntrypoint {
             translationBuilder.add(Blocks.REDSTONE_INTERFACE.get(), "Redstone Interface");
             translationBuilder.add(Blocks.TANK_TRAP.get(), "Tank Trap");
             translationBuilder.add(Blocks.LED_PANEL.get(), "LED Panel");
-            translationBuilder.add(Blocks.VIDEO_PANEL.get(), "Video Panel");
             translationBuilder.add(Blocks.BASIC_LIGHTING_DESK.get(), "Basic Lighting Desk");
             translationBuilder.add(Items.CONFIGURATION_CARD.get(), "Configuration Card");
+            translationBuilder.add(Items.FIXTURE_FOCUSER.get(), "Fixture Focuser");
             translationBuilder.add("itemGroup.theatrical", "Theatrical");
             translationBuilder.add("artneti.dmxUniverse", "Network Universe");
             translationBuilder.add("artneti.ipAddress", "IP Address");

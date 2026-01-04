@@ -69,6 +69,7 @@ public abstract class BaseLightBlock extends HangableBlock implements EntityBloc
             }
         }
     }
+
     @Override
     public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
         BlockEntity be = level.getBlockEntity(pos);

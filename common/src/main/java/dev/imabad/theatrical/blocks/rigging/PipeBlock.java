@@ -151,17 +151,15 @@ public class PipeBlock extends DirectionalBlock implements Support {
                         hangDirection = Direction.DOWN;
                     }
                     Direction facingDirection = hangableBlock.getLightFacing(hangDirection, player);
-                    level.setBlock(offset, hangableBlock.defaultBlockState()
+                    BlockState hanglableBlockState = hangableBlock.defaultBlockState()
                             .setValue(HangableBlock.FACING, facingDirection)
                             .setValue(HangableBlock.HANGING, true)
-                            .setValue(HangableBlock.HANG_DIRECTION, hangDirection), Block.UPDATE_CLIENTS);
+                            .setValue(HangableBlock.HANG_DIRECTION, hangDirection);
+                    level.setBlock(offset, hanglableBlockState, Block.UPDATE_CLIENTS);
                     if (!player.isCreative()) {
-                        if (player.getItemInHand(hand).getCount() > 1) {
-                            player.getItemInHand(hand).setCount(player.getItemInHand(hand).getCount() - 1);
-                        } else {
-                            player.setItemInHand(hand, new ItemStack(Items.AIR));
-                        }
+                        player.getItemInHand(hand).shrink(1);
                     }
+                    hangableBlock.setPlacedBy(level, offset, hanglableBlockState, player, player.getItemInHand(hand));
                     return InteractionResult.CONSUME;
                 }
             }

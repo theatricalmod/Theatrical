@@ -11,6 +11,8 @@ import net.minecraft.world.item.Item;
 
 public class Items {
     public static final DeferredRegister<Item> ITEMS = TheatricalRegistry.get(Registries.ITEM);
+
+    // Blocks
     public static final RegistrySupplier<Item> MOVING_LIGHT = ITEMS.register(
         "moving_light",
         () -> new BlockItem(Blocks.MOVING_LIGHT_BLOCK.get(), new Item.Properties().arch$tab(Theatrical.TAB))
@@ -47,13 +49,18 @@ public class Items {
             "basic_lighting_desk",
             () -> new BlockItem(Blocks.BASIC_LIGHTING_DESK.get(), new Item.Properties().arch$tab(Theatrical.TAB))
     );
-    public static final RegistrySupplier<Item> CONFIGURATION_CARD = ITEMS.register(
-            "configuration_card",
-            ConfigurationCard::new
-    );
     public static final RegistrySupplier<Item> MOVING_WASH = ITEMS.register(
         "moving_wash",
         () -> new BlockItem(Blocks.MOVING_WASH_BLOCK.get(), new Item.Properties().arch$tab(Theatrical.TAB))
     );
-    
+
+    // Items
+    public static final RegistrySupplier<Item> CONFIGURATION_CARD = ITEMS.register(
+            "configuration_card",
+            ConfigurationCard::new
+    );
+    public static final RegistrySupplier<Item> FIXTURE_FOCUSER = ITEMS.register(
+            "fixture_focuser",
+            FixtureFocuser::new
+    );
 }
