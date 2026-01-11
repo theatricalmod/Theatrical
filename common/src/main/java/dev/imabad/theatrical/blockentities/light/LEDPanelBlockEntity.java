@@ -22,38 +22,40 @@ public class LEDPanelBlockEntity extends BaseDMXConsumerLightBlockEntity {
     }
 
     @Override
-    public void consume(byte[] dmxValues) {
-        int start = this.getChannelStart() > 0 ? this.getChannelStart() - 1 : 0;
-        byte[] ourValues = Arrays.copyOfRange(dmxValues, start,
-                start+ this.getChannelCount());
-        if(ourValues.length < 4){
-            return;
+    public void consume(byte[] dmxValues, boolean mapped) {
+        if(!mapped) {
+            int start = this.getChannelStart() > 0 ? this.getChannelStart() - 1 : 0;
+            dmxValues = Arrays.copyOfRange(dmxValues, start,
+                    start + this.getChannelCount());
+            if (dmxValues.length < getChannelCount()) {
+                return;
+            }
         }
-        if(this.storePrev()){
+        if(this.storePrev() && this.hasLevel() && !this.level.isClientSide){
             level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
         }
         boolean hasUpdated = false;
-        int newIntensity = convertByteToInt(ourValues[0]);
+        int newIntensity = convertByteToInt(dmxValues[0]);
         if(intensity != newIntensity){
             intensity = newIntensity;
             hasUpdated = true;
         }
-        int newRed = convertByteToInt(ourValues[1]);
+        int newRed = convertByteToInt(dmxValues[1]);
         if(red != newRed) {
             red = newRed;
             hasUpdated = true;
         }
-        int newGreen = convertByteToInt(ourValues[2]);
+        int newGreen = convertByteToInt(dmxValues[2]);
         if(green != newGreen){
             green = newGreen;
             hasUpdated = true;
         }
-        int newBlue = convertByteToInt(ourValues[3]);
+        int newBlue = convertByteToInt(dmxValues[3]);
         if(blue != newBlue){
             blue = newBlue;
             hasUpdated = true;
         }
-        if(hasUpdated) {
+        if(hasUpdated && this.hasLevel() && !this.level.isClientSide) {
             level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
             setChanged();
         }

@@ -61,14 +61,9 @@ public class RDMUpdateConsumer extends BaseC2SMessage {
                 Theatrical.LOGGER.info("{} tried to send an RDM update for a network that doesn't exist or isn't part of", context.getPlayer().getName().getString());
                 return;
             }
-            BlockPos consumerPos = network.dmx().getConsumerPos(universe, dmxDevice);
+            DMXConsumer consumerPos = network.dmx().getConsumer(universe, dmxDevice);
             if(consumerPos != null){
-                BlockEntity be = context.getPlayer().level().getBlockEntity(consumerPos);
-                if(be instanceof BaseDMXConsumerLightBlockEntity dmxConsumerLightBlock){
-                    dmxConsumerLightBlock.setChannelStartPoint(newAddress);
-                } else if(be instanceof RedstoneInterfaceBlockEntity redstoneInterfaceBlockEntity){
-                    redstoneInterfaceBlockEntity.setChannelStartPoint(newAddress);
-                }
+                consumerPos.setStartAddress(newAddress);
             }
         }
     }

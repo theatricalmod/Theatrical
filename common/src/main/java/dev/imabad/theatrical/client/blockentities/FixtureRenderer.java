@@ -28,13 +28,6 @@ import org.joml.Matrix4f;
 import java.util.Optional;
 
 public abstract class FixtureRenderer<T extends BaseLightBlockEntity> implements BlockEntityRenderer<T> {
-
-    public record FixtureRenderContext(Fixture fixtureType, Direction facing, boolean isFlipped, boolean isHanging,
-                                       int prevPan, int pan, int prevTilt, int tilt,
-                                       Optional<BlockState> supportingStructure, float intensity, float prevIntensity,
-                                       int prevRed, int red, int prevGreen, int green, int prevBlue, int blue,
-                                       BlockPos pos, int focus, double distance){}
-
     private final Double beamOpacity = TheatricalConfig.INSTANCE.CLIENT.beamOpacity;
 
     public FixtureRenderer(BlockEntityRendererProvider.Context context) {
@@ -47,31 +40,25 @@ public abstract class FixtureRenderer<T extends BaseLightBlockEntity> implements
         boolean isFlipped = blockEntity.isUpsideDown();
         boolean isHanging = ((HangableBlock) blockState.getBlock()).isHanging(blockEntity.getLevel(), blockEntity.getBlockPos());
         Direction facing = blockState.getValue(MovingLightBlock.FACING);
-        FixtureRenderContext fixtureRenderContext = new FixtureRenderContext(blockEntity.getFixture(), facing, isFlipped, isHanging, blockEntity.getPrevPan(),
-                blockEntity.getPan(), blockEntity.getPrevTilt(), blockEntity.getTilt(), BaseLightBlockEntity
-                .getSupportingStructure(blockEntity.getLevel(), blockEntity.getBlockPos(), blockState), blockEntity.getIntensity(),
-                blockEntity.getPrevIntensity(), blockEntity.getPrevRed(), blockEntity.getRed(), blockEntity.getPrevGreen(), blockEntity.getGreen(),
-                blockEntity.getPrevBlue(), blockEntity.getBlue(), blockEntity.getBlockPos(), blockEntity.getFocus(), blockEntity.getDistance());
-        renderModel(fixtureRenderContext, poseStack, vertexConsumer, partialTick, blockState, packedLight, packedOverlay);
-        beforeRenderBeam(fixtureRenderContext, poseStack, vertexConsumer, multiBufferSource,  partialTick, blockState, packedLight, packedOverlay);
-        VertexConsumer linesB = multiBufferSource.getBuffer(RenderType.lines());
-        LevelRenderer.renderLineBox(poseStack, linesB, AABB.ofSize(new Vec3(0, 0, 0), .1d, .1d, .1d), 1, 0, 1, 1);
-        if(!shouldRenderBeam(fixtureRenderContext)){
+        renderModel(blockEntity, poseStack, vertexConsumer, facing, partialTick, isFlipped, blockState, isHanging, packedLight, packedOverlay);
+        beforeRenderBeam(blockEntity, poseStack, vertexConsumer, multiBufferSource, facing, partialTick, isFlipped, blockState, isHanging, packedLight, packedOverlay);
+        if(shouldRenderBeam(blockEntity)){
+            final PoseStack.Pose fromOg = poseStack.last();
             LazyRenderers.addLazyRender(new LazyRenderers.LazyRenderer() {
                 @Override
                 public void render(MultiBufferSource.BufferSource bufferSource, PoseStack poseStack, Camera camera, float partialTick) {
-                    poseStack.pushPose();
-                    Vec3 offset = Vec3.atLowerCornerOf(blockEntity.getBlockPos()).subtract(camera.getPosition());
-                    poseStack.translate(offset.x, offset.y, offset.z);
-                    preparePoseStack(fixtureRenderContext, poseStack, partialTick, blockState);
+//                    poseStack.pushPose();
+//                    Vec3 offset = Vec3.atLowerCornerOf(blockEntity.getBlockPos()).subtract(camera.getPosition());
+//                    poseStack.translate(offset.x, offset.y, offset.z);
+//                    preparePoseStack(blockEntity, poseStack, facing, partialTick, isFlipped, blockState, isHanging);
                     VertexConsumer beamConsumer = bufferSource.getBuffer(TheatricalRenderTypes.BEAM);
-                    poseStack.translate(blockEntity.getFixture().getBeamStartPosition()[0], blockEntity.getFixture().getBeamStartPosition()[1], blockEntity.getFixture().getBeamStartPosition()[2]);
+                    fromOg.pose().translate(blockEntity.getFixture().getBeamStartPosition()[0], blockEntity.getFixture().getBeamStartPosition()[1], blockEntity.getFixture().getBeamStartPosition()[2]);
                     float intensity = blockEntity.getIntensity();
                     int color = blockEntity.getColour();
                     if(color != 0) {
-                        renderLightBeam(beamConsumer, poseStack, fixtureRenderContext, partialTick, (float) ((intensity * beamOpacity) / 255f), blockEntity.getFixture().getBeamWidth(), (float) blockEntity.getDistance(), color);
+                        renderLightBeam(beamConsumer, fromOg, blockEntity, partialTick, (float) ((intensity * beamOpacity) / 255f), blockEntity.getFixture().getBeamWidth(), (float) blockEntity.getDistance(), color);
                     }
-                    poseStack.popPose();
+//                    poseStack.popPose();
                 }
 
                 @Override
@@ -83,31 +70,34 @@ public abstract class FixtureRenderer<T extends BaseLightBlockEntity> implements
         poseStack.popPose();
     }
 
-    public abstract void renderModel(FixtureRenderContext fixtureRenderContext, PoseStack poseStack, VertexConsumer vertexConsumer, float partialTicks, BlockState blockState, int packedLight, int packedOverlay);
+    public abstract void renderModel(T blockEntity, PoseStack poseStack, VertexConsumer vertexConsumer, Direction facing, float partialTicks, boolean isFlipped, BlockState blockState, boolean isHanging, int packedLight, int packedOverlay);
 
-    public abstract void preparePoseStack(FixtureRenderContext fixtureRenderContext, PoseStack poseStack, float partialTicks, BlockState blockState);
+    public abstract void preparePoseStack(T blockEntity, PoseStack poseStack, Direction facing, float partialTicks, boolean isFlipped, BlockState blockState, boolean isHanging);
 
-    public void beforeRenderBeam(FixtureRenderContext fixtureRenderContext, PoseStack poseStack, VertexConsumer vertexConsumer,
-                                 MultiBufferSource multiBufferSource,  float partialTicks, BlockState blockstate, int packedLight,
+    public void beforeRenderBeam(T blockEntity, PoseStack poseStack, VertexConsumer vertexConsumer,
+                                 MultiBufferSource multiBufferSource, Direction facing, float partialTicks,
+                                 boolean isFlipped, BlockState blockstate, boolean isHanging, int packedLight,
                                  int packedOverlay) {}
 
-    public static boolean shouldRenderBeam(FixtureRenderContext context){
-        return context.intensity() > 0 && context.fixtureType().hasBeam();
+    public boolean shouldRenderBeam(T blockEntity){
+        return blockEntity.getIntensity() > 0 && blockEntity.getFixture().hasBeam();
     }
 
-    protected static void minecraftRenderModel(PoseStack poseStack, VertexConsumer vertexConsumer, BlockState blockState, BakedModel model, int packedLight, int packedOverlay){
+    protected void minecraftRenderModel(PoseStack poseStack, VertexConsumer vertexConsumer, BlockState blockState, BakedModel model, int packedLight, int packedOverlay){
         Minecraft.getInstance().getBlockRenderer().getModelRenderer().renderModel(poseStack.last(), vertexConsumer, blockState, model, 1, 1, 1, packedLight, packedOverlay);
     }
 
-    public static void renderLightBeam(VertexConsumer builder, PoseStack stack, FixtureRenderContext context, float partialTicks, float alpha, float beamSize, float length, int color) {
+    protected void renderLightBeam(VertexConsumer builder, PoseStack.Pose pose, T tileEntityFixture, float partialTicks, float alpha, float beamSize, float length, int color) {
         int r = (color >> 16) & 0xFF;
         int g = (color >> 8) & 0xFF;
         int b = color & 0xFF;
         int a = (int) (alpha * 255);
-        Matrix4f m = stack.last().pose();
-        Matrix3f normal = stack.last().normal();
+        Matrix4f m = pose.pose();
+        Matrix3f normal = pose.normal();
         length += 0.5f;
-        float endMultiplier = 1 + context.focus() *length*0.03f;
+        float endMultiplier = 1 + tileEntityFixture.getFocus()*length*0.03f;
+
+
         addVertex(builder, m, normal, r, g, b, 0, beamSize * endMultiplier, beamSize * endMultiplier, -length);
         addVertex(builder, m, normal, r, g, b, a,  beamSize, beamSize, 0);
         addVertex(builder, m, normal, r, g, b, a, beamSize, -beamSize, 0);
@@ -127,12 +117,9 @@ public abstract class FixtureRenderer<T extends BaseLightBlockEntity> implements
         addVertex(builder, m, normal, r, g, b, a, beamSize, -beamSize, 0);
         addVertex(builder, m, normal, r, g, b, a, -beamSize, -beamSize, 0);
         addVertex(builder, m, normal, r, g, b, 0, -beamSize * endMultiplier, -beamSize * endMultiplier, -length);
-
-
-
     }
 
-    protected static void addVertex(VertexConsumer builder, Matrix4f matrix4f, Matrix3f matrix3f, int r, int g, int b, int a, float x, float y, float z) {
+    protected void addVertex(VertexConsumer builder, Matrix4f matrix4f, Matrix3f matrix3f, int r, int g, int b, int a, float x, float y, float z) {
         builder.vertex(matrix4f, x, y, z).color(r, g, b, a).endVertex();
     }
 

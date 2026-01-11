@@ -42,6 +42,12 @@ public abstract class BaseLightBlockEntity extends ClientSyncBlockEntity impleme
     private int prevLuminance;
     private LongOpenHashSet trackedLitChunkPos = new LongOpenHashSet();
 
+    public static final RayTraceSupplier DEFAULT_RAY_TRACE_SUPPLIER = (from, to, level, be) -> {
+        ClipContext context = new ClipContext(from, to, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, null);
+        ((ClipContextAccessor) context).setCollisionContext(new LightCollisionContext(be.getBlockPos()));
+        return level.clip(context);
+    };
+
     public BaseLightBlockEntity(BlockEntityType<?> blockEntityType, BlockPos blockPos, BlockState blockState) {
         super(blockEntityType, blockPos, blockState);
     }
@@ -194,33 +200,15 @@ public abstract class BaseLightBlockEntity extends ClientSyncBlockEntity impleme
         }
     }
 
-    public void tick() {}
-
-    public static <T extends BlockEntity> void tickInContraption(Level level, T be, Vec3 position) {
+    public static <T extends BlockEntity> void tickInContraption(Level level, T be, Vec3 pos, RayTraceSupplier rayTraceSupplier) {
         BaseLightBlockEntity tile = (BaseLightBlockEntity) be;
-//        if(!level.isClientSide){
-        tile.tickTimer++;
-        if(tile.tickTimer >= 5){
-//                if(tile.storePrev()){
-//                    level.sendBlockUpdated(pos, state, state, Block.UPDATE_CLIENTS);
-//                }
-
-            tile.tickTimer = 0;
-        }
         if(tile.shouldTrace()){
-            tile.distance = tile.doRayTrace(position);
+            tile.distance = tile.doRayTrace(level, pos, rayTraceSupplier);
         }
-        if (level.isClientSide() && LightManager.shouldUpdateDynamicLight()) {
-            if (tile.isRemoved()) {
-                tile.setDynamicLightEnabled(false);
-            } else {
-                tile.dynamicLightTick();
-                LightManager.updateTracking(tile);
-            }
-        }
-//        } else {
-//        }
+        tile.tick();
     }
+
+    public void tick() {}
 
     public int getPan() {
         return pan;
@@ -294,6 +282,17 @@ public abstract class BaseLightBlockEntity extends ClientSyncBlockEntity impleme
         if(level != null){
             BlockState blockState = level.getBlockState(pos
                     .relative(state.getValue(HangableBlock.HANG_DIRECTION)));
+            if(blockState.getBlock() instanceof Support) {
+                return Optional.of(blockState);
+            }
+        }
+        return Optional.empty();
+    }
+
+    public Optional<BlockState> getSupportingStructure(){
+        if(getLevel() != null){
+            BlockState blockState = getLevel().getBlockState(getBlockPos()
+                    .relative(getBlockState().getValue(HangableBlock.HANG_DIRECTION)));
             if(blockState.getBlock() instanceof Support) {
                 return Optional.of(blockState);
             }
@@ -404,24 +403,21 @@ public abstract class BaseLightBlockEntity extends ClientSyncBlockEntity impleme
     }
 
     public double doRayTrace(){
-        return doRayTrace(getBlockPos().getCenter());
+        return doRayTrace(this.level, getBlockPos().getCenter(), DEFAULT_RAY_TRACE_SUPPLIER);
     }
 
-    public double doRayTrace(Vec3 position) {
+    public double doRayTrace(Level level, Vec3 position, RayTraceSupplier rayTraceSupplier) {
         Vec3 viewVector = BaseLightBlockEntity.rayTraceDir(this);
         double distance = getMaxLightDistance();
         Vec3 vec33 = position.add(viewVector.x * distance, viewVector.y * distance, viewVector.z * distance);
-        ClipContext context = new ClipContext(position, vec33, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, null);
-        ((ClipContextAccessor) context).setCollisionContext(new LightCollisionContext(getBlockPos()));
-        BlockHitResult result = this.level.clip(context);
+        BlockHitResult result = rayTraceSupplier.doRayTrace(position, vec33, level, this);
         BlockPos lightPos = result.getBlockPos();
         if (result.getType() != HitResult.Type.MISS && !result.isInside()) {
-            distance = result.getLocation().distanceTo(position);
             if (!result.getBlockPos().equals(getBlockPos())) {
                 lightPos = result.getBlockPos().relative(result.getDirection(), 1);
             }
         }
-        distance = new Vec3(lightPos.getX(), lightPos.getY(), lightPos.getZ()).distanceTo(new Vec3(getBlockPos().getX(), getBlockPos().getY(), getBlockPos().getZ()));
+        distance = new Vec3(lightPos.getX(), lightPos.getY(), lightPos.getZ()).distanceTo(new Vec3(position.x(), position.y(), position.z()));
         emissionBlock = lightPos;
         return distance;
     }
@@ -527,5 +523,9 @@ public abstract class BaseLightBlockEntity extends ClientSyncBlockEntity impleme
     @Override
     public Level getLightWorld() {
         return getLevel();
+    }
+
+    public interface RayTraceSupplier {
+        BlockHitResult doRayTrace(Vec3 from, Vec3 to, Level level, BaseLightBlockEntity be);
     }
 }

@@ -19,12 +19,12 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class NetworkDMXManager {
 
-    private final IntObjectMap<Map<BlockPos, DMXConsumer>> dmxUniverseToNodeMap = new IntObjectHashMap<>();
+    private final IntObjectMap<Set<DMXConsumer>> dmxUniverseToNodeMap = new IntObjectHashMap<>();
     private final Set<ServerPlayer> knownSenders = new HashSet<>();
 
-    public void addConsumer(BlockPos pos, DMXConsumer consumer){
-        Map<BlockPos, DMXConsumer> universe = dmxUniverseToNodeMap.computeIfAbsent(consumer.getUniverse(), (uni) -> new ConcurrentHashMap<>());
-        universe.put(pos, consumer);
+    public void addConsumer(DMXConsumer consumer){
+        Set<DMXConsumer> universe = dmxUniverseToNodeMap.computeIfAbsent(consumer.getUniverse(), (uni) -> new HashSet<>());
+        universe.add(consumer);
         dmxUniverseToNodeMap.put(consumer.getUniverse(), universe);
         new NotifyConsumerChange(consumer.getUniverse(),
                 NotifyConsumerChange.ChangeType.ADD,
@@ -42,45 +42,42 @@ public class NetworkDMXManager {
                 .sendTo(knownSenders);
     }
 
-    public void removeConsumer(DMXConsumer consumer, BlockPos pos){
+    public void removeConsumer(DMXConsumer consumer){
         if(!dmxUniverseToNodeMap.containsKey(consumer.getUniverse())){
             return;
         }
-        Map<BlockPos, DMXConsumer> universe = dmxUniverseToNodeMap.get(consumer.getUniverse());
-        universe.remove(pos);
+        Set<DMXConsumer> universe = dmxUniverseToNodeMap.get(consumer.getUniverse());
+        universe.remove(consumer);
         new NotifyConsumerChange(consumer.getUniverse(), NotifyConsumerChange.ChangeType.REMOVE,
                 new DMXDevice(consumer.getDeviceId(), 0, 0,0,
                         0, "", new ResourceLocation("")))
                 .sendTo(knownSenders);
     }
+
+    public void handleDMXData(int universe, byte[] data){
+        Collection<DMXConsumer> consumers = getConsumers(universe);
+        if(consumers != null) {
+            consumers.forEach(consumer -> {
+                consumer.consume(data);
+            });
+        }
+    }
+
     @Nullable
     public Collection<DMXConsumer> getConsumers(int universe){
         if(dmxUniverseToNodeMap.get(universe) != null) {
-            return dmxUniverseToNodeMap.get(universe).values();
+            return dmxUniverseToNodeMap.get(universe);
         }
         return null;
     }
 
-    public BlockPos getConsumerPos(int universe, RDMDeviceId deviceId){
-        for (Map.Entry<BlockPos, DMXConsumer> blockPosDMXConsumerEntry : dmxUniverseToNodeMap.get(universe).entrySet()) {
-            if(blockPosDMXConsumerEntry.getValue().getDeviceId().equals(deviceId)){
-                return blockPosDMXConsumerEntry.getKey();
+    public DMXConsumer getConsumer(int universe, RDMDeviceId deviceId){
+        for (DMXConsumer dmxConsumer : dmxUniverseToNodeMap.get(universe)) {
+            if(dmxConsumer.getDeviceId().equals(deviceId)){
+                return dmxConsumer;
             }
         }
         return null;
-    }
-
-    public Collection<DMXConsumer> getConsumersInRange(int universe, BlockPos fromPos, int radius){
-        Collection<DMXConsumer> consumers = new HashSet<>();
-        if(!dmxUniverseToNodeMap.containsKey(universe) || dmxUniverseToNodeMap.get(universe).isEmpty()){
-            return consumers;
-        }
-        for(Map.Entry<BlockPos, DMXConsumer> entry : dmxUniverseToNodeMap.get(universe).entrySet()){
-            if(Math.sqrt(fromPos.distToCenterSqr(entry.getKey().getX(), entry.getKey().getY(), entry.getKey().getZ())) <= radius){
-                consumers.add(entry.getValue());
-            }
-        }
-        return consumers;
     }
 
     public Set<Integer> getUniverses(){

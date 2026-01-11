@@ -15,18 +15,18 @@ public class SendBEDataToContraption extends BaseS2CMessage {
 
     private int entityId;
     private BlockPos posInContraption;
-    private CompoundTag blockEntityData;
+    private byte[] dmxData;
 
-    public SendBEDataToContraption(int entityId, BlockPos posInContraption, CompoundTag blockEntityData) {
+    public SendBEDataToContraption(int entityId, BlockPos posInContraption, byte[] dmxData) {
         this.entityId = entityId;
         this.posInContraption = posInContraption;
-        this.blockEntityData = blockEntityData;
+        this.dmxData = dmxData;
     }
 
     public SendBEDataToContraption(FriendlyByteBuf friendlyByteBuf){
         entityId = friendlyByteBuf.readInt();
         posInContraption = friendlyByteBuf.readBlockPos();
-        blockEntityData = friendlyByteBuf.readAnySizeNbt();
+        dmxData = friendlyByteBuf.readByteArray();
     }
 
     @Override
@@ -38,7 +38,7 @@ public class SendBEDataToContraption extends BaseS2CMessage {
     public void write(FriendlyByteBuf buf) {
         buf.writeInt(entityId);
         buf.writeBlockPos(posInContraption);
-        buf.writeNbt(blockEntityData);
+        buf.writeByteArray(dmxData);
     }
 
     @Override
@@ -56,7 +56,5 @@ public class SendBEDataToContraption extends BaseS2CMessage {
         return posInContraption;
     }
 
-    public CompoundTag getBlockEntityData() {
-        return blockEntityData;
-    }
+    public byte[] getDmxData() {return dmxData;}
 }

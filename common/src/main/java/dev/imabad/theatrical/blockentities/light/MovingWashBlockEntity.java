@@ -28,25 +28,28 @@ public class MovingWashBlockEntity extends BaseDMXConsumerLightBlockEntity {
     }
 
     @Override
-    public void consume(byte[] dmxValues) {
-        int start = this.getChannelStart() > 0 ? this.getChannelStart() - 1 : 0;
-        byte[] ourValues = Arrays.copyOfRange(dmxValues, start,
-                start+ this.getChannelCount());
-        if(ourValues.length < 7){
-            return;
+    public void consume(byte[] dmxValues, boolean mapped) {
+        if(!mapped) {
+            int start = this.getChannelStart() > 0 ? this.getChannelStart() - 1 : 0;
+            dmxValues = Arrays.copyOfRange(dmxValues, start,
+                    start + this.getChannelCount());
+            if (dmxValues.length < getChannelCount()) {
+                return;
+            }
         }
-        if(this.storePrev()){
+        if(this.storePrev() && this.hasLevel() && !this.level.isClientSide){
             level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
         }
-        intensity = convertByteToInt(ourValues[0]);
-        red = convertByteToInt(ourValues[1]);
-        green = convertByteToInt(ourValues[2]);
-        blue = convertByteToInt(ourValues[3]);
-        focus = convertByteToInt(ourValues[4]);
-        pan = (int) ((convertByteToInt(ourValues[5]) * 360) / 255f) - 180;
-        tilt = (int) ((convertByteToInt(ourValues[6]) * 270) / 255F) - 225;
-        level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
-        setChanged();
+        intensity = convertByteToInt(dmxValues[0]);
+        red = convertByteToInt(dmxValues[1]);
+        green = convertByteToInt(dmxValues[2]);
+        blue = convertByteToInt(dmxValues[3]);
+        focus = convertByteToInt(dmxValues[4]);
+        pan = (int) ((convertByteToInt(dmxValues[5]) * 360) / 255f) - 180;
+        tilt = (int) ((convertByteToInt(dmxValues[6]) * 270) / 255F) - 225;
+        if(this.hasLevel() && !this.level.isClientSide) {
+            notifyChanged();
+        }
     }
 
     @Override

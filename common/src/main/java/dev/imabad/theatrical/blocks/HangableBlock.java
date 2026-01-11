@@ -1,5 +1,6 @@
 package dev.imabad.theatrical.blocks;
 
+import dev.imabad.theatrical.api.Hangable;
 import dev.imabad.theatrical.api.Support;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -18,7 +19,7 @@ import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.ticks.ScheduledTick;
 import org.jetbrains.annotations.Nullable;
 
-public abstract class HangableBlock extends HorizontalDirectionalBlock {
+public abstract class HangableBlock extends HorizontalDirectionalBlock implements Hangable {
 
     public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
 

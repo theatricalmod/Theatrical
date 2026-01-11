@@ -50,6 +50,11 @@ public abstract class BaseLightBlock extends HangableBlock implements EntityBloc
     }
 
     @Override
+    public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+        return super.getShape(state, level, pos, context);
+    }
+
+    @Override
     public VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         if(context instanceof LightCollisionContext lcC){
            if(lcC.getFromPos().equals(pos)) {

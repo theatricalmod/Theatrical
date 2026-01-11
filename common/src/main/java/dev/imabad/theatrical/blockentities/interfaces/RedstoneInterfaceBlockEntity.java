@@ -23,6 +23,8 @@ import java.util.UUID;
 
 public class RedstoneInterfaceBlockEntity extends ClientSyncBlockEntity implements DMXConsumer {
 
+    //TODO: Move this to use BaseDMXData
+
     private int channelStartPoint, dmxUniverse = 0;
     private int redstoneOutput = 0;
     private RDMDeviceId deviceId;
@@ -136,14 +138,16 @@ public class RedstoneInterfaceBlockEntity extends ClientSyncBlockEntity implemen
     }
 
     @Override
-    public void consume(byte[] dmxValues) {
-        int start = this.getChannelStart() > 0 ? this.getChannelStart() - 1 : 0;
-        byte[] ourValues = Arrays.copyOfRange(dmxValues, start,
-                start+ this.getChannelCount());
-        if(ourValues.length < 1){
-            return;
+    public void consume(byte[] dmxValues, boolean mapped) {
+        if(!mapped) {
+            int start = this.getChannelStart() > 0 ? this.getChannelStart() - 1 : 0;
+            dmxValues = Arrays.copyOfRange(dmxValues, start,
+                    start + this.getChannelCount());
+            if (dmxValues.length < 1) {
+                return;
+            }
         }
-        int newOutput = (int) Math.round(Mth.map((double)convertByteToInt(ourValues[0]), 0, 255, 0, 15));
+        int newOutput = (int) Math.round(Mth.map((double)convertByteToInt(dmxValues[0]), 0, 255, 0, 15));
         if(newOutput != redstoneOutput) {
             redstoneOutput = newOutput;
             level.updateNeighborsAt(getBlockPos(), getBlockState().getBlock());

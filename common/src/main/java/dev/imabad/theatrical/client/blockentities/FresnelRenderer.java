@@ -4,9 +4,6 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import dev.imabad.theatrical.TheatricalExpectPlatform;
-import dev.imabad.theatrical.api.HangType;
-import dev.imabad.theatrical.api.Support;
-import dev.imabad.theatrical.blockentities.light.BaseLightBlockEntity;
 import dev.imabad.theatrical.blockentities.light.FresnelBlockEntity;
 import dev.imabad.theatrical.blockentities.light.MovingLightBlockEntity;
 import dev.imabad.theatrical.blocks.HangableBlock;
@@ -32,19 +29,19 @@ public class FresnelRenderer extends FixtureRenderer<FresnelBlockEntity> {
     }
 
     @Override
-    public void renderModel(FixtureRenderContext fixtureRenderContext, PoseStack poseStack, VertexConsumer vertexConsumer, float partialTicks, BlockState blockState, int packedLight, int packedOverlay) {
+    public void renderModel(FresnelBlockEntity blockEntity, PoseStack poseStack, VertexConsumer vertexConsumer, Direction facing, float partialTicks, boolean isFlipped, BlockState blockState, boolean isHanging, int packedLight, int packedOverlay) {
         if(cachedStaticModel == null){
-            cachedStaticModel = TheatricalExpectPlatform.getBakedModel(fixtureRenderContext.fixtureType().getStaticModel());
+            cachedStaticModel = TheatricalExpectPlatform.getBakedModel(blockEntity.getFixture().getStaticModel());
         }
         if (cachedPanModel == null){
-            cachedPanModel = TheatricalExpectPlatform.getBakedModel(fixtureRenderContext.fixtureType().getPanModel());
+            cachedPanModel = TheatricalExpectPlatform.getBakedModel(blockEntity.getFixture().getPanModel());
         }
         if (cachedTiltModel == null){
-            cachedTiltModel = TheatricalExpectPlatform.getBakedModel(fixtureRenderContext.fixtureType().getTiltModel());
+            cachedTiltModel = TheatricalExpectPlatform.getBakedModel(blockEntity.getFixture().getTiltModel());
         }
         //#region Fixture Hanging
         poseStack.translate(0.5F, 0, .5F);
-        if(fixtureRenderContext.isHanging()){
+        if(isHanging){
             Direction hangDirection = blockState.getValue(HangableBlock.HANG_DIRECTION);
             poseStack.translate(0, 0.5, 0F);
             if(hangDirection.getAxis() != Direction.Axis.Y){
@@ -67,16 +64,16 @@ public class FresnelRenderer extends FixtureRenderer<FresnelBlockEntity> {
             poseStack.translate(0, -0.5, 0F);
         }
         //#endregion
-        if(fixtureRenderContext.facing().getAxis() == Direction.Axis.X){
-            poseStack.mulPose(Axis.YP.rotationDegrees(fixtureRenderContext.facing().toYRot()));
+        if(facing.getAxis() == Direction.Axis.X){
+            poseStack.mulPose(Axis.YP.rotationDegrees(facing.toYRot()));
         } else {
-            poseStack.mulPose(Axis.YP.rotationDegrees(fixtureRenderContext.facing().getOpposite().toYRot()));
+            poseStack.mulPose(Axis.YP.rotationDegrees(facing.getOpposite().toYRot()));
         }
         poseStack.translate(-0.5F, 0, -.5F);
-        if (fixtureRenderContext.isHanging()) {
-            Optional<BlockState> optionalSupport = fixtureRenderContext.supportingStructure();
+        if (isHanging) {
+            Optional<BlockState> optionalSupport = blockEntity.getSupportingStructure();
             if (optionalSupport.isPresent()) {
-                float[] transforms = fixtureRenderContext.fixtureType().getTransforms(blockState, optionalSupport.get());
+                float[] transforms = blockEntity.getFixture().getTransforms(blockState, optionalSupport.get());
                 poseStack.translate(transforms[0], transforms[1], transforms[2]);
             } else {
                 poseStack.translate(0, 0.19, 0);
@@ -85,19 +82,19 @@ public class FresnelRenderer extends FixtureRenderer<FresnelBlockEntity> {
         // Static Model Render
         minecraftRenderModel(poseStack, vertexConsumer, blockState, cachedStaticModel, packedLight, packedOverlay);
         //#region Model Pan
-        float[] pans = fixtureRenderContext.fixtureType().getPanRotationPosition();
+        float[] pans = blockEntity.getFixture().getPanRotationPosition();
         poseStack.translate(pans[0], pans[1], pans[2]);
-        int prevPan = fixtureRenderContext.prevPan();
-        int pan = fixtureRenderContext.pan();
+        int prevPan = blockEntity.getPrevPan();
+        int pan = blockEntity.getPan();
         poseStack.mulPose(Axis.YN.rotationDegrees((prevPan + (pan - prevPan) * partialTicks)));
         poseStack.translate(-pans[0], -pans[1], -pans[2]);
         minecraftRenderModel(poseStack, vertexConsumer, blockState, cachedPanModel, packedLight, packedOverlay);
         //#endregion
         //#region Model Tilt
-        float[] tilts = fixtureRenderContext.fixtureType().getTiltRotationPosition();
+        float[] tilts = blockEntity.getFixture().getTiltRotationPosition();
         poseStack.translate(tilts[0], tilts[1], tilts[2]);
-        int prevTilt = fixtureRenderContext.prevTilt();
-        int tilt = fixtureRenderContext.tilt();
+        int prevTilt = blockEntity.getPrevTilt();
+        int tilt = blockEntity.getTilt();
 //        poseStack.mulPose(Axis.XP.rotationDegrees(180));
         poseStack.mulPose(Axis.XP.rotationDegrees((prevTilt + (tilt - prevTilt) * partialTicks)));
         poseStack.translate(-tilts[0], -tilts[1], -tilts[2]);
@@ -141,10 +138,10 @@ public class FresnelRenderer extends FixtureRenderer<FresnelBlockEntity> {
     }
 
     @Override
-    public void preparePoseStack(FixtureRenderContext fixtureRenderContext, PoseStack poseStack, float partialTicks, BlockState blockState) {
+    public void preparePoseStack(FresnelBlockEntity blockEntity, PoseStack poseStack, Direction facing, float partialTicks, boolean isFlipped, BlockState blockState, boolean isHanging) {
         //#region Fixture Hanging
         poseStack.translate(0.5F, 0, .5F);
-        if(fixtureRenderContext.isHanging()){
+        if(isHanging){
             Direction hangDirection = blockState.getValue(HangableBlock.HANG_DIRECTION);
             poseStack.translate(0, 0.5, 0F);
             if(hangDirection.getAxis() != Direction.Axis.Y){
@@ -167,34 +164,34 @@ public class FresnelRenderer extends FixtureRenderer<FresnelBlockEntity> {
             poseStack.translate(0, -0.5, 0F);
         }
         //#endregion
-        if(fixtureRenderContext.facing().getAxis() == Direction.Axis.X){
-            poseStack.mulPose(Axis.YP.rotationDegrees(fixtureRenderContext.facing().toYRot()));
+        if(facing.getAxis() == Direction.Axis.X){
+            poseStack.mulPose(Axis.YP.rotationDegrees(facing.toYRot()));
         } else {
-            poseStack.mulPose(Axis.YP.rotationDegrees(fixtureRenderContext.facing().getOpposite().toYRot()));
+            poseStack.mulPose(Axis.YP.rotationDegrees(facing.getOpposite().toYRot()));
         }
         poseStack.translate(-0.5F, 0, -.5F);
-        if (fixtureRenderContext.isHanging()) {
-            Optional<BlockState> optionalSupport = fixtureRenderContext.supportingStructure();
+        if (isHanging) {
+            Optional<BlockState> optionalSupport = blockEntity.getSupportingStructure();
             if (optionalSupport.isPresent()) {
-                float[] transforms = fixtureRenderContext.fixtureType().getTransforms(blockState, optionalSupport.get());
+                float[] transforms = blockEntity.getFixture().getTransforms(blockState, optionalSupport.get());
                 poseStack.translate(transforms[0], transforms[1], transforms[2]);
             } else {
                 poseStack.translate(0, 0.19, 0);
             }
         }
         //#region Model Pan
-        float[] pans = fixtureRenderContext.fixtureType().getPanRotationPosition();
+        float[] pans = blockEntity.getFixture().getPanRotationPosition();
         poseStack.translate(pans[0], pans[1], pans[2]);
-        int prevPan = fixtureRenderContext.prevPan();
-        int pan = fixtureRenderContext.pan();
+        int prevPan = blockEntity.getPrevPan();
+        int pan = blockEntity.getPan();
         poseStack.mulPose(Axis.YN.rotationDegrees((prevPan + (pan - prevPan) * partialTicks)));
         poseStack.translate(-pans[0], -pans[1], -pans[2]);
         //#endregion
         //#region Model Tilt
-        float[] tilts = fixtureRenderContext.fixtureType().getTiltRotationPosition();
+        float[] tilts = blockEntity.getFixture().getTiltRotationPosition();
         poseStack.translate(tilts[0], tilts[1], tilts[2]);
-        int prevTilt = fixtureRenderContext.prevTilt();
-        int tilt = fixtureRenderContext.tilt();
+        int prevTilt = blockEntity.getPrevTilt();
+        int tilt = blockEntity.getTilt();
 //        poseStack.mulPose(Axis.XP.rotationDegrees(180));
         poseStack.mulPose(Axis.XP.rotationDegrees((prevTilt + (tilt - prevTilt) * partialTicks)));
         poseStack.translate(-tilts[0], -tilts[1], -tilts[2]);

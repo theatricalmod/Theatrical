@@ -2,6 +2,7 @@ package dev.imabad.theatrical.blocks.rigging;
 
 import dev.imabad.theatrical.api.FixtureProvider;
 import dev.imabad.theatrical.api.HangType;
+import dev.imabad.theatrical.api.Hangable;
 import dev.imabad.theatrical.api.Support;
 import dev.imabad.theatrical.blocks.Blocks;
 import dev.imabad.theatrical.blocks.HangableBlock;
@@ -76,6 +77,16 @@ public class PipeBlock extends DirectionalBlock implements Support {
         }
 
         return new float[]{0, 0F, 0};
+    }
+
+    @Override
+    public boolean isAttachedTo(LevelReader levelReader, BlockPos pos, BlockState state, Direction direction) {
+        Direction facing = state.getValue(FACING);
+        if(facing.getAxis() != Direction.Axis.Y && direction != Direction.DOWN) {
+            return false;
+        }
+        BlockState blockState = levelReader.getBlockState(pos.relative(direction));
+        return !blockState.isAir() && blockState.getBlock() instanceof Hangable;
     }
 
     @Override

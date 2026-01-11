@@ -4,6 +4,7 @@ import dev.architectury.platform.forge.EventBuses;
 import dev.imabad.theatrical.Theatrical;
 import dev.imabad.theatrical.TheatricalClient;
 import dev.imabad.theatrical.api.Fixture;
+import dev.imabad.theatrical.compat.ModCompat;
 import dev.imabad.theatrical.fixtures.Fixtures;
 import net.minecraftforge.client.event.ModelEvent;
 import net.minecraftforge.client.event.RenderLevelStageEvent;
@@ -19,7 +20,7 @@ public class TheatricalForge {
         // Submit our event bus to let architectury register our content on the right time
         EventBuses.registerModEventBus(Theatrical.MOD_ID, FMLJavaModLoadingContext.get().getModEventBus());
         Theatrical.init();
-        if(ModList.get().isLoaded("create")){
+        if(ModCompat.CREATE){
             dev.imabad.theatrical.forge.compat.create.CreateCompat.init();
         }
     }

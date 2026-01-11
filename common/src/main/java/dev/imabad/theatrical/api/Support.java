@@ -3,7 +3,9 @@ package dev.imabad.theatrical.api;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.state.BlockState;
 
 public interface Support {
     float[] getHookTransforms(LevelReader levelReader, BlockPos pos, Direction facing);
+    boolean isAttachedTo(LevelReader levelReader, BlockPos pos, BlockState state, Direction direction);
 }

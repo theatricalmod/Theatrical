@@ -1,5 +1,6 @@
 package dev.imabad.theatrical.blocks.rigging;
 
+import dev.imabad.theatrical.api.Hangable;
 import dev.imabad.theatrical.api.Support;
 import dev.imabad.theatrical.blocks.Blocks;
 import dev.imabad.theatrical.blocks.HangableBlock;
@@ -126,5 +127,14 @@ public class TrussBlock extends RotatedPillarBlock implements SimpleWaterloggedB
             }
         }
         return super.use(state, level, pos, player, hand, hit);
+    }
+
+    @Override
+    public boolean isAttachedTo(LevelReader levelReader, BlockPos pos, BlockState state, Direction direction) {
+        if(direction != Direction.DOWN){
+            return false;
+        }
+        BlockState blockState = levelReader.getBlockState(pos.relative(direction));
+        return !blockState.isAir() && blockState.getBlock() instanceof Hangable;
     }
 }

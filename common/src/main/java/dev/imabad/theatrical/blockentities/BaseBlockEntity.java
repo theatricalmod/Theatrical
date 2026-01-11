@@ -3,6 +3,7 @@ package dev.imabad.theatrical.blockentities;
 import dev.imabad.theatrical.api.NBTStorage;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -22,5 +23,12 @@ public abstract class BaseBlockEntity extends BlockEntity implements NBTStorage 
     protected void saveAdditional(CompoundTag compoundTag) {
         super.saveAdditional(compoundTag);
         write(compoundTag);
+    }
+
+    public void notifyChanged(){
+        setChanged();
+        if(level != null) {
+            level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
+        }
     }
 }

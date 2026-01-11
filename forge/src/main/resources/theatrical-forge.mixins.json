@@ -7,5 +7,7 @@
     "defaultRequire": 1
   },
   "mixins": [
+    "create.BaseLightBlockMixin",
+    "create.VirtualRenderWorldMixin"
   ]
 }

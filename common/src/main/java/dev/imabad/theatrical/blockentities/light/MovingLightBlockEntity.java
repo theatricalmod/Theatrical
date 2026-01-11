@@ -12,6 +12,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.Arrays;
+import java.util.Optional;
 
 public class MovingLightBlockEntity extends BaseDMXConsumerLightBlockEntity {
     public MovingLightBlockEntity(BlockEntityType<?> blockEntityType, BlockPos blockPos, BlockState blockState) {
@@ -28,53 +29,55 @@ public class MovingLightBlockEntity extends BaseDMXConsumerLightBlockEntity {
     }
 
     @Override
-    public void consume(byte[] dmxValues) {
-        int start = this.getChannelStart() > 0 ? this.getChannelStart() - 1 : 0;
-        byte[] ourValues = Arrays.copyOfRange(dmxValues, start,
-                start+ this.getChannelCount());
-        if(ourValues.length < 7){
+    public void consume(byte[] dmxValues, boolean mapped) {
+        if(!mapped) {
+            int start = this.getChannelStart() > 0 ? this.getChannelStart() - 1 : 0;
+            dmxValues = Arrays.copyOfRange(dmxValues, start,
+                    start + this.getChannelCount());
+        }
+        if (dmxValues.length < 7) {
             return;
         }
-        if(this.storePrev()){
+        if(this.storePrev() && this.hasLevel() && !this.level.isClientSide){
             level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
         }
         boolean hasUpdated = false;
-        int newIntensity = convertByteToInt(ourValues[0]);
+        int newIntensity = convertByteToInt(dmxValues[0]);
         if(intensity != newIntensity){
             intensity = newIntensity;
             hasUpdated = true;
         }
-        int newRed = convertByteToInt(ourValues[1]);
+        int newRed = convertByteToInt(dmxValues[1]);
         if(red != newRed) {
             red = newRed;
             hasUpdated = true;
         }
-        int newGreen = convertByteToInt(ourValues[2]);
+        int newGreen = convertByteToInt(dmxValues[2]);
         if(green != newGreen){
             green = newGreen;
             hasUpdated = true;
         }
-        int newBlue = convertByteToInt(ourValues[3]);
+        int newBlue = convertByteToInt(dmxValues[3]);
         if(blue != newBlue){
             blue = newBlue;
             hasUpdated = true;
         }
-        int newFocus = convertByteToInt(ourValues[4]);
+        int newFocus = convertByteToInt(dmxValues[4]);
         if(focus != newFocus){
             focus = newFocus;
             hasUpdated = true;
         }
-        int newPan = (int) ((convertByteToInt(ourValues[5]) * 360) / 255f) - 180;
+        int newPan = (int) ((convertByteToInt(dmxValues[5]) * 360) / 255f) - 180;
         if(pan != newPan){
             pan = newPan;
             hasUpdated = true;
         }
-        int newTilt = (int) ((convertByteToInt(ourValues[6]) * 270) / 255F) - 225;
+        int newTilt = (int) ((convertByteToInt(dmxValues[6]) * 270) / 255F) - 225;
         if(tilt != newTilt){
             tilt = newTilt;
             hasUpdated = true;
         }
-        if(hasUpdated) {
+        if(hasUpdated && this.hasLevel() && !this.level.isClientSide) {
             level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
             setChanged();
         }
@@ -117,4 +120,5 @@ public class MovingLightBlockEntity extends BaseDMXConsumerLightBlockEntity {
     public String getTranslationKey() {
         return "block.theatrical.moving_light";
     }
+
 }

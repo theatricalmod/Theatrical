@@ -13,7 +13,11 @@ public interface DMXConsumer extends BelongsToNetwork {
 
     int getUniverse();
 
-    void consume(byte[] dmxValues);
+    void consume(byte[] dmxValues, boolean mapped);
+
+    default void consume(byte[] dmxValues){
+        consume(dmxValues, false);
+    }
 
     RDMDeviceId getDeviceId();
 
