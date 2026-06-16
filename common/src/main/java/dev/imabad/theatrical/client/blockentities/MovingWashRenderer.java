@@ -4,7 +4,6 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import dev.imabad.theatrical.TheatricalExpectPlatform;
-import dev.imabad.theatrical.blockentities.light.LEDPanelBlockEntity;
 import dev.imabad.theatrical.blockentities.light.MovingWashBlockEntity;
 import dev.imabad.theatrical.blocks.HangableBlock;
 import dev.imabad.theatrical.client.LazyRenderers;
@@ -18,12 +17,25 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.Optional;
+import java.util.Map;
+import java.util.WeakHashMap;
 
 import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 
 public class MovingWashRenderer extends FixtureRenderer<MovingWashBlockEntity> {
+
     private BakedModel cachedPanModel, cachedTiltModel, cachedStaticModel;
+
+    private static class SmoothingState {
+        float smoothPan = 0f;
+        float smoothTilt = 0f;
+        long lastUpdateTime = -1;
+    }
+
+
+    private final Map<MovingWashBlockEntity, SmoothingState> smoothingStates = new WeakHashMap<>();
+    private static final float SMOOTH_SPEED = 7f;
 
     public MovingWashRenderer(BlockEntityRendererProvider.Context context) {
         super(context);
@@ -84,32 +96,44 @@ public class MovingWashRenderer extends FixtureRenderer<MovingWashBlockEntity> {
             poseStack.mulPose(Axis.ZP.rotationDegrees(180));
             poseStack.translate(-0.5F, -0.5, -.5F);
         }
-        // Static Model Render
+
         minecraftRenderModel(poseStack, vertexConsumer, blockState, cachedStaticModel, packedLight, packedOverlay);
+        SmoothingState state = smoothingStates.computeIfAbsent(blockEntity, k -> new SmoothingState());
+
+        long now = System.nanoTime();
+        if (state.lastUpdateTime < 0) state.lastUpdateTime = now;
+        float deltaTime = (now - state.lastUpdateTime) / 1_000_000_000f;
+        state.lastUpdateTime = now;
+        deltaTime = Math.min(deltaTime, 0.1f);
+
+        float targetPan = blockEntity.getPrevPan() + (blockEntity.getPan() - blockEntity.getPrevPan()) * partialTicks;
+        float targetTilt = blockEntity.getPrevTilt() + (blockEntity.getTilt() - blockEntity.getPrevTilt()) * partialTicks;
+
+        float alpha = 1f - (float) Math.exp(-SMOOTH_SPEED * deltaTime);
+        state.smoothPan = state.smoothPan + (targetPan - state.smoothPan) * alpha;
+        state.smoothTilt = state.smoothTilt + (targetTilt - state.smoothTilt) * alpha;
+
         //#region Model Pan
         float[] pans = blockEntity.getFixture().getPanRotationPosition();
         poseStack.translate(pans[0], pans[1], pans[2]);
-        int prevPan = blockEntity.getPrevPan();
-        int pan = blockEntity.getPan();
-        poseStack.mulPose(Axis.YP.rotationDegrees((prevPan + (pan - prevPan) * partialTicks)));
+        poseStack.mulPose(Axis.YP.rotationDegrees(state.smoothPan));
         poseStack.translate(-pans[0], -pans[1], -pans[2]);
         minecraftRenderModel(poseStack, vertexConsumer, blockState, cachedPanModel, packedLight, packedOverlay);
         //#endregion
         //#region Model Tilt
         float[] tilts = blockEntity.getFixture().getTiltRotationPosition();
         poseStack.translate(tilts[0], tilts[1], tilts[2]);
-        int prevTilt = blockEntity.getPrevTilt();
-        int tilt = blockEntity.getTilt();
         if (isFlipped) {
             poseStack.mulPose(Axis.XP.rotationDegrees(-180));
         } else {
             poseStack.mulPose(Axis.XP.rotationDegrees(180));
         }
-        poseStack.mulPose(Axis.XP.rotationDegrees((prevTilt + (tilt - prevTilt) * partialTicks)));
+        poseStack.mulPose(Axis.XP.rotationDegrees(state.smoothTilt));
         poseStack.translate(-tilts[0], -tilts[1], -tilts[2]);
         minecraftRenderModel(poseStack, vertexConsumer, blockState, cachedTiltModel, packedLight, packedOverlay);
         //#endregion
     }
+
     @Override
     public void beforeRenderBeam(MovingWashBlockEntity blockEntity, PoseStack poseStack, VertexConsumer vertexConsumer, MultiBufferSource multiBufferSource, Direction facing, float partialTicks, boolean isFlipped, BlockState blockstate, boolean isHanging, int packedLight, int packedOverlay) {
         if(blockEntity.getIntensity() > 0){
@@ -121,7 +145,6 @@ public class MovingWashRenderer extends FixtureRenderer<MovingWashBlockEntity> {
                     poseStack.translate(offset.x, offset.y, offset.z);
                     preparePoseStack(blockEntity, poseStack, facing, partialTick, isFlipped, blockstate, isHanging);
                     VertexConsumer beamConsumer = multiBufferSource.getBuffer(TheatricalRenderTypes.BEAM);
-//            poseStack.translate(blockEntity.getFixture().getBeamStartPosition()[0], blockEntity.getFixture().getBeamStartPosition()[1], blockEntity.getFixture().getBeamStartPosition()[2]);
                     float intensity = (blockEntity.getPrevIntensity() + ((blockEntity.getIntensity()) - blockEntity.getPrevIntensity()) * partialTicks);
                     int color = blockEntity.getColour();
                     int r = (color >> 16) & 0xFF;
@@ -191,24 +214,23 @@ public class MovingWashRenderer extends FixtureRenderer<MovingWashBlockEntity> {
             poseStack.mulPose(Axis.ZP.rotationDegrees(180));
             poseStack.translate(-0.5F, -0.5, -.5F);
         }
+
+        SmoothingState state = smoothingStates.computeIfAbsent(blockEntity, k -> new SmoothingState());
+
         float[] pans = blockEntity.getFixture().getPanRotationPosition();
         poseStack.translate(pans[0], pans[1], pans[2]);
-        int prevPan = blockEntity.getPrevPan();
-        int pan = blockEntity.getPan();
-        poseStack.mulPose(Axis.YP.rotationDegrees((prevPan + (pan - prevPan) * partialTicks)));
+        poseStack.mulPose(Axis.YP.rotationDegrees(state.smoothPan));
         poseStack.translate(-pans[0], -pans[1], -pans[2]);
         //#endregion
         //#region Model Tilt
         float[] tilts = blockEntity.getFixture().getTiltRotationPosition();
         poseStack.translate(tilts[0], tilts[1], tilts[2]);
-        int prevTilt = blockEntity.getPrevTilt();
-        int tilt = blockEntity.getTilt();
         if (isFlipped) {
             poseStack.mulPose(Axis.XP.rotationDegrees(-180));
         } else {
             poseStack.mulPose(Axis.XP.rotationDegrees(180));
         }
-        poseStack.mulPose(Axis.XP.rotationDegrees((prevTilt + (tilt - prevTilt) * partialTicks)));
+        poseStack.mulPose(Axis.XP.rotationDegrees(state.smoothTilt));
         poseStack.translate(-tilts[0], -tilts[1], -tilts[2]);
         //#endregion
     }
