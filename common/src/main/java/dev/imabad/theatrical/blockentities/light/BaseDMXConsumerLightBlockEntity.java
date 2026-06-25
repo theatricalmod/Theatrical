@@ -4,6 +4,7 @@ import ch.bildspur.artnet.rdm.RDMDeviceId;
 import dev.imabad.theatrical.Constants;
 import dev.imabad.theatrical.api.dmx.DMXConsumer;
 import dev.imabad.theatrical.networks.TheatricalNetworkData;
+import dev.imabad.theatrical.util.DmxPacketGuard;
 import dev.imabad.theatrical.util.RndUtils;
 import dev.imabad.theatrical.util.UUIDUtil;
 import net.minecraft.core.BlockPos;
@@ -94,6 +95,9 @@ public abstract class BaseDMXConsumerLightBlockEntity extends BaseLightBlockEnti
         if(this.dmxUniverse == dmxUniverse){
             return;
         }
+        if (!DmxPacketGuard.isValidUniverse(dmxUniverse)) {
+            return;
+        }
         removeConsumer();
         this.dmxUniverse = dmxUniverse;
         addConsumer();
@@ -107,6 +111,10 @@ public abstract class BaseDMXConsumerLightBlockEntity extends BaseLightBlockEnti
 
     public void setChannelStartPoint(int channelStartPoint) {
         if(this.channelStartPoint == channelStartPoint){
+            return;
+        }
+        if (!DmxPacketGuard.isValidAddress(channelStartPoint)
+                || !DmxPacketGuard.fitsInUniverse(channelStartPoint, channelCount)) {
             return;
         }
         this.channelStartPoint = channelStartPoint;

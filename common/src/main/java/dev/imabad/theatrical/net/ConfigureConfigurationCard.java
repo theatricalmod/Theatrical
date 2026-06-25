@@ -3,9 +3,14 @@ package dev.imabad.theatrical.net;
 import dev.architectury.networking.NetworkManager;
 import dev.architectury.networking.simple.BaseC2SMessage;
 import dev.architectury.networking.simple.MessageType;
+import dev.imabad.theatrical.Theatrical;
 import dev.imabad.theatrical.items.Items;
+import dev.imabad.theatrical.networks.TheatricalNetwork;
+import dev.imabad.theatrical.util.DmxPacketGuard;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -57,13 +62,19 @@ public class ConfigureConfigurationCard extends BaseC2SMessage {
     @Override
     public void handle(NetworkManager.PacketContext context) {
         context.queue(() -> {
-            Player player = context.getPlayer();
-            ItemStack itemStack = null;
-            if(player.getItemInHand(InteractionHand.MAIN_HAND).getItem() == Items.CONFIGURATION_CARD.get()){
-                itemStack = player.getItemInHand(InteractionHand.MAIN_HAND);
-            } else if(player.getItemInHand(InteractionHand.OFF_HAND).getItem() == Items.CONFIGURATION_CARD.get()){
-                itemStack = player.getItemInHand(InteractionHand.OFF_HAND);
+            ServerPlayer player = (ServerPlayer) context.getPlayer();
+            TheatricalNetwork theatricalNetwork = DmxPacketGuard.resolveNetwork((ServerLevel) player.level(), network);
+            if (theatricalNetwork == null || !DmxPacketGuard.canConfigure(player, theatricalNetwork)) {
+                Theatrical.LOGGER.info("{} tried to configure a card for a network they cannot access", player.getName().getString());
+                return;
             }
+            if (addressEnabled && !DmxPacketGuard.isValidAddress(dmxAddress)) {
+                return;
+            }
+            if (universeEnabled && !DmxPacketGuard.isValidUniverse(dmxUniverse)) {
+                return;
+            }
+            ItemStack itemStack = findConfigurationCard(player);
             if(itemStack != null){
                 CompoundTag dataTag = itemStack.getOrCreateTag();
                 dataTag.putUUID("network", network);
@@ -75,5 +86,15 @@ public class ConfigureConfigurationCard extends BaseC2SMessage {
                 itemStack.save(dataTag);
             }
         });
+    }
+
+    private static ItemStack findConfigurationCard(Player player) {
+        if(player.getItemInHand(InteractionHand.MAIN_HAND).getItem() == Items.CONFIGURATION_CARD.get()){
+            return player.getItemInHand(InteractionHand.MAIN_HAND);
+        }
+        if(player.getItemInHand(InteractionHand.OFF_HAND).getItem() == Items.CONFIGURATION_CARD.get()){
+            return player.getItemInHand(InteractionHand.OFF_HAND);
+        }
+        return null;
     }
 }

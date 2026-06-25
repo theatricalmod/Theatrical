@@ -49,7 +49,7 @@ public class RequestConsumers extends BaseC2SMessage {
         Level level = context.getPlayer().level();
         if(level.getServer() != null ) {
             TheatricalNetwork network = TheatricalNetworkData.getInstance(level.getServer().overworld()).getNetwork(networkId);
-            if(network != null && network.members().isMember(context.getPlayer().getUUID())){
+            if(network != null && network.members().canSendDMX(context.getPlayer().getUUID())){
                 List<DMXDevice> devices = new ArrayList<>();
                 Collection<DMXConsumer> consumers = network.dmx().getConsumers(universe);
                 if(consumers == null){

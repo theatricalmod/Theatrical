@@ -70,7 +70,11 @@ public class Theatrical {
             for (TheatricalNetwork network : instance.getNetworksForPlayer(event.connection.player.getUUID())) {
                 for (Integer universe : network.dmx().getUniverses()) {
                     List<DMXDevice> devices = new ArrayList<>();
-                    network.dmx().getConsumers(universe).forEach(consumer -> {
+                    var consumers = network.dmx().getConsumers(universe);
+                    if (consumers == null) {
+                        continue;
+                    }
+                    consumers.forEach(consumer -> {
                         devices.add(new DMXDevice(consumer.getDeviceId(), consumer.getChannelStart(),
                                 consumer.getChannelCount(), consumer.getDeviceTypeId(), consumer.getActivePersonality(), consumer.getModelName(),
                                 consumer.getFixtureId()));
