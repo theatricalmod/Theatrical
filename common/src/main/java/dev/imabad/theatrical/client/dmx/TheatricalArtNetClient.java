@@ -171,7 +171,7 @@ public class TheatricalArtNetClient extends ArtNetClient {
         return (int) (sum * (sum + 1) / 2) + a;
     }
 
-    private final IntObjectMap<byte[]> pendingServerFrames = new IntObjectHashMap<>();
+    private final Map<Integer, byte[]> pendingServerFrames = new HashMap<>();
 
     public void queueServerFrame(int networkUniverse, byte[] dmxData) {
         if (networkUniverse < 0 || dmxData == null) {
@@ -186,8 +186,8 @@ public class TheatricalArtNetClient extends ArtNetClient {
         if (manager.getNetworkId() == UUIDUtil.NULL || pendingServerFrames.isEmpty()) {
             return;
         }
-        for (IntObjectMap.Entry<byte[]> entry : pendingServerFrames.entries()) {
-            new SendArtNetData(manager.getNetworkId(), entry.key(), entry.value()).sendToServer();
+        for (Map.Entry<Integer, byte[]> entry : pendingServerFrames.entrySet()) {
+            new SendArtNetData(manager.getNetworkId(), entry.getKey(), entry.getValue()).sendToServer();
         }
         pendingServerFrames.clear();
     }
