@@ -186,8 +186,8 @@ public class TheatricalArtNetClient extends ArtNetClient {
         if (manager.getNetworkId() == UUIDUtil.NULL || pendingServerFrames.isEmpty()) {
             return;
         }
-        for (IntObjectMap.PrimitiveEntry<byte[]> entry : pendingServerFrames.int2ObjectEntrySet()) {
-            new SendArtNetData(manager.getNetworkId(), entry.intKey(), entry.value()).sendToServer();
+        for (IntObjectMap.Entry<byte[]> entry : pendingServerFrames.entries()) {
+            new SendArtNetData(manager.getNetworkId(), entry.key(), entry.value()).sendToServer();
         }
         pendingServerFrames.clear();
     }
