@@ -32,9 +32,8 @@ public class MovingWashBlockEntity extends BaseDMXConsumerLightBlockEntity {
         if(ourValues.length < 7){
             return;
         }
-        if(this.storePrev()){
-            level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
-        }
+        boolean prevAdvanced = this.storePrev();
+        int _pi = intensity, _pr = red, _pg = green, _pb = blue, _pf = focus, _pp = pan, _pt = tilt;
         intensity = convertByteToInt(ourValues[0]);
         red = convertByteToInt(ourValues[1]);
         green = convertByteToInt(ourValues[2]);
@@ -42,8 +41,9 @@ public class MovingWashBlockEntity extends BaseDMXConsumerLightBlockEntity {
         focus = convertByteToInt(ourValues[4]);
         pan = (int) ((convertByteToInt(ourValues[5]) * 360) / 255f) - 180;
         tilt = (int) ((convertByteToInt(ourValues[6]) * 270) / 255F) - 225;
-        level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
-        setChanged();
+        boolean hasUpdated = intensity != _pi || red != _pr || green != _pg || blue != _pb
+                || focus != _pf || pan != _pp || tilt != _pt;
+        finishDmxConsume(hasUpdated, prevAdvanced);
     }
 
     @Override

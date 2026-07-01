@@ -32,9 +32,7 @@ public class MovingLightBlockEntity extends BaseDMXConsumerLightBlockEntity {
         if(ourValues.length < 7){
             return;
         }
-        if(this.storePrev()){
-            level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
-        }
+        boolean prevAdvanced = this.storePrev();
         boolean hasUpdated = false;
         int newIntensity = convertByteToInt(ourValues[0]);
         if(intensity != newIntensity){
@@ -71,10 +69,7 @@ public class MovingLightBlockEntity extends BaseDMXConsumerLightBlockEntity {
             tilt = newTilt;
             hasUpdated = true;
         }
-        if(hasUpdated) {
-            level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
-            setChanged();
-        }
+        finishDmxConsume(hasUpdated, prevAdvanced);
     }
 
     @Override

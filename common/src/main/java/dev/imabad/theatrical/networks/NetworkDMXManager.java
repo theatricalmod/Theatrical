@@ -80,7 +80,7 @@ public class NetworkDMXManager {
             return consumers;
         }
         for(Map.Entry<BlockPos, DMXConsumer> entry : dmxUniverseToNodeMap.get(universe).entrySet()){
-            if(Math.sqrt(fromPos.distToCenterSqr(entry.getKey().getX(), entry.getKey().getY(), entry.getKey().getZ())) <= radius){
+            if(fromPos.distSqr(entry.getKey()) <= (long) radius * radius){
                 consumers.add(entry.getValue());
             }
         }

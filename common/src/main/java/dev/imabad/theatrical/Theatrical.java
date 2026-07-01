@@ -3,6 +3,8 @@ package dev.imabad.theatrical;
 import dev.architectury.event.events.common.CommandRegistrationEvent;
 import dev.architectury.event.events.common.LifecycleEvent;
 import dev.architectury.event.events.common.PlayerEvent;
+import dev.architectury.event.events.common.TickEvent;
+import dev.imabad.theatrical.networks.ServerDmxBroker;
 import dev.architectury.platform.Platform;
 import dev.architectury.registry.CreativeTabRegistry;
 import dev.architectury.registry.registries.DeferredRegister;
@@ -83,6 +85,7 @@ public class Theatrical {
                 }
             }
         });
+        TickEvent.SERVER_POST.register(server -> ServerDmxBroker.flush(server));
         LifecycleEvent.SERVER_LEVEL_UNLOAD.register(world -> {
             if(world.dimension().equals(Level.OVERWORLD)){
                 TheatricalNetworkData.unloadLevel();

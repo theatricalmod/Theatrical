@@ -10,7 +10,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
@@ -62,9 +61,7 @@ public class FresnelBlockEntity extends BaseDMXConsumerLightBlockEntity implemen
         if(ourValues.length < 4){
             return;
         }
-        if(this.storePrev()){
-            level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
-        }
+        boolean prevAdvanced = this.storePrev();
         boolean hasUpdated = false;
         int newIntensity = convertByteToInt(ourValues[0]);
         if(intensity != newIntensity){
@@ -86,10 +83,7 @@ public class FresnelBlockEntity extends BaseDMXConsumerLightBlockEntity implemen
             blue = newBlue;
             hasUpdated = true;
         }
-        if(hasUpdated) {
-            level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
-            setChanged();
-        }
+        finishDmxConsume(hasUpdated, prevAdvanced);
     }
 
     @Override
