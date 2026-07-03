@@ -3,12 +3,10 @@ package dev.imabad.theatrical.blockentities.light;
 import dev.imabad.theatrical.api.Fixture;
 import dev.imabad.theatrical.blockentities.BlockEntities;
 import dev.imabad.theatrical.fixtures.Fixtures;
+import dev.imabad.theatrical.util.DmxPacketGuard;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
-
-import java.util.Arrays;
 
 public class LEDPanelBlockEntity extends BaseDMXConsumerLightBlockEntity {
     public LEDPanelBlockEntity(BlockPos blockPos, BlockState blockState) {
@@ -23,15 +21,11 @@ public class LEDPanelBlockEntity extends BaseDMXConsumerLightBlockEntity {
 
     @Override
     public void consume(byte[] dmxValues) {
-        int start = this.getChannelStart() > 0 ? this.getChannelStart() - 1 : 0;
-        byte[] ourValues = Arrays.copyOfRange(dmxValues, start,
-                start+ this.getChannelCount());
+        byte[] ourValues = DmxPacketGuard.sliceDmxChannels(dmxValues, getChannelStart(), getChannelCount());
         if(ourValues.length < 4){
             return;
         }
-        if(this.storePrev()){
-            level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
-        }
+        boolean prevAdvanced = this.storePrev();
         boolean hasUpdated = false;
         int newIntensity = convertByteToInt(ourValues[0]);
         if(intensity != newIntensity){
@@ -53,10 +47,7 @@ public class LEDPanelBlockEntity extends BaseDMXConsumerLightBlockEntity {
             blue = newBlue;
             hasUpdated = true;
         }
-        if(hasUpdated) {
-            level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
-            setChanged();
-        }
+        finishDmxConsume(hasUpdated, prevAdvanced);
     }
 
     @Override

@@ -7,6 +7,7 @@ import dev.imabad.theatrical.blockentities.BlockEntities;
 import dev.imabad.theatrical.blockentities.ClientSyncBlockEntity;
 import dev.imabad.theatrical.networks.TheatricalNetworkData;
 import dev.imabad.theatrical.fixtures.Fixtures;
+import dev.imabad.theatrical.util.DmxPacketGuard;
 import dev.imabad.theatrical.util.RndUtils;
 import dev.imabad.theatrical.util.UUIDUtil;
 import net.minecraft.core.BlockPos;
@@ -17,7 +18,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 
-import java.util.Arrays;
 import java.util.Random;
 import java.util.UUID;
 
@@ -132,9 +132,7 @@ public class RedstoneInterfaceBlockEntity extends ClientSyncBlockEntity implemen
 
     @Override
     public void consume(byte[] dmxValues) {
-        int start = this.getChannelStart() > 0 ? this.getChannelStart() - 1 : 0;
-        byte[] ourValues = Arrays.copyOfRange(dmxValues, start,
-                start+ this.getChannelCount());
+        byte[] ourValues = DmxPacketGuard.sliceDmxChannels(dmxValues, getChannelStart(), getChannelCount());
         if(ourValues.length < 1){
             return;
         }
@@ -149,6 +147,10 @@ public class RedstoneInterfaceBlockEntity extends ClientSyncBlockEntity implemen
     }
 
     public void setChannelStartPoint(int channelStartPoint) {
+        if (!DmxPacketGuard.isValidAddress(channelStartPoint)
+                || !DmxPacketGuard.fitsInUniverse(channelStartPoint, getChannelCount())) {
+            return;
+        }
         this.channelStartPoint = channelStartPoint;
         this.setChanged();
         updateConsumer();
@@ -157,6 +159,9 @@ public class RedstoneInterfaceBlockEntity extends ClientSyncBlockEntity implemen
 
     public void setUniverse(int universe) {
         if(this.dmxUniverse == universe){
+            return;
+        }
+        if (!DmxPacketGuard.isValidUniverse(universe)) {
             return;
         }
         removeConsumer();

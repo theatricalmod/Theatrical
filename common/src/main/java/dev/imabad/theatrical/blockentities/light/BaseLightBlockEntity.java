@@ -178,9 +178,23 @@ public abstract class BaseLightBlockEntity extends ClientSyncBlockEntity impleme
         return false;
     }
 
+    /** Un seul sendBlockUpdated par trame DMX (évite le double sync prev + values). */
+    protected void finishDmxConsume(boolean valuesChanged, boolean prevAdvanced) {
+        if (level == null || level.isClientSide()) {
+            return;
+        }
+        if (valuesChanged || prevAdvanced) {
+            level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
+        }
+        if (valuesChanged) {
+            setChanged();
+        }
+    }
+
     public static <T extends BlockEntity> void tick(Level level, BlockPos pos, BlockState state, T be) {
         BaseLightBlockEntity tile = (BaseLightBlockEntity) be;
-        if(tile.shouldTrace()){
+        // Raycast uniquement côté client (lumière dynamique + rendu) — inutile et coûteux sur le serveur.
+        if (level.isClientSide() && tile.shouldTrace()) {
             tile.distance = tile.doRayTrace();
         }
         tile.tick();
@@ -437,7 +451,15 @@ public abstract class BaseLightBlockEntity extends ClientSyncBlockEntity impleme
 
     @Override
     public void lightTick() {
-
+        if (level != null && level.isClientSide()) {
+            prevPan = pan;
+            prevTilt = tilt;
+            prevFocus = focus;
+            prevIntensity = intensity;
+            prevRed = red;
+            prevGreen = green;
+            prevBlue = blue;
+        }
     }
 
     @Override

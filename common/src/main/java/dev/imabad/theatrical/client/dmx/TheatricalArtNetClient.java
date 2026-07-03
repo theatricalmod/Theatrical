@@ -171,6 +171,37 @@ public class TheatricalArtNetClient extends ArtNetClient {
         return (int) (sum * (sum + 1) / 2) + a;
     }
 
+    private final Object pendingServerLock = new Object();
+    private final Map<Integer, byte[]> pendingServerFrames = new HashMap<>();
+
+    public void queueServerFrame(int networkUniverse, byte[] dmxData) {
+        if (networkUniverse < 0 || dmxData == null) {
+            return;
+        }
+        int length = Math.min(dmxData.length, 512);
+        synchronized (pendingServerLock) {
+            pendingServerFrames.put(networkUniverse, Arrays.copyOf(dmxData, length));
+        }
+    }
+
+    /** Envoie au serveur au plus une trame par univers et par tick client. */
+    public void flushPendingToServer() {
+        if (manager.getNetworkId() == UUIDUtil.NULL) {
+            return;
+        }
+        Map<Integer, byte[]> toSend;
+        synchronized (pendingServerLock) {
+            if (pendingServerFrames.isEmpty()) {
+                return;
+            }
+            toSend = new HashMap<>(pendingServerFrames);
+            pendingServerFrames.clear();
+        }
+        for (Map.Entry<Integer, byte[]> entry : toSend.entrySet()) {
+            new SendArtNetData(manager.getNetworkId(), entry.getKey(), entry.getValue()).sendToServer();
+        }
+    }
+
     private void onPacketReceived(InetAddress sourceAddress, final ArtNetPacket packet) {
         switch(packet.getType()){
             case ART_OUTPUT: {
@@ -184,7 +215,7 @@ public class TheatricalArtNetClient extends ArtNetClient {
                 getInputBuffer().setDmxData((short) subnet, (short) universe, dmxPacket.getDmxData());
                 int networkUniverse = getNetworkUniverse(subnet, universe);
                 if(networkUniverse != -1){
-                    new SendArtNetData(manager.getNetworkId(), networkUniverse, dmxPacket.getDmxData()).sendToServer();
+                    queueServerFrame(networkUniverse, dmxPacket.getDmxData());
                 }
                 break;
             }

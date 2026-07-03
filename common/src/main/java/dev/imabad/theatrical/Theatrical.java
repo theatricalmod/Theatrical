@@ -3,6 +3,8 @@ package dev.imabad.theatrical;
 import dev.architectury.event.events.common.CommandRegistrationEvent;
 import dev.architectury.event.events.common.LifecycleEvent;
 import dev.architectury.event.events.common.PlayerEvent;
+import dev.architectury.event.events.common.TickEvent;
+import dev.imabad.theatrical.networks.ServerDmxBroker;
 import dev.architectury.platform.Platform;
 import dev.architectury.registry.CreativeTabRegistry;
 import dev.architectury.registry.registries.DeferredRegister;
@@ -70,7 +72,11 @@ public class Theatrical {
             for (TheatricalNetwork network : instance.getNetworksForPlayer(event.connection.player.getUUID())) {
                 for (Integer universe : network.dmx().getUniverses()) {
                     List<DMXDevice> devices = new ArrayList<>();
-                    network.dmx().getConsumers(universe).forEach(consumer -> {
+                    var consumers = network.dmx().getConsumers(universe);
+                    if (consumers == null) {
+                        continue;
+                    }
+                    consumers.forEach(consumer -> {
                         devices.add(new DMXDevice(consumer.getDeviceId(), consumer.getChannelStart(),
                                 consumer.getChannelCount(), consumer.getDeviceTypeId(), consumer.getActivePersonality(), consumer.getModelName(),
                                 consumer.getFixtureId()));
@@ -79,6 +85,7 @@ public class Theatrical {
                 }
             }
         });
+        TickEvent.SERVER_POST.register(server -> ServerDmxBroker.flush(server));
         LifecycleEvent.SERVER_LEVEL_UNLOAD.register(world -> {
             if(world.dimension().equals(Level.OVERWORLD)){
                 TheatricalNetworkData.unloadLevel();

@@ -62,7 +62,11 @@ public class NetworkDMXManager {
     }
 
     public BlockPos getConsumerPos(int universe, RDMDeviceId deviceId){
-        for (Map.Entry<BlockPos, DMXConsumer> blockPosDMXConsumerEntry : dmxUniverseToNodeMap.get(universe).entrySet()) {
+        Map<BlockPos, DMXConsumer> universeConsumers = dmxUniverseToNodeMap.get(universe);
+        if (universeConsumers == null) {
+            return null;
+        }
+        for (Map.Entry<BlockPos, DMXConsumer> blockPosDMXConsumerEntry : universeConsumers.entrySet()) {
             if(blockPosDMXConsumerEntry.getValue().getDeviceId().equals(deviceId)){
                 return blockPosDMXConsumerEntry.getKey();
             }
@@ -76,7 +80,7 @@ public class NetworkDMXManager {
             return consumers;
         }
         for(Map.Entry<BlockPos, DMXConsumer> entry : dmxUniverseToNodeMap.get(universe).entrySet()){
-            if(Math.sqrt(fromPos.distToCenterSqr(entry.getKey().getX(), entry.getKey().getY(), entry.getKey().getZ())) <= radius){
+            if(fromPos.distSqr(entry.getKey()) <= (long) radius * radius){
                 consumers.add(entry.getValue());
             }
         }

@@ -10,6 +10,7 @@ import dev.imabad.theatrical.blockentities.light.BaseDMXConsumerLightBlockEntity
 import dev.imabad.theatrical.networks.TheatricalNetwork;
 import dev.imabad.theatrical.networks.TheatricalNetworkData;
 import dev.imabad.theatrical.net.TheatricalNet;
+import dev.imabad.theatrical.util.DmxPacketGuard;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.level.Level;
@@ -54,20 +55,27 @@ public class RDMUpdateConsumer extends BaseC2SMessage {
     @Override
     public void handle(NetworkManager.PacketContext context) {
         Level level = context.getPlayer().level();
-        if(level.getServer() != null ) {
-            TheatricalNetwork network = TheatricalNetworkData.getInstance(level.getServer().overworld()).getNetwork(networkId);
-            if(network == null || !network.members().canSendDMX(context.getPlayer().getUUID())) {
-                Theatrical.LOGGER.info("{} tried to send an RDM update for a network that doesn't exist or isn't part of", context.getPlayer().getName().getString());
-                return;
-            }
-            BlockPos consumerPos = network.dmx().getConsumerPos(universe, dmxDevice);
-            if(consumerPos != null){
-                BlockEntity be = context.getPlayer().level().getBlockEntity(consumerPos);
-                if(be instanceof BaseDMXConsumerLightBlockEntity dmxConsumerLightBlock){
-                    dmxConsumerLightBlock.setChannelStartPoint(newAddress);
-                } else if(be instanceof RedstoneInterfaceBlockEntity redstoneInterfaceBlockEntity){
-                    redstoneInterfaceBlockEntity.setChannelStartPoint(newAddress);
+        if(level.getServer() == null || !DmxPacketGuard.isValidUniverse(universe) || !DmxPacketGuard.isValidAddress(newAddress)) {
+            return;
+        }
+        TheatricalNetwork network = TheatricalNetworkData.getInstance(level.getServer().overworld()).getNetwork(networkId);
+        if(network == null || !network.members().canSendDMX(context.getPlayer().getUUID())) {
+            Theatrical.LOGGER.info("{} tried to send an RDM update for a network that doesn't exist or isn't part of", context.getPlayer().getName().getString());
+            return;
+        }
+        BlockPos consumerPos = network.dmx().getConsumerPos(universe, dmxDevice);
+        if(consumerPos != null){
+            BlockEntity be = context.getPlayer().level().getBlockEntity(consumerPos);
+            if(be instanceof BaseDMXConsumerLightBlockEntity dmxConsumerLightBlock){
+                if (!DmxPacketGuard.fitsInUniverse(newAddress, dmxConsumerLightBlock.getChannelCount())) {
+                    return;
                 }
+                dmxConsumerLightBlock.setChannelStartPoint(newAddress);
+            } else if(be instanceof RedstoneInterfaceBlockEntity redstoneInterfaceBlockEntity){
+                if (!DmxPacketGuard.fitsInUniverse(newAddress, redstoneInterfaceBlockEntity.getChannelCount())) {
+                    return;
+                }
+                redstoneInterfaceBlockEntity.setChannelStartPoint(newAddress);
             }
         }
     }

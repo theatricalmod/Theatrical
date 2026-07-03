@@ -4,6 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import dev.architectury.event.events.client.ClientPlayerEvent;
+import dev.architectury.event.events.client.ClientTickEvent;
 import dev.architectury.platform.Platform;
 import dev.architectury.registry.client.rendering.BlockEntityRendererRegistry;
 import dev.imabad.theatrical.api.dmx.DMXConsumer;
@@ -64,6 +65,14 @@ public class TheatricalClient {
         BlockEntityRendererRegistry.register(BlockEntities.LED_PANEL.get(), LEDPanelRenderer::new);
         BlockEntityRendererRegistry.register(BlockEntities.BASIC_LIGHTING_DESK.get(), BasicLightingConsoleRenderer::new);
         artNetManager = new ArtNetManager();
+        ClientTickEvent.CLIENT_LEVEL_POST.register(world -> {
+            if (TheatricalConfig.INSTANCE.CLIENT.artnetEnabled && artNetManager != null) {
+                TheatricalArtNetClient client = artNetManager.getClient();
+                if (client != null) {
+                    client.flushPendingToServer();
+                }
+            }
+        });
         ClientPlayerEvent.CLIENT_PLAYER_JOIN.register((event) -> {
             new RequestNetworks().sendToServer();
             if(TheatricalConfig.INSTANCE.CLIENT.artnetEnabled){

@@ -4,14 +4,13 @@ import dev.imabad.theatrical.api.Fixture;
 import dev.imabad.theatrical.blockentities.BlockEntities;
 import dev.imabad.theatrical.blocks.light.MovingWashBlock;
 import dev.imabad.theatrical.fixtures.Fixtures;
+import dev.imabad.theatrical.util.DmxPacketGuard;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-
-import java.util.Arrays;
 
 public class MovingWashBlockEntity extends BaseDMXConsumerLightBlockEntity {
     public MovingWashBlockEntity(BlockEntityType<?> blockEntityType, BlockPos blockPos, BlockState blockState) {
@@ -29,15 +28,12 @@ public class MovingWashBlockEntity extends BaseDMXConsumerLightBlockEntity {
 
     @Override
     public void consume(byte[] dmxValues) {
-        int start = this.getChannelStart() > 0 ? this.getChannelStart() - 1 : 0;
-        byte[] ourValues = Arrays.copyOfRange(dmxValues, start,
-                start+ this.getChannelCount());
+        byte[] ourValues = DmxPacketGuard.sliceDmxChannels(dmxValues, getChannelStart(), getChannelCount());
         if(ourValues.length < 7){
             return;
         }
-        if(this.storePrev()){
-            level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
-        }
+        boolean prevAdvanced = this.storePrev();
+        int _pi = intensity, _pr = red, _pg = green, _pb = blue, _pf = focus, _pp = pan, _pt = tilt;
         intensity = convertByteToInt(ourValues[0]);
         red = convertByteToInt(ourValues[1]);
         green = convertByteToInt(ourValues[2]);
@@ -45,8 +41,9 @@ public class MovingWashBlockEntity extends BaseDMXConsumerLightBlockEntity {
         focus = convertByteToInt(ourValues[4]);
         pan = (int) ((convertByteToInt(ourValues[5]) * 360) / 255f) - 180;
         tilt = (int) ((convertByteToInt(ourValues[6]) * 270) / 255F) - 225;
-        level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
-        setChanged();
+        boolean hasUpdated = intensity != _pi || red != _pr || green != _pg || blue != _pb
+                || focus != _pf || pan != _pp || tilt != _pt;
+        finishDmxConsume(hasUpdated, prevAdvanced);
     }
 
     @Override

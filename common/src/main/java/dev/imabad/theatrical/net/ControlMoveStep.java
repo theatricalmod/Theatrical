@@ -4,8 +4,10 @@ import dev.architectury.networking.NetworkManager;
 import dev.architectury.networking.simple.BaseC2SMessage;
 import dev.architectury.networking.simple.MessageType;
 import dev.imabad.theatrical.blockentities.control.BasicLightingDeskBlockEntity;
+import dev.imabad.theatrical.util.DmxPacketGuard;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
 public class ControlMoveStep extends BaseC2SMessage {
@@ -36,8 +38,12 @@ public class ControlMoveStep extends BaseC2SMessage {
 
     @Override
     public void handle(NetworkManager.PacketContext context) {
-        BlockEntity be = context.getPlayer().level().getBlockEntity(blockPos);
+        ServerPlayer player = (ServerPlayer) context.getPlayer();
+        BlockEntity be = player.level().getBlockEntity(blockPos);
         if(be instanceof BasicLightingDeskBlockEntity lightingDeskBlock){
+            if (!DmxPacketGuard.canControlConsole(player, lightingDeskBlock)) {
+                return;
+            }
             if(forward) {
                 lightingDeskBlock.moveForward();
             } else {
