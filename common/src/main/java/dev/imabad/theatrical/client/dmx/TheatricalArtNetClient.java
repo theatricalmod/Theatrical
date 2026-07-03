@@ -171,6 +171,7 @@ public class TheatricalArtNetClient extends ArtNetClient {
         return (int) (sum * (sum + 1) / 2) + a;
     }
 
+    private final Object pendingServerLock = new Object();
     private final Map<Integer, byte[]> pendingServerFrames = new HashMap<>();
 
     public void queueServerFrame(int networkUniverse, byte[] dmxData) {
@@ -178,18 +179,27 @@ public class TheatricalArtNetClient extends ArtNetClient {
             return;
         }
         int length = Math.min(dmxData.length, 512);
-        pendingServerFrames.put(networkUniverse, Arrays.copyOf(dmxData, length));
+        synchronized (pendingServerLock) {
+            pendingServerFrames.put(networkUniverse, Arrays.copyOf(dmxData, length));
+        }
     }
 
     /** Envoie au serveur au plus une trame par univers et par tick client. */
     public void flushPendingToServer() {
-        if (manager.getNetworkId() == UUIDUtil.NULL || pendingServerFrames.isEmpty()) {
+        if (manager.getNetworkId() == UUIDUtil.NULL) {
             return;
         }
-        for (Map.Entry<Integer, byte[]> entry : pendingServerFrames.entrySet()) {
+        Map<Integer, byte[]> toSend;
+        synchronized (pendingServerLock) {
+            if (pendingServerFrames.isEmpty()) {
+                return;
+            }
+            toSend = new HashMap<>(pendingServerFrames);
+            pendingServerFrames.clear();
+        }
+        for (Map.Entry<Integer, byte[]> entry : toSend.entrySet()) {
             new SendArtNetData(manager.getNetworkId(), entry.getKey(), entry.getValue()).sendToServer();
         }
-        pendingServerFrames.clear();
     }
 
     private void onPacketReceived(InetAddress sourceAddress, final ArtNetPacket packet) {

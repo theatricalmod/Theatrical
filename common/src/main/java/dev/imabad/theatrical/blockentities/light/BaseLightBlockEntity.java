@@ -451,7 +451,15 @@ public abstract class BaseLightBlockEntity extends ClientSyncBlockEntity impleme
 
     @Override
     public void lightTick() {
-
+        if (level != null && level.isClientSide()) {
+            prevPan = pan;
+            prevTilt = tilt;
+            prevFocus = focus;
+            prevIntensity = intensity;
+            prevRed = red;
+            prevGreen = green;
+            prevBlue = blue;
+        }
     }
 
     @Override
