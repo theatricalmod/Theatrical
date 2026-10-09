@@ -69,7 +69,10 @@ public class ArtNetConfigurationScreen extends Screen {
         layout.addChild(configList, 2, 1, 2, 1, LayoutSettings.defaults().alignHorizontallyCenter().paddingBottom(0));
         configList.setEntries(universeConfigs);
         layout.addChild(new Button.Builder(Component.literal("Add"), (b) -> {
-            universeConfigs.put(universeConfigs.size() + 1, new UniverseConfig(0, 0, false));
+            int next = 1;
+            while (universeConfigs.containsKey(next)) next++;
+            if (next > TheatricalConfig.INSTANCE.CLIENT.maxArtNetUniverses) return;
+            universeConfigs.put(next, new UniverseConfig((next - 1) / 16, (next - 1) % 16, false));
             refresh();
         }).width(150).build(), 4, 1, LayoutSettings.defaults().paddingTop(0).alignHorizontallyCenter());
         deleteConfig = new Button.Builder(Component.literal("Delete"), (b) -> {

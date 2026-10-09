@@ -10,6 +10,12 @@ The mod is currently Work In Progress and is being developed by Rushmead with su
 
 Pull Requests are welcome and will be reviewed by Rushmead.
 
+## Art-Net universes
+
+The client config (`config/theatrical-client.yml`) supports `maxArtNetUniverses` (default: `512`, maximum: `32768`). This controls how many network universes can be added in the Art-Net configuration screen. Existing universe entries are not removed when the setting is lowered.
+
+Network universe 1 maps to Art-Net Net 0, Sub-Net 0, Universe 0. The Art-Net `subnet` value in each universe entry is a continuous index: 0–15 use Net 0, 16–31 use Net 1, and so on. Each subnet has universe values 0–15. For example, network universe 257 maps to `subnet: 16`, `universe: 0` (Art-Net Net 1, Sub-Net 0, Universe 0). Set the sending console's Art-Net Net and Sub-Net to match.
+
 ## Contributors
 
 * Rushmead
