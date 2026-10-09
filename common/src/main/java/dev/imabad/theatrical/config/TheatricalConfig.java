@@ -34,6 +34,10 @@ public class TheatricalConfig {
         public String artNetIP = "";
         @TheatricalConfigItem
         public Map<Integer, UniverseConfig> universes =  new IntObjectHashMap<>();
+
+        // Maximum number of network universes that can be added in the Art-Net screen.
+        @TheatricalConfigItem(minValue = "1", maxValue = "32768")
+        public int maxArtNetUniverses = 512;
     }
 
     public static class ServerConfig extends BaseConfig{

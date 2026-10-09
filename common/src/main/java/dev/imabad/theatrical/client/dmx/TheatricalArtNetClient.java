@@ -156,10 +156,11 @@ public class TheatricalArtNetClient extends ArtNetClient {
     private void sendTOD(short subnet, short universe){
         ArtTodDataPacket replyPacket = new ArtTodDataPacket();
         replyPacket.setTotalDevices(proxiedDevices.size() + 1);
-        replyPacket.setUniverse(subnet, universe);
+        replyPacket.setUniverse(subnet & 0x0F, universe);
         for (RDMDeviceId proxiedDevice : getProxyMap(subnet, universe).keySet()) {
             replyPacket.addDevice(proxiedDevice.toBytes());
         }
+        replyPacket.getData()[20] = (byte) ((subnet >> 4) & 0x7F);
         getArtNetServer().broadcastPacket(replyPacket);
     }
 
@@ -178,7 +179,9 @@ public class TheatricalArtNetClient extends ArtNetClient {
                     return;
 
                 ArtDmxPacket dmxPacket = (ArtDmxPacket) packet;
-                int subnet = dmxPacket.getSubnetID();
+                // The library exposes only the 4-bit Sub-Net. Include the ArtDMX Net
+                // byte so configured subnets 16-31 address a second, distinct Net.
+                int subnet = ((dmxPacket.getData()[15] & 0x7F) << 4) | dmxPacket.getSubnetID();
                 int universe = dmxPacket.getUniverseID();
                 lastPacketMS = System.currentTimeMillis();
                 getInputBuffer().setDmxData((short) subnet, (short) universe, dmxPacket.getDmxData());
@@ -190,13 +193,13 @@ public class TheatricalArtNetClient extends ArtNetClient {
             }
             case ART_TOD_REQUEST: {
                 ArtTodRequestPacket requestPacket = (ArtTodRequestPacket) packet;
-                sendTOD((short) requestPacket.getSubnetID(), (short)  requestPacket.getUniverseID());
+                sendTOD((short) (((requestPacket.getData()[15] & 0x7F) << 4) | requestPacket.getSubnetID()), (short) requestPacket.getUniverseID());
                 break;
             }
             case ART_TOD_CONTROL: {
                 ArtTodControlPacket controlPacket = (ArtTodControlPacket) packet;
                 if (controlPacket.isFlush()) {
-                    sendTOD((short) controlPacket.getSubnetID(), (short)  controlPacket.getUniverseID());
+                    sendTOD((short) (((controlPacket.getData()[21] & 0x7F) << 4) | controlPacket.getSubnetID()), (short) controlPacket.getUniverseID());
                 }
                 break;
             }
@@ -204,7 +207,7 @@ public class TheatricalArtNetClient extends ArtNetClient {
                 ArtRdmPacket artRdmPacket = (ArtRdmPacket) packet;
                 RDMPacket rdmPacket = artRdmPacket.getRdmPacket();
                 short universe = getUniverseFromPortAddress(artRdmPacket.getAddress());
-                short subnet = getSubnetFromPortAddress(artRdmPacket.getAddress());
+                short subnet = (short) ((artRdmPacket.getNet() << 4) | getSubnetFromPortAddress(artRdmPacket.getAddress()));
                 RDMDeviceId destinationID = new RDMDeviceId(rdmPacket.getDestinationID());
                 if(!getProxyMap(subnet, universe).containsKey(destinationID) && !Arrays.equals(rdmPacket.getDestinationID(), RDM_DEVICE_ID)){
                     return;
@@ -435,8 +438,8 @@ public class TheatricalArtNetClient extends ArtNetClient {
                             getCommandResponse.write();
                             ArtRdmPacket sendArtRdmPacket = new ArtRdmPacket();
                             sendArtRdmPacket.setRdmPacket(getCommandResponse);
-                            sendArtRdmPacket.setNet(0);
-                            sendArtRdmPacket.setAddress(0 << 4 | universe);
+                            sendArtRdmPacket.setNet((subnet >> 4) & 0x7F);
+                            sendArtRdmPacket.setAddress(((subnet & 0x0F) << 4) | universe);
                             sendArtRdmPacket.write();
                             getArtNetServer().unicastPacket(sendArtRdmPacket, sourceAddress);
                             return;
@@ -468,8 +471,8 @@ public class TheatricalArtNetClient extends ArtNetClient {
                             setCommandResponse.write();
                             ArtRdmPacket sendArtRdmPacket = new ArtRdmPacket();
                             sendArtRdmPacket.setRdmPacket(setCommandResponse);
-                            sendArtRdmPacket.setNet(0);
-                            sendArtRdmPacket.setAddress(0 << 4 | universe);
+                            sendArtRdmPacket.setNet((subnet >> 4) & 0x7F);
+                            sendArtRdmPacket.setAddress(((subnet & 0x0F) << 4) | universe);
                             sendArtRdmPacket.write();
                             getArtNetServer().unicastPacket(sendArtRdmPacket, sourceAddress);
                             return;
@@ -483,12 +486,12 @@ public class TheatricalArtNetClient extends ArtNetClient {
 
     private short getUniverseFromPortAddress(int portAddress)
     {
-        return (short) (portAddress & 0xFF);
+        return (short) (portAddress & 0x0F);
     }
 
     private short getSubnetFromPortAddress(int portAddress)
     {
-        return (short) ((portAddress >> 8) & 0x0F);
+        return (short) ((portAddress >> 4) & 0x0F);
     }
 
     public boolean hasReceivedPacket(){
